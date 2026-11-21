@@ -11,4 +11,5 @@ export * from './state.js';
 export * from './stats.js';
 export * from './steps.js';
 export * from './timeline.js';
+export * from './triggers.js';
 export * from './warnings.js';

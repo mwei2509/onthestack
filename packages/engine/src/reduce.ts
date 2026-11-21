@@ -1,5 +1,6 @@
 import type { GameEvent } from './events.js';
 import { clone } from './clone.js';
+import { looksBack, scanTriggers } from './triggers.js';
 import type { GameState } from './state.js';
 
 /** Folds one GameEvent into a copy of the state. This is the only place game state changes. */
@@ -10,9 +11,15 @@ export function reduce(state: GameState, event: GameEvent): GameState {
 }
 
 export function reduceInto(draft: GameState, event: GameEvent): void {
+  const lookBack = looksBack(event);
+  const before = lookBack ? scanTriggers(draft, event) : [];
   draft.gameEventsThisTurn.push(event);
   advanceIds(draft, event);
+  applyEvent(draft, event);
+  draft.pendingTriggers.push(...(lookBack ? before : scanTriggers(draft, event)));
+}
 
+function applyEvent(draft: GameState, event: GameEvent): void {
   switch (event.type) {
     case 'PhaseStarted':
       draft.turn = { number: event.turn, activePlayerId: event.activePlayerId, step: event.step };
@@ -159,6 +166,16 @@ export function reduceInto(draft: GameState, event: GameEvent): void {
       draft.stack = draft.stack.filter((item) => item.id !== event.stackItemId);
       return;
 
+    case 'AbilityTriggered': {
+      const { stackItem } = event;
+      draft.stack.push(stackItem);
+      const i = draft.pendingTriggers.findIndex(
+        (t) => t.ability === stackItem.ability && t.triggeredBy === stackItem.triggeredBy && t.source.permanentId === stackItem.source.permanentId,
+      );
+      if (i >= 0) draft.pendingTriggers.splice(i, 1);
+      return;
+    }
+
     case 'PlayerTaskCreated':
       return;
   }
@@ -179,5 +196,6 @@ function advanceIds(draft: GameState, event: GameEvent): void {
   };
   bump('gameEvent', event.id, 'e');
   if (event.type === 'SpellCast') bump('stackItem', event.stackItemId, 'k');
+  if (event.type === 'AbilityTriggered') bump('stackItem', event.stackItem.id, 'k');
   if (event.type === 'ZoneChanged' && event.to === 'battlefield') for (const id of event.objects) bump('permanent', id, 'p');
 }
