@@ -6,6 +6,7 @@ import type { CardDefinition } from './cards.js';
 import type { GameEvent } from './events.js';
 import { createGame } from './game.js';
 import { reduce } from './reduce.js';
+import { resolveTop } from './stack.js';
 import type { GameState } from './state.js';
 
 const cards: Record<string, CardDefinition> = {
@@ -34,6 +35,12 @@ function run(state: GameState, steps: [GameAction, ApplyContext][]) {
     state = r.state;
     events.push(...r.events);
     warnings.push(...r.warnings);
+    while (state.stack.length > 0) {
+      const x = resolveTop(state);
+      state = x.state;
+      events.push(...x.events);
+      warnings.push(...x.warnings);
+    }
   }
   return { state, events, warnings };
 }
@@ -45,18 +52,27 @@ describe('applyAction', () => {
     expect(state.permanents.p1).toMatchObject({ card: 'Plains', ownerId: 'theo', controllerId: 'theo', tapped: false, controlledSince: 1 });
   });
 
-  it('casts a creature: SpellCast, then it resolves onto the battlefield, caused by its Stack item', () => {
+  it('casting puts a Stack item on the stack; nothing enters until it resolves', () => {
+    const r = applyAction(newGame(), { type: 'cast', card: 'Savannah Lions' }, said('theo'));
+    expect(r.events).toMatchObject([{ type: 'SpellCast', casterId: 'theo', card: 'Savannah Lions', stackItemId: 'k1', from: 'hand' }]);
+    expect(r.state.stack).toMatchObject([{ id: 'k1', kind: 'spell', controllerId: 'theo', source: { card: 'Savannah Lions' }, status: 'pending' }]);
+    expect(r.state.permanents).toEqual({});
+  });
+
+  it('a creature spell resolves onto the battlefield, caused by its Stack item', () => {
     const { state, events } = run(newGame(), [[{ type: 'cast', card: 'Savannah Lions' }, said('theo')]]);
     expect(events).toMatchObject([
-      { type: 'SpellCast', casterId: 'theo', card: 'Savannah Lions', stackItemId: 'k1', from: 'hand' },
+      { type: 'SpellCast', stackItemId: 'k1' },
+      { type: 'StackItemResolved', stackItemId: 'k1', status: 'resolved' },
       { type: 'ZoneChanged', objects: ['p1'], from: 'stack', to: 'battlefield', how: 'resolve', causedBy: { stackItem: 'k1' } },
     ]);
+    expect(state.stack).toEqual([]);
     expect(state.permanents.p1?.card).toBe('Savannah Lions');
   });
 
   it('casts an instant: it goes to its owner’s graveyard when it resolves', () => {
     const { state, events } = run(newGame(), [[{ type: 'cast', card: 'Fatal Push' }, said('theo')]]);
-    expect(events.map((e) => e.type)).toEqual(['SpellCast', 'ZoneChanged']);
+    expect(events.map((e) => e.type)).toEqual(['SpellCast', 'StackItemResolved', 'ZoneChanged']);
     expect(state.graveyards.theo).toEqual(['Fatal Push']);
   });
 
@@ -111,8 +127,8 @@ describe('applyAction', () => {
 
   it('flags an unknown card instead of guessing what it is', () => {
     const { state, events, warnings } = run(newGame(), [[{ type: 'cast', card: 'Ulamog, the Ceaseless Hunger' }, said('theo')]]);
-    expect(events.map((e) => e.type)).toEqual(['SpellCast']);
-    expect(warnings).toMatchObject([{ code: 'unknownCard' }]);
+    expect(events.map((e) => e.type)).toEqual(['SpellCast', 'StackItemResolved']);
+    expect(warnings).toMatchObject([{ code: 'unknownCard' }, { code: 'unknownCard' }]);
     expect(state.permanents).toEqual({});
   });
 
@@ -166,6 +182,13 @@ function runOps(ops: Op[]) {
     const r = applyAction(state, toAction(state, o), { playerId: o.player, cause: { playerStatement: `s${i + 1}` } });
     state = r.state;
     events.push(...r.events);
+    if (o.pick % 3 !== 0) {
+      while (state.stack.length > 0) {
+        const x = resolveTop(state);
+        state = x.state;
+        events.push(...x.events);
+      }
+    }
   });
   return { state, events };
 }

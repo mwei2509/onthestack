@@ -1,7 +1,8 @@
-import type { Cause, GameEvent, GameEventBody } from './events.js';
+import type { GameEvent, GameEventBody } from './events.js';
 import type { GameEventId, PermanentId } from './ids.js';
 import { clone } from './clone.js';
-import { reduceInto } from './reduce.js';
+import { emit } from './emit.js';
+import { resolveTop } from './stack.js';
 import type { GameState } from './state.js';
 import { stats } from './stats.js';
 import type { RulesWarning } from './warnings.js';
@@ -17,11 +18,13 @@ export interface SettleResult {
 }
 
 /**
- * Performs state-based actions until none apply (CR 704.3). Each pass finds every applicable action against the
- * same state and performs them together, so simultaneous deaths really are simultaneous.
+ * Settles the board: state-based actions until none apply (CR 704.3), each pass found against the same state and
+ * performed together so simultaneous deaths really are simultaneous. Then, unless a Response is pending, the top
+ * Stack item resolves and the board settles again, until the Stack is empty.
  */
-export function settle(state: GameState): SettleResult {
-  const draft = clone(state);
+export function settle(state: GameState, options: { resolveStack?: boolean } = {}): SettleResult {
+  const resolveStack = options.resolveStack ?? true;
+  let draft = clone(state);
   const events: GameEvent[] = [];
   const warnings: RulesWarning[] = [];
 
@@ -31,13 +34,17 @@ export function settle(state: GameState): SettleResult {
       break;
     }
     const found = stateBasedActions(draft);
-    if (found.length === 0) break;
-    for (const { body, after } of found) {
-      const causedBy: Cause = after ? { rule: 'stateBasedAction', after } : { rule: 'stateBasedAction' };
-      const event = { ...body, id: `e${draft.nextIds.gameEvent++}`, causedBy } as GameEvent;
-      reduceInto(draft, event);
-      events.push(event);
+    if (found.length > 0) {
+      for (const { body, after } of found) {
+        emit(draft, events, body, after ? { rule: 'stateBasedAction', after } : { rule: 'stateBasedAction' });
+      }
+      continue;
     }
+    if (!resolveStack || draft.stack.length === 0) break;
+    const r = resolveTop(draft);
+    draft = r.state;
+    events.push(...r.events);
+    warnings.push(...r.warnings);
   }
   return { state: draft, events, warnings };
 }

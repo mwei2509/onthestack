@@ -7,7 +7,7 @@ import { hasKeyword } from './stats.js';
 import type { GameState, Permanent } from './state.js';
 import type { RulesWarning } from './warnings.js';
 
-const PERMANENT_TYPES = new Set(['Artifact', 'Battle', 'Creature', 'Enchantment', 'Land', 'Planeswalker']);
+export const PERMANENT_TYPES = new Set(['Artifact', 'Battle', 'Creature', 'Enchantment', 'Land', 'Planeswalker']);
 
 export interface ApplyContext {
   /** Who did it: the speaker for "I", or the player a statement named. */
@@ -56,24 +56,27 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
     }
 
     case 'cast': {
-      const def = draft.cards[action.card];
       const cz = draft.commandZone[ctx.playerId];
       const from = cz?.inZone && cz.card === action.card ? 'command' : 'hand';
       const stackItemId = `k${draft.nextIds.stackItem++}`;
-      emit({ type: 'SpellCast', casterId: ctx.playerId, card: action.card, targets: action.targets ?? [], stackItemId, from });
-      if (!def) {
+      emit({ type: 'SpellCast', casterId: ctx.playerId, card: action.card, targets: action.targets ?? [], stackItemId, from, gameActions: action.effects ?? [] });
+      if (!draft.cards[action.card]) {
         warnings.push({ code: 'unknownCard', message: `${action.card} isn't in this game's card list. Check the card.` });
+      }
+      break;
+    }
+
+    case 'counter': {
+      const item = draft.stack.find((k) => k.id === action.stackItemId);
+      if (!item) {
+        warnings.push({ code: 'notOnStack', message: `${action.stackItemId} isn't on the stack.`, objectIds: [action.stackItemId] });
         break;
       }
-      if (def.types.some((t) => PERMANENT_TYPES.has(t))) {
+      const countered = emit({ type: 'StackItemResolved', stackItemId: item.id, status: 'countered' });
+      if (item.kind === 'spell') {
         emit(
-          { type: 'ZoneChanged', objects: [newPermanentId()], card: action.card, ownerId: ctx.playerId, from: 'stack', to: 'battlefield', how: 'resolve', controllerId: ctx.playerId },
-          { stackItem: stackItemId },
-        );
-      } else {
-        emit(
-          { type: 'ZoneChanged', objects: [stackItemId], card: action.card, ownerId: ctx.playerId, from: 'stack', to: 'graveyard', how: 'resolve' },
-          { stackItem: stackItemId },
+          { type: 'ZoneChanged', objects: [item.id], card: item.source.card, ownerId: item.controllerId, from: 'stack', to: 'graveyard', how: 'countered' },
+          { gameEvent: countered.id },
         );
       }
       break;

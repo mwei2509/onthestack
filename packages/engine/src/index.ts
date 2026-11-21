@@ -6,6 +6,7 @@ export * from './game.js';
 export * from './ids.js';
 export * from './reduce.js';
 export * from './settle.js';
+export * from './stack.js';
 export * from './state.js';
 export * from './stats.js';
 export * from './steps.js';
