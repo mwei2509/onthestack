@@ -26,15 +26,15 @@ One thing a player tells the app, captured by one Hold-to-talk. It may contain s
 _Avoid_: utterance, input, request
 
 **Interpretation**:
-The app's current reading of everything said during this phase, as an ordered account of what happened. It is redone after every new statement, so later statements and take-backs can change it; corrections a player makes by hand stay fixed.
+The app's current reading of everything said during this turn, as an ordered account of what happened. It is redone after every new statement, so later statements and take-backs can change it; corrections a player makes by hand stay fixed.
 _Avoid_: parse, transcript
 
 **Staged**:
-The state of everything said during the current phase before it is Committed. Staged items are visible to everyone and can be edited, removed or reordered.
+The state of everything said during the current turn before the turn is Sealed. Staged items are visible to everyone; players change them by saying so or by tapping to remove or fix one.
 _Avoid_: pending, queued, draft
 
 **Commit**:
-Moving to the next phase, which makes everything Staged in the current phase part of the game.
+The moment a turn is Sealed, when everything Staged during it becomes final.
 _Avoid_: confirm, resolve, apply
 
 **Step**:
@@ -65,7 +65,7 @@ _Avoid_: resolved, done
 A turn that has ended and can no longer be Undone. Its history stays readable, but its board can only be Edited.
 
 **Undo**:
-Taking back Commands within the current turn, restoring the game to an earlier moment of that turn.
+Taking something back within the current turn, by saying so ("oops, I meant…") or by tapping an item to remove or fix it.
 _Avoid_: rewind, revert
 
 **Edit**:
