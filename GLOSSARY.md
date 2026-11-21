@@ -33,6 +33,26 @@ _Avoid_: pending, queued, draft
 Moving to the next phase, which makes everything Staged in the current phase part of the game.
 _Avoid_: confirm, resolve, apply
 
+**Step**:
+One of the rules' fixed moments within a turn (upkeep, declare attackers, first-strike damage, end step, …). The app always knows which Step the game is in and shows it.
+_Avoid_: stage, part
+
+**Stack**:
+The spells and triggered or activated abilities waiting to resolve, last in, first out. Casting something puts it on the Stack; it takes effect when it resolves.
+_Avoid_: queue, pile
+
+**Response**:
+A spell or ability said while something it answers is still on the Stack, or anchored to an earlier moment ("in response to that", "after first strike"). It resolves first.
+_Avoid_: reaction, interrupt
+
+**Fizzle**:
+What happens to a spell or ability whose targets are all gone when it would resolve: it does nothing and is marked as fizzled.
+_Avoid_: skipped, cancelled
+
+**Event**:
+Something that happened in the game as a result of a Command, the rules or a resolving spell ("Serra Angel died", "Theo gained 3 life"). Triggers listen for Events, and each Event remembers what caused it.
+_Avoid_: action, outcome
+
 **Ready**:
 The state of a defending player who has answered an attack, by blocking or by taking the damage. Combat damage is previewed once every defender is Ready.
 _Avoid_: resolved, done

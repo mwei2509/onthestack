@@ -33,7 +33,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 3. **Flag, don't block.** Illegal-looking actions raise a Warning with "Do it anyway". Players can always do it anyway or Edit the board, and that is recorded in the history.
 4. **Players decide, the app tallies.** Never suggest moves, highlight legal plays or list options. The Rules assistant answers rules questions and refuses strategy.
 5. **The physical board is the source of truth.** The app keeps a correctable copy; Edits are always available.
-6. **Undo works within a turn.** The current turn keeps a snapshot per Command; ended turns are Sealed to one snapshot plus read-only history (ADR 0004).
+6. **Undo works within a turn.** The current turn keeps a snapshot per Commit and replays Staged Commands; ended turns are Sealed to one snapshot, a read-only history and a per-turn summary (ADR 0004, 0014).
 
 ## Engineering expectations
 
