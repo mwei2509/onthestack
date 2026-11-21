@@ -1,0 +1,19 @@
+{
+  "name": "@onthestack/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typegen": "wrangler types",
+    "typecheck": "wrangler types && tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.9.0",
+    "wrangler": "^4.166.0"
+  },
+  "dependencies": {
+    "@onthestack/engine": "workspace:^"
+  }
+}
