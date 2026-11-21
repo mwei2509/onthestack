@@ -25,6 +25,10 @@ A player in a game who has no account, joined with only a name and optionally a 
 One thing a player tells the app, captured by one Hold-to-talk. It may contain several actions ("I drop a Plains, cast Hinterland and attack Andrea").
 _Avoid_: utterance, input, request
 
+**Interpretation**:
+The app's current reading of everything said during this phase, as an ordered account of what happened. It is redone after every new statement, so later statements and take-backs can change it; corrections a player makes by hand stay fixed.
+_Avoid_: parse, transcript
+
 **Staged**:
 The state of everything said during the current phase before it is Committed. Staged items are visible to everyone and can be edited, removed or reordered.
 _Avoid_: pending, queued, draft

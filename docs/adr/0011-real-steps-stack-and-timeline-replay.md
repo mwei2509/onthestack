@@ -4,7 +4,7 @@ The engine walks the Comprehensive Rules' steps (untap, upkeep, draw, main, begi
 
 Spells and abilities go on a stack, and casting is separate from resolving: `SpellCast` fires when a spell is cast, and a permanent only enters when it resolves. A trigger keeps the information it needs from its source, so it resolves even if the source left; a spell or ability whose targets are all gone fizzles and is marked that way.
 
-Like Arena, a cast spell resolves immediately unless someone responds. Late responses ("in response to that", "after first strike damage", "before blocks") are inserted at that point in the phase's step-indexed Staged timeline, and the timeline is replayed from the start of the phase. Because nothing is final until Commit, the engine can walk back and replay without special cases. Moving to the next phase resolves anything left on the stack first.
+A cast spell resolves immediately unless someone responds. Late responses ("in response to that", "after first strike damage", "before blocks") and take-backs are placed in the phase's step-indexed Staged timeline by the conversation interpreter (ADR 0015), and the timeline is replayed from the start of the phase. Because nothing is final until Commit, the engine can walk back and replay without special cases. Moving to the next phase resolves anything left on the stack first.
 
 ## Considered options
 

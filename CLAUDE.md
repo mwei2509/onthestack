@@ -28,7 +28,7 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 
 These come from the proposal as amended by `docs/adr/`, and override reasoning from first principles:
 
-1. **The AI translates and the code decides.** An LLM only turns speech into a schema-validated Command and card Oracle text into a validated Translation. All rules logic lives in a deterministic engine. No game logic in prompts.
+1. **The AI translates and the code decides.** An LLM only turns the phase's conversation into a schema-validated timeline of literal Actions, and card Oracle text into a validated Translation. All rules logic and every calculation (damage, deaths, triggers) lives in a deterministic engine. No game logic in prompts.
 2. **Never guess.** Unmodeled cards and ambiguous input become a Question or Task for the players ("check this card", "which zombie?"), never an assumption.
 3. **Flag, don't block.** Illegal-looking actions raise a Warning with "Do it anyway". Players can always do it anyway or Edit the board, and that is recorded in the history.
 4. **Players decide, the app tallies.** Never suggest moves, highlight legal plays or list options. The Rules assistant answers rules questions and refuses strategy.
@@ -39,7 +39,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 
 - Engine code stays pure and side-effect free, so it can be property-tested with fast-check. Lint enforces this in `packages/engine` (`eslint.config.mjs`); pass time, ids and randomness in as inputs.
 - Tests sit next to the code they cover as `*.test.ts` in `src/`, in every package.
-- Voice-parser changes come with eval cases (transcript → expected Command). Card Translation changes come with eval cases (Oracle text → expected Translation).
+- Interpreter changes come with eval cases (conversation + board → expected timeline). Card Translation changes come with eval cases (Oracle text → expected Translation).
 - Keep pull requests small and focused.
 - Stay on free tiers. Flag anything that would cost money before adding it.
 - Never store raw audio from gameplay, only confirmed commands. The one exception is the opt-in voice eval set, kept outside this repo (ADR 0009).
