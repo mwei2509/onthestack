@@ -1,7 +1,7 @@
 import { DurableObject } from 'cloudflare:workers';
-import { createGame, type GameState, type NewPlayer } from '@onthestack/engine';
+import { createGame, type GameState, type Seat } from '@onthestack/engine';
 
-type ClientMessage = { type: 'createGame'; seating: NewPlayer[] };
+type ClientMessage = { type: 'createGame'; seating: Seat[] };
 export type ServerMessage = { type: 'state'; state: GameState | null } | { type: 'error'; message: string };
 
 export class Game extends DurableObject<Env> {

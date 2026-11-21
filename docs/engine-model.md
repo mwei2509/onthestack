@@ -173,6 +173,8 @@ Effects are either a `gameAction` or a `playerTask`, the latter for anything tha
 
 ## 8. Data structures
 
+The engine's types live in `packages/engine/src` (`state.ts`, `actions.ts`, `events.ts`, `cards.ts`, `timeline.ts`) and are the source of truth. The sketch below shows the shape; where it differs from the code, the code wins.
+
 ```ts
 // The game's Durable Object.
 interface Game {
