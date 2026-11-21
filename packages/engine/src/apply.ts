@@ -206,6 +206,10 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
     }
 
     case 'noBlock':
+      if (!draft.combat?.attacks.length) {
+        warnings.push({ code: 'notAttacking', message: 'Nothing is attacking right now.' });
+        break;
+      }
       emit({ type: 'BlockersDeclared', defenderId: ctx.playerId, blocks: [] });
       break;
 

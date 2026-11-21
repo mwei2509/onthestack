@@ -15,4 +15,6 @@ export interface TimelineEntry {
   playerId: PlayerId;
   gameAction: GameAction;
   from: PlayerStatementId[];
+  /** Said in response to what is on the Stack ("in response to that"), so the Stack waits for it instead of resolving first. */
+  response?: boolean;
 }
