@@ -1,6 +1,6 @@
 # Worktrees: the main clone stays on `main`
 
-Applies to every change, however small. The main clone (`onthestack/`) always has `main` checked out and is never edited. All work happens in a worktree made by `stx wt` (see `packages/cli/src/commands/worktree.ts` for where they live).
+Applies to every change, however small. The main clone (`onthestack/`) always has `main` checked out and is never edited. All work happens in a worktree made by `stx wt`, which puts them in `../onthestack-worktrees/` (see the Dev CLI section of `CLAUDE.md`).
 
 ## Starting work
 

@@ -16,5 +16,6 @@ Applies to every change you open a PR for. The goal is that each PR is easy to r
 
 ## After a merge
 
-- PRs are squash-merged and their branches auto-deleted, so GitHub retargets the next PR to `main`. Its branch still contains the old commits: rebase it with `git rebase --onto origin/main <old base branch tip> <branch>`, then `git push --force-with-lease`.
-- Right before pushing to any PR branch, check the PR is still open (`gh pr view <n> --json state`). If it merged, put the commits on a fresh branch from `origin/main` and open a new PR instead.
+- PRs are squash-merged and their branches auto-deleted, so GitHub retargets the next PR to `main`. Its branch, and every branch above it, still contains the merged PR's original commits.
+- Run `stx stack sync` from any branch in the stack (`-n` first to see the plan). It rebases each branch onto the one below, dropping the merged commits, checks every PR is still open and force-pushes the changed branches with leases. If it stops on a conflict, resolve it in the worktree it names, `git rebase --continue`, and run it again.
+- By hand: `git rebase --onto origin/main <old base branch tip> <branch>`, then `git push --force-with-lease`, repeating up the stack. Right before pushing, check the PR is still open (`gh pr view <n> --json state`). If it merged, put the commits on a fresh branch from `origin/main` and open a new PR instead.
