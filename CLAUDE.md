@@ -2,21 +2,22 @@
 
 Voice-driven Magic: The Gathering table companion for casual Commander (onthestack.gg). Players speak their actions. The app tracks life, combat, triggers and the stack.
 
-**Status:** pre-code. The repo is a pnpm workspace (TypeScript): `packages/engine` (pure rules engine, game setup only so far), `packages/server` (Cloudflare Worker plus the `Game` Durable Object), `packages/web` (React app served by the Worker) and `packages/cli` (the `stx` dev CLI). Nothing is deployed yet. The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
+**Status:** pre-code. The repo is a pnpm workspace (TypeScript): `packages/engine` (pure rules engine, game setup only so far), `packages/server` (Cloudflare Worker plus the `Game` Durable Object), `packages/web` (React app served by the Worker) and `packages/cli` (the repo-specific `stx` commands). Nothing is deployed yet. The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
 
-## Dev CLI: `stx` (`packages/cli`)
+## Dev CLI: `stx`
+
+On the maintainer's machine `stx` is a shell function from a personal CLI kept outside this repo (`mels-skillz`). It provides the generic commands below and forwards everything else to `packages/cli`, which only holds what is specific to this repo.
 
 | Command | Description |
 | ------- | ----------- |
-| `stx claude [-o \| -e] [args…]` | Launch Claude Code at the checkout root (`-o` skip permissions, `-e` accept edits). Other args pass through. |
-| `stx wt <branch>` | Create the worktree if missing, otherwise enter it. Worktrees live in `../onthestack-worktrees/` (override with `STX_WORKTREE_DIR`). |
-| `stx start [--no-open]` | Run the local Worker (:8790) and Vite (:5190) in a new iTerm2 tab split into two panes (inline with prefixed output elsewhere), then open the browser. Offers to stop whatever already holds those ports. |
+| `stx claude [-o \| -e] [args…]` | Launch Claude Code in the current worktree, or the main clone from anywhere else (`-o` skip permissions, `-e` accept edits). Other args pass through. |
+| `stx wt <branch>` | Create the worktree if missing, otherwise enter it. Worktrees live in `../onthestack-worktrees/`. |
 | `stx wt go \| rm \| list \| prune <…>` | Enter, remove, list, or prune worktrees whose branches have merged. |
-| `pnpm cli:link` | Rebuild `stx` and symlink it to `~/.local/bin/stx`. |
+| `stx stack sync [-n]` | After a PR in a stack merges, rebase every branch above it and force-push them. See `.claude/rules/pull-requests.md`. |
+| `stx start [--no-open]` | (`packages/cli`) Run the local Worker (:8790) and Vite (:5190) in a new iTerm2 tab split into two panes (inline with prefixed output elsewhere), then open the browser. Offers to stop whatever already holds those ports. |
+| `pnpm cli:build` | Rebuild `packages/cli`. `stx` runs the main clone's build, so rebuild there after pulling changes to it. |
 | `pnpm build` / `pnpm typecheck` / `pnpm lint` / `pnpm test` | Run across all packages. CI (`.github/workflows/ci.yml`) runs all four on every PR; the server tests need the web build. |
 | `pnpm --filter @onthestack/server dev` + `pnpm --filter @onthestack/web dev` | What `stx start` runs: the local Worker (game sockets, `/api`) and the Vite dev server, which proxies `/api` to it. `stx start` also builds `packages/web/dist` first, which the Worker serves; run that build yourself if you start these by hand. |
-
-`stx wt` can only `cd` your shell if `eval "$(stx shell-init)"` is in your rc file.
 
 ## Docs
 

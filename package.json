@@ -7,8 +7,7 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "test": "pnpm -r test",
-    "cli:build": "pnpm --filter @onthestack/cli build",
-    "cli:link": "pnpm --filter @onthestack/cli build && mkdir -p ~/.local/bin && ln -sf \"$PWD/packages/cli/dist/index.js\" ~/.local/bin/stx"
+    "cli:build": "pnpm --filter @onthestack/cli build"
   },
   "devDependencies": {
     "eslint": "^10.15.0",
