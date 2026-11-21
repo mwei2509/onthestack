@@ -69,7 +69,7 @@ _Avoid_: notification, alert
 ## Cards
 
 **Deck**:
-A player's registered list of cards, imported from Archidekt. It may be incomplete; cards not on it can still come up in a game.
+A list of cards imported from Archidekt that exists on its own, independent of any player or account, so it can be shared and reused. Each player picks one for a game. It may be incomplete; cards not on it can still come up in a game.
 _Avoid_: decklist, list
 
 **Translation**:
