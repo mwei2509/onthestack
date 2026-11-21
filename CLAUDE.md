@@ -41,7 +41,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 - Engine code stays pure and side-effect free, so it can be property-tested with fast-check. Lint enforces this in `packages/engine` (`eslint.config.mjs`); pass time, ids and randomness in as inputs.
 - Tests sit next to the code they cover as `*.test.ts` in `src/`, in every package.
 - Interpreter changes come with eval cases (conversation + board → expected timeline). Card Translation changes come with eval cases (Oracle text → expected Translation).
-- Keep pull requests small and focused.
+- Break every issue into small, stacked pull requests that are easy to review one at a time. See `.claude/rules/pull-requests.md`.
 - Stay on free tiers. Flag anything that would cost money before adding it.
 - Never store raw audio from gameplay, only confirmed commands. The one exception is the opt-in voice eval set, kept outside this repo (ADR 0009).
 
