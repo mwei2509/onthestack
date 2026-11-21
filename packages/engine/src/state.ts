@@ -72,7 +72,10 @@ export interface DelayedTrigger {
 export interface CombatState {
   attacks: Attack[];
   blocks: Block[];
+  /** Attacked players who have answered, by blocking or taking it. */
   ready: PlayerId[];
+  /** Damage divisions players stated for blocked attackers, keyed by attacker (ADR 0012). */
+  divisions: Record<PermanentId, Record<string, number>>;
 }
 
 export interface GameState {

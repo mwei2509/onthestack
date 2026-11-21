@@ -5,6 +5,7 @@ import { clone } from './clone.js';
 import { reduceInto } from './reduce.js';
 import { hasKeyword } from './stats.js';
 import { entersTappedBecause } from './triggers.js';
+import { attackWarnings, blockWarnings } from './combat.js';
 import type { GameState, Permanent } from './state.js';
 import type { RulesWarning } from './warnings.js';
 
@@ -185,13 +186,37 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
       break;
     }
 
-    case 'attack':
-    case 'block':
-    case 'noBlock':
-    case 'doneAttacking':
-    case 'divideDamage':
-      warnings.push({ code: 'notYetSupported', message: `${action.type} is handled with combat, which isn't built yet.` });
+    case 'attack': {
+      warnings.push(...attackWarnings(draft, action.attacks, ctx.playerId));
+      const attacks = action.attacks.filter((a) => draft.permanents[a.attackerId]);
+      if (attacks.length === 0) break;
+      const declared = emit({ type: 'AttackersDeclared', attacks });
+      for (const a of attacks) {
+        const p = draft.permanents[a.attackerId]!;
+        if (!p.tapped && !hasKeyword(p, draft, 'Vigilance')) emit({ type: 'TapChanged', permanentId: p.id, tapped: true }, { gameEvent: declared.id });
+      }
       break;
+    }
+
+    case 'block': {
+      warnings.push(...blockWarnings(draft, action.blocks, ctx.playerId));
+      const blocks = action.blocks.filter((b) => draft.permanents[b.blockerId] && draft.permanents[b.attackerId]);
+      emit({ type: 'BlockersDeclared', defenderId: ctx.playerId, blocks });
+      break;
+    }
+
+    case 'noBlock':
+      emit({ type: 'BlockersDeclared', defenderId: ctx.playerId, blocks: [] });
+      break;
+
+    case 'doneAttacking':
+      break;
+
+    case 'divideDamage': {
+      if (!permanent(action.attackerId)) break;
+      emit({ type: 'DamageAssignmentSet', attackerId: action.attackerId, split: action.split });
+      break;
+    }
   }
 
   return { state: draft, events, warnings };

@@ -1,6 +1,7 @@
 export * from './actions.js';
 export * from './apply.js';
 export * from './cards.js';
+export * from './combat.js';
 export * from './events.js';
 export * from './game.js';
 export * from './ids.js';
