@@ -2,7 +2,7 @@
 
 Voice-driven Magic: The Gathering table companion for casual Commander (onthestack.gg). Players speak their actions. The app tracks life, combat, triggers and the stack.
 
-**Status:** pre-code. The repo is a pnpm workspace (TypeScript) holding only the `stx` dev CLI so far. The app stack hasn't been chosen yet. Don't scaffold or pick dependencies without asking. Record each choice as an ADR when it's made.
+**Status:** pre-code. The repo is a pnpm workspace (TypeScript) holding only the `stx` dev CLI so far. The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
 
 ## Dev CLI: `stx` (`packages/cli`)
 
@@ -38,7 +38,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 - Voice-parser changes come with eval cases (transcript → expected Command). Card Translation changes come with eval cases (Oracle text → expected Translation).
 - Keep pull requests small and focused.
 - Stay on free tiers. Flag anything that would cost money before adding it.
-- Never store raw audio, only confirmed commands.
+- Never store raw audio from gameplay, only confirmed commands. The one exception is the opt-in voice eval set, kept outside this repo (ADR 0009).
 
 ## Agent skills
 
