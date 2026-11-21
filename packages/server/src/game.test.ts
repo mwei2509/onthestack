@@ -1,6 +1,6 @@
 import { exports } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
-import type { ServerMessage } from '../src/game.js';
+import type { ServerMessage } from './game.js';
 
 async function connect(gameId: string) {
   const res = await exports.default.fetch(`http://test/api/games/${gameId}/ws`, {

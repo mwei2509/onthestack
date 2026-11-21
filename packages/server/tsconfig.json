@@ -8,5 +8,5 @@
     "noEmit": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src", "test", "vitest.config.ts", "worker-configuration.d.ts"]
+  "include": ["src", "vitest.config.ts", "worker-configuration.d.ts"]
 }

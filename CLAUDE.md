@@ -37,6 +37,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 ## Engineering expectations
 
 - Engine code stays pure and side-effect free, so it can be property-tested with fast-check. Lint enforces this in `packages/engine` (`eslint.config.mjs`); pass time, ids and randomness in as inputs.
+- Tests sit next to the code they cover as `*.test.ts` in `src/`, in every package.
 - Voice-parser changes come with eval cases (transcript → expected Command). Card Translation changes come with eval cases (Oracle text → expected Translation).
 - Keep pull requests small and focused.
 - Stay on free tiers. Flag anything that would cost money before adding it.
