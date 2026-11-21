@@ -2,7 +2,7 @@
 
 Voice-driven Magic: The Gathering table companion for casual Commander (onthestack.gg). Players speak their actions. The app tracks life, combat, triggers and the stack.
 
-**Status:** pre-code. The repo is a pnpm workspace (TypeScript) holding only the `stx` dev CLI so far. The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
+**Status:** pre-code. The repo is a pnpm workspace (TypeScript): `packages/engine` (pure rules engine, types only so far) and `packages/cli` (the `stx` dev CLI). The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
 
 ## Dev CLI: `stx` (`packages/cli`)
 
@@ -12,6 +12,7 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 | `stx wt <branch>` | Create the worktree if missing, otherwise enter it. Worktrees live in `../onthestack-worktrees/` (override with `STX_WORKTREE_DIR`). |
 | `stx wt go \| rm \| list \| prune <…>` | Enter, remove, list, or prune worktrees whose branches have merged. |
 | `pnpm cli:link` | Rebuild `stx` and symlink it to `~/.local/bin/stx`. |
+| `pnpm typecheck` / `pnpm lint` / `pnpm test` | Run across all packages. CI (`.github/workflows/ci.yml`) runs all three on every PR. |
 
 `stx wt` can only `cd` your shell if `eval "$(stx shell-init)"` is in your rc file.
 
@@ -34,7 +35,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 
 ## Engineering expectations
 
-- Engine code stays pure and side-effect free, so it can be property-tested with fast-check.
+- Engine code stays pure and side-effect free, so it can be property-tested with fast-check. Lint enforces this in `packages/engine` (`eslint.config.mjs`); pass time, ids and randomness in as inputs.
 - Voice-parser changes come with eval cases (transcript → expected Command). Card Translation changes come with eval cases (Oracle text → expected Translation).
 - Keep pull requests small and focused.
 - Stay on free tiers. Flag anything that would cost money before adding it.
