@@ -1,5 +1,7 @@
 # Staging and Commit instead of confirming each action
 
+Status: the per-phase Commit is superseded by ADR 0016 (the turn is the unit of staging).
+
 The proposal had every parsed command become a pending action that players confirm. Confirming every Command breaks the flow of play, so everything said during a phase is Staged in a visible queue instead, and moving to the next phase Commits it. Staged items can be edited, removed or reordered; ambiguous input still becomes a Question, never a guess.
 
 ## Consequences
