@@ -11,7 +11,7 @@ Applies to every change, however small. The main clone (`onthestack/`) always ha
 
 ## Running the app
 
-`stx start` runs whichever checkout it is started from, so run it from inside the worktree. The Worker serves that worktree's `packages/web/dist`, so run `pnpm build` there first. Dev ports are fixed, so only one checkout can run at a time; `stx start` offers to stop the other one.
+`stx start` runs whichever checkout it is started from, so run it from inside the worktree. It builds the web app before starting the Worker, and both Vite and `wrangler dev` hot-reload from there. Dev ports are fixed, so only one checkout can run at a time; `stx start` offers to stop the other one.
 
 ## After a merge
 
