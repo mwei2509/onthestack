@@ -28,12 +28,12 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 
 These come from the proposal as amended by `docs/adr/`, and override reasoning from first principles:
 
-1. **The AI translates and the code decides.** An LLM only turns the turn's conversation into a schema-validated timeline of literal Actions, and card Oracle text into a validated Translation. All rules logic and every calculation (damage, deaths, triggers) lives in a deterministic engine. No game logic in prompts.
-2. **Never guess.** Unmodeled cards and ambiguous input become a Question or Task for the players ("check this card", "which zombie?"), never an assumption.
-3. **Flag, don't block.** Illegal-looking actions raise a Warning with "Do it anyway". Players can always do it anyway or Edit the board, and that is recorded in the history.
+1. **The AI translates and the code decides.** An LLM only turns the TurnTranscript into a schema-validated InterpretedTimeline of GameActions, and card Oracle text into a validated Translation. All rules logic and every calculation (damage, deaths, triggers) lives in a deterministic engine. No game logic in prompts.
+2. **Never guess.** Unmodeled cards and ambiguous input become a PlayerQuestion or PlayerTask for the players ("check this card", "which zombie?"), never an assumption.
+3. **Flag, don't block.** Illegal-looking GameActions raise a RulesWarning with "Do it anyway". Players can always do it anyway or make a BoardCorrection, and that is recorded in the history.
 4. **Players decide, the app tallies.** Never suggest moves, highlight legal plays or list options. The Rules assistant answers rules questions and refuses strategy.
-5. **The physical board is the source of truth.** The app keeps a correctable copy; Edits are always available.
-6. **Take-backs work within a turn.** Players undo by saying so or by tapping to fix an item; the engine replays the turn from its starting snapshot. Sealed turns keep one snapshot, a read-only history and a summary, and can only be Edited (ADR 0014, 0016).
+5. **The physical board is the source of truth.** The app keeps a correctable copy; BoardCorrections are always available.
+6. **Take-backs work within a turn.** Players take things back by saying so or with a TimelineCorrection; the engine replays the turn from its starting snapshot. Sealed turns keep one snapshot, a read-only history (including GameEvents) and a summary, and only change through BoardCorrections (ADR 0014, 0016, 0019).
 
 ## Engineering expectations
 

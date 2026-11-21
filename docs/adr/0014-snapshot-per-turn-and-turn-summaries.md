@@ -1,6 +1,6 @@
 # One snapshot per turn, and a summary kept for each Sealed turn
 
-Amends ADR 0004. Because the conversation interpreter re-reads the whole turn after every statement (ADR 0015) and the engine replays the result, the board only needs saving once, at the start of each turn: a snapshot is a plain copy of the game state. Undo is no longer a separate mechanism. Players take things back by saying so, or by tapping an item on the timeline to remove or fix it, which pins the correction.
+Amends ADR 0004. Amended by ADR 0019 (Sealed turns keep their GameEvents). Because the conversation interpreter re-reads the whole turn after every statement (ADR 0015) and the engine replays the result, the board only needs saving once, at the start of each turn: a snapshot is a plain copy of the game state. Undo is no longer a separate mechanism. Players take things back by saying so, or by tapping an item on the timeline to remove or fix it, which pins the correction.
 
 Every Event and stack item records what caused it (a Command, an earlier Event, or a resolving spell or trigger), so a take-back removes an item together with everything downstream of it, and the readback can explain why something happened.
 
