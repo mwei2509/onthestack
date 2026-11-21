@@ -11,5 +11,6 @@
   "durable_objects": {
     "bindings": [{ "name": "GAME", "class_name": "Game" }]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Game"] }]
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Game"] }],
+  "dev": { "port": 8790 }
 }

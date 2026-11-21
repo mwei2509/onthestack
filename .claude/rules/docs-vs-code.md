@@ -17,6 +17,7 @@ Some duplication is kept because it saves agents exploration. When you change th
 | --- | --- |
 | `pnpm-workspace.yaml` `packages` + top-level package dirs | Root `CLAUDE.md` "Status" line |
 | `packages/cli/src/commands/*` and root `package.json` `scripts` | Root `CLAUDE.md` "Dev CLI" table |
+| Dev ports in `packages/web/vite.config.ts` (`server.port`) and `packages/server/wrangler.jsonc` (`dev.port`) | `SERVER_PORT`/`WEB_PORT` in `packages/cli/src/commands/start.ts`, the Vite `/api` proxy target, root `CLAUDE.md` command table |
 | `docs/adr/` decisions (and the proposal where no ADR overrides it) | Root `CLAUDE.md` "Non-negotiable principles" |
 
 When a doc and the code disagree, the code wins: fix the doc as part of the current change, or tell the user if it's out of scope.
