@@ -1,5 +1,7 @@
 # Hold-to-talk instead of a wake phrase
 
+Status: Accepted (decided with Melissa, 2026-11-21).
+
 The proposal captured commands after an on-device "Hey Stack" wake phrase. We use hold-to-talk on each player's Phone instead. A Commander table talks constantly ("is that a flyer? can I do this?") between declarations, so holding the button is a deliberate "this is what's happening" signal that keeps table talk out. It also removes end-of-speech guessing (the table rarely goes quiet), avoids an always-on microphone, and tells the app who is speaking.
 
 ## Considered options

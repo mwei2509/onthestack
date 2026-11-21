@@ -22,7 +22,7 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 
 - [`GLOSSARY.md`](GLOSSARY.md): the domain language. Use its terms in code, issues and tests.
 - [`docs/engine-model.md`](docs/engine-model.md): the engine spec: domains, the event loop, Steps, the Stack, combat, GameEvents, Ability definitions, data structures, engine functions, property tests and a worked example. Read it before working on `packages/engine` or `packages/interpreter`.
-- `docs/adr/`: architecture decision records, one file per decision (`NNNN-short-title.md`). They take precedence over the proposal. If a decision changes something, write a new ADR rather than editing an old one or the proposal.
+- `docs/adr/`: architecture decision records, one file per decision (`NNNN-short-title.md`), each with a `Status:` line. Only Accepted ones are decided. They take precedence over the proposal. If a decision changes something, write a new ADR rather than editing an old one or the proposal.
 - [`docs/proposal.md`](docs/proposal.md): the original dictated first draft (data structures, engine loop, combat). Useful background, but read the ADRs and glossary first; much of its product shape has been superseded.
 
 ## Non-negotiable principles
@@ -42,6 +42,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 - Tests sit next to the code they cover as `*.test.ts` in `src/`, in every package.
 - Interpreter changes come with eval cases (conversation + board → expected timeline). Card Translation changes come with eval cases (Oracle text → expected Translation).
 - Break every issue into small, stacked pull requests that are easy to review one at a time. See `.claude/rules/pull-requests.md`.
+- Design decisions are made with the user, never silently: ask before building, record each as an ADR, and only she accepts one. See `.claude/rules/design-decisions.md`.
 - Stay on free tiers. Flag anything that would cost money before adding it.
 - Never store raw audio from gameplay, only confirmed commands. The one exception is the opt-in voice eval set, kept outside this repo (ADR 0009).
 

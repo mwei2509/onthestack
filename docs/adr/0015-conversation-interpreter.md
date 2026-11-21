@@ -1,5 +1,7 @@
 # An LLM interprets the whole turn's conversation; the engine calculates
 
+Status: Accepted (decided with Melissa, 2026-11-21).
+
 At a real table, meaning depends on the conversation: "after that creature's first strike" only makes sense next to "this double striker attacks you", people speak out of order, and they take things back ("oops, I didn't mean that", "wait, I forgot my trigger"). Interpreting one Hold-to-talk at a time can't follow that.
 
 So after every new statement, an LLM re-reads everything said during the current turn, each statement tagged with its speaker, and returns the whole turn as an ordered timeline of literal Actions (ADR 0013), each placed in its Step. It is given a summary of the board (cards in play with current stats, keywords and Oracle text), the current Step and Stack, and a short rules primer covering timing words. The output is schema-checked.

@@ -1,5 +1,7 @@
 # Four domains, and how interpretation handles a burst of statements
 
+Status: Accepted (decided with Melissa, 2026-11-21).
+
 The system splits into four domains with one-way dependencies:
 
 - **Capture** (web app and server): Hold-to-talk, audio, transcription, producing PlayerStatements.

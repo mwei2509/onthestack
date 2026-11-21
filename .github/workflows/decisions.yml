@@ -1,0 +1,41 @@
+name: Decisions
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  decisions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Label PRs that change design decisions
+        # Forks get a read-only token, so they can't be labelled; the check below still runs.
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          if git diff --name-only "origin/$BASE...HEAD" | grep -qE '^(docs/adr/|docs/engine-model\.md$|GLOSSARY\.md$)'; then
+            gh pr edit "$PR" --add-label design-decision
+          fi
+
+      - name: Every ADR in this PR is Accepted
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          proposed=$(git diff --name-only --diff-filter=AM "origin/$BASE...HEAD" -- 'docs/adr/*.md' | xargs -r grep -l '^Status: Proposed' || true)
+          if [ -n "$proposed" ]; then
+            echo "::error::These ADRs are still Proposed. Melissa needs to weigh in first (comment '@claude grill me on the decisions in this PR'):"
+            echo "$proposed"
+            exit 1
+          fi
+          echo "No Proposed ADRs in this PR."

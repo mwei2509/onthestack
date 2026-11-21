@@ -8,6 +8,11 @@ Applies to every change you open a PR for. The goal is that each PR is easy to r
 - Each PR does one thing: types or a prefactor first, then behaviour, then wiring. Tests and docs go in the same PR as the code they cover.
 - Aim for a diff a reviewer can read in one sitting, roughly a few hundred lines. Generated files (lockfiles, generated types) don't count, but say so in the description.
 
+## Design decisions
+
+- Settle the decisions a stack needs before building it, and record them in a docs-only PR at the bottom (`.claude/rules/design-decisions.md`).
+- A PR with the `design-decision` label starts its description with a **Decisions** section.
+
 ## Stack them
 
 - The first PR targets `main`. Each later PR's base is the previous PR's branch.

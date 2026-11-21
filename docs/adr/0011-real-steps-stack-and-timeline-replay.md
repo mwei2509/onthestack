@@ -1,5 +1,7 @@
 # Real steps, a real stack, and late responses replayed into a timeline
 
+Status: Accepted (decided with Melissa, 2026-11-21).
+
 The engine walks the Comprehensive Rules' steps (untap, upkeep, draw, main, beginning of combat, declare attackers, declare blockers, first-strike and regular combat damage, end of combat, end step, cleanup), and the screen prompts the current one. Turn-based actions happen automatically, "at the beginning of" triggers fire, and combat damage steps run on their own once blocks are done.
 
 Spells and abilities go on a stack, and casting is separate from resolving: `SpellCast` fires when a spell is cast, and a permanent only enters when it resolves. A trigger keeps the information it needs from its source, so it resolves even if the source left; a spell or ability whose targets are all gone fizzles and is marked that way.
