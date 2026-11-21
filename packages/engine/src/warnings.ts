@@ -1,4 +1,4 @@
-export type RulesWarningCode = 'unknownCard' | 'notALand' | 'notOnBattlefield' | 'unknownPlayer' | 'notYetSupported';
+export type RulesWarningCode = 'unknownCard' | 'notALand' | 'notOnBattlefield' | 'unknownPlayer' | 'notYetSupported' | 'possibleLoop';
 
 /** Flags something that looks wrong. The engine never refuses a GameAction because of one (principle 3). */
 export interface RulesWarning {

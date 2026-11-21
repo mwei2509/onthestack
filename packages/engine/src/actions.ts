@@ -3,6 +3,13 @@ import type { Zone } from './steps.js';
 
 export type Recipient = { playerId: PlayerId } | { permanentId: PermanentId };
 
+export interface TokenDefinition {
+  types: string[];
+  power?: number;
+  toughness?: number;
+  keywords?: string[];
+}
+
 export interface Attack {
   attackerId: PermanentId;
   target: PlayerId;
@@ -22,7 +29,7 @@ export type GameAction =
   | { type: 'gainControl'; permanentId: PermanentId; until?: 'endOfTurn' }
   | { type: 'counters'; target: Recipient; kind: string; delta: number }
   | { type: 'modify'; permanentId: PermanentId; power: number; toughness: number; keywords?: string[]; until: 'endOfTurn' }
-  | { type: 'createToken'; token: CardName; count: number }
+  | { type: 'createToken'; token: CardName; count: number; definition?: TokenDefinition }
   | { type: 'life'; playerId: PlayerId; delta: number }
   | { type: 'damage'; sourceId: ObjectId; recipient: Recipient; amount: number }
   | { type: 'attack'; attacks: Attack[] }

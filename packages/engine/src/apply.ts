@@ -3,6 +3,7 @@ import type { Cause, GameEvent, GameEventBody } from './events.js';
 import type { PermanentId, PlayerId } from './ids.js';
 import { clone } from './clone.js';
 import { reduceInto } from './reduce.js';
+import { hasKeyword } from './stats.js';
 import type { GameState, Permanent } from './state.js';
 import type { RulesWarning } from './warnings.js';
 
@@ -119,7 +120,7 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
 
     case 'createToken': {
       const ids = Array.from({ length: action.count }, newPermanentId);
-      emit({ type: 'ZoneChanged', objects: ids, card: action.token, ownerId: ctx.playerId, from: 'nowhere', to: 'battlefield', how: 'token', controllerId: ctx.playerId, isToken: true });
+      emit({ type: 'ZoneChanged', objects: ids, card: action.token, ownerId: ctx.playerId, from: 'nowhere', to: 'battlefield', how: 'token', controllerId: ctx.playerId, isToken: true, tokenDefinition: action.definition });
       break;
     }
 
@@ -132,13 +133,21 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
 
     case 'damage': {
       if ('permanentId' in action.recipient ? !permanent(action.recipient.permanentId) : !player(action.recipient.playerId)) break;
-      const dealt = emit({ type: 'DamageDealt', damage: [{ sourceId: action.sourceId, recipient: action.recipient, amount: action.amount, combat: false }] });
+      const source = draft.permanents[action.sourceId];
+      const deathtouch = source ? hasKeyword(source, draft, 'Deathtouch') : false;
+      const dealt = emit({ type: 'DamageDealt', damage: [{ sourceId: action.sourceId, recipient: action.recipient, amount: action.amount, combat: false, deathtouch }] });
       if ('playerId' in action.recipient) {
         const life = draft.players[action.recipient.playerId]!.life;
         emit(
           { type: 'LifeChanged', playerId: action.recipient.playerId, delta: -action.amount, lifeAfter: life - action.amount, reason: 'damage' },
           { gameEvent: dealt.id },
         );
+      }
+      if (source && action.amount > 0 && hasKeyword(source, draft, 'Lifelink')) {
+        const gainer = draft.players[source.controllerId];
+        if (gainer) {
+          emit({ type: 'LifeChanged', playerId: gainer.id, delta: action.amount, lifeAfter: gainer.life + action.amount, reason: 'gain' }, { gameEvent: dealt.id });
+        }
       }
       break;
     }

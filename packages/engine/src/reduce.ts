@@ -32,7 +32,10 @@ export function reduceInto(draft: GameState, event: GameEvent): void {
       for (const d of event.damage) {
         if ('permanentId' in d.recipient) {
           const p = draft.permanents[d.recipient.permanentId];
-          if (p) p.damage += d.amount;
+          if (p) {
+            p.damage += d.amount;
+            if (d.deathtouch && d.amount > 0) p.deathtouchDamage = true;
+          }
         }
       }
       return;
@@ -54,7 +57,8 @@ export function reduceInto(draft: GameState, event: GameEvent): void {
       return;
 
     case 'ZoneChanged':
-      for (const id of event.objects) {
+      // A card moving between graveyard, exile and the command zone has no permanent ID.
+      for (const id of event.objects.length ? event.objects : ['']) {
         if (event.from === 'battlefield') delete draft.permanents[id];
         if (event.from === 'graveyard') removeOne(draft.graveyards[event.ownerId], event.card);
         if (event.from === 'exile') {
@@ -64,6 +68,10 @@ export function reduceInto(draft: GameState, event: GameEvent): void {
 
         switch (event.to) {
           case 'battlefield':
+            if (!id) break;
+            if (event.tokenDefinition && !draft.cards[event.card]) {
+              draft.cards[event.card] = { name: event.card, ...event.tokenDefinition, abilities: [] };
+            }
             draft.permanents[id] = {
               id,
               card: event.card,
