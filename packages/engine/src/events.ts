@@ -1,12 +1,13 @@
 import type { Attack, Block, Recipient } from './actions.js';
-import type { CardName, GameEventId, ObjectId, PlayerId, PlayerStatementId, StackItemId } from './ids.js';
+import type { CardName, GameEventId, ObjectId, PermanentId, PlayerId, PlayerStatementId, StackItemId } from './ids.js';
+import type { Effect } from './state.js';
 import type { Step, Zone } from './steps.js';
 
 /** Why a GameEvent happened. Every GameEvent has exactly one cause, so the chain can always be followed back. */
 export type Cause =
   | { playerStatement: PlayerStatementId }
   | { gameEvent: GameEventId }
-  | { stackItem: StackItemId; gameAction: number; triggeredBy?: GameEventId }
+  | { stackItem: StackItemId; gameAction?: number; triggeredBy?: GameEventId }
   | { rule: 'turnStructure' | 'combatDamage' | 'stateBasedAction' | 'boardCorrection' };
 
 export type DamageItem = { sourceId: ObjectId; recipient: Recipient; amount: number; combat: boolean };
@@ -17,10 +18,26 @@ export type GameEventBody =
   | { type: 'BlockersDeclared'; blocks: Block[] }
   | { type: 'DamageDealt'; damage: DamageItem[] }
   | { type: 'LifeChanged'; playerId: PlayerId; delta: number; lifeAfter: number; reason: 'damage' | 'gain' | 'loss' | 'payment' }
-  | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId }
-  | { type: 'ZoneChanged'; objects: ObjectId[]; card: CardName; from: Zone; to: Zone; how?: 'destroy' | 'sacrifice' | 'exile' | 'resolve' | 'stateBased' }
+  | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId; from: Zone }
+  | {
+      type: 'ZoneChanged';
+      objects: ObjectId[];
+      card: CardName;
+      ownerId: PlayerId;
+      from: Zone | 'nowhere';
+      to: Zone;
+      how?: 'destroy' | 'sacrifice' | 'exile' | 'resolve' | 'stateBased' | 'token';
+      /** Set when entering the battlefield. */
+      controllerId?: PlayerId;
+      tapped?: boolean;
+      isToken?: boolean;
+    }
   | { type: 'CountersChanged'; target: Recipient; kind: string; delta: number }
-  | { type: 'PlayerLost'; playerId: PlayerId; reason: 'life' | 'poison' | 'commanderDamage' | 'conceded' };
+  | { type: 'PlayerLost'; playerId: PlayerId; reason: 'life' | 'poison' | 'commanderDamage' | 'conceded' }
+  | { type: 'TapChanged'; permanentId: PermanentId; tapped: boolean }
+  | { type: 'ControlChanged'; permanentId: PermanentId; controllerId: PlayerId; until?: 'endOfTurn' }
+  | { type: 'EffectAdded'; permanentId: PermanentId; effect: Effect }
+  | { type: 'PlayerTaskCreated'; playerId: PlayerId; text: string };
 
 export type GameEvent = GameEventBody & { id: GameEventId; causedBy: Cause };
 

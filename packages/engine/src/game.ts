@@ -32,10 +32,11 @@ export function createGame(seats: Seat[], cards: Record<CardName, CardDefinition
     permanents: {},
     graveyards: Object.fromEntries(seats.map((s) => [s.id, []])),
     exile: [],
-    commandZone: Object.fromEntries(seats.map((s) => [s.id, s.commander ? { card: s.commander, casts: 0 } : null])),
+    commandZone: Object.fromEntries(seats.map((s) => [s.id, s.commander ? { card: s.commander, casts: 0, inZone: true } : null])),
     stack: [],
     combat: null,
     delayedTriggers: [],
     gameEventsThisTurn: [],
+    nextIds: { permanent: 1, gameEvent: 1, stackItem: 1 },
   };
 }

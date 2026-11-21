@@ -36,6 +36,8 @@ export interface Permanent {
   counters: Record<string, number>;
   effects: Effect[];
   isToken: boolean;
+  /** A temporary control change, reverted at cleanup. */
+  controlUntil?: { revertTo: PlayerId; until: 'endOfTurn' };
 }
 
 export interface StackItem {
@@ -72,9 +74,11 @@ export interface GameState {
   permanents: Record<PermanentId, Permanent>;
   graveyards: Record<PlayerId, CardName[]>;
   exile: { card: CardName; ownerId: PlayerId; note?: string }[];
-  commandZone: Record<PlayerId, { card: CardName; casts: number } | null>;
+  commandZone: Record<PlayerId, { card: CardName; casts: number; inZone: boolean } | null>;
   stack: StackItem[];
   combat: CombatState | null;
   delayedTriggers: DelayedTrigger[];
   gameEventsThisTurn: GameEvent[];
+  /** IDs come from these counters, never from randomness, so a replay always produces the same IDs. */
+  nextIds: { permanent: number; gameEvent: number; stackItem: number };
 }

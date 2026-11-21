@@ -24,7 +24,7 @@ describe('createGame', () => {
   test.prop([seats])('puts each commander in its owner’s command zone and every zone starts empty', (s) => {
     const game = createGame(s);
     for (const seat of s) {
-      expect(game.commandZone[seat.id]).toEqual(seat.commander ? { card: seat.commander, casts: 0 } : null);
+      expect(game.commandZone[seat.id]).toEqual(seat.commander ? { card: seat.commander, casts: 0, inZone: true } : null);
       expect(game.graveyards[seat.id]).toEqual([]);
     }
     expect(game.permanents).toEqual({});
