@@ -21,6 +21,7 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 ## Docs
 
 - [`GLOSSARY.md`](GLOSSARY.md): the domain language. Use its terms in code, issues and tests.
+- [`docs/engine-model.md`](docs/engine-model.md): the engine spec: domains, the event loop, Steps, the Stack, combat, GameEvents, Ability definitions, data structures, engine functions, property tests and a worked example. Read it before working on `packages/engine` or `packages/interpreter`.
 - `docs/adr/`: architecture decision records, one file per decision (`NNNN-short-title.md`). They take precedence over the proposal. If a decision changes something, write a new ADR rather than editing an old one or the proposal.
 - [`docs/proposal.md`](docs/proposal.md): the original dictated first draft (data structures, engine loop, combat). Useful background, but read the ADRs and glossary first; much of its product shape has been superseded.
 
