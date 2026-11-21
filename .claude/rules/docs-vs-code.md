@@ -17,6 +17,6 @@ Some duplication is kept because it saves agents exploration. When you change th
 | --- | --- |
 | `pnpm-workspace.yaml` `packages` + top-level package dirs | Root `CLAUDE.md` "Status" line |
 | `packages/cli/src/commands/*` and root `package.json` `scripts` | Root `CLAUDE.md` "Dev CLI" table |
-| `docs/proposal.md` principles (as amended by `docs/adr/`) | Root `CLAUDE.md` "Non-negotiable principles" |
+| `docs/adr/` decisions (and the proposal where no ADR overrides it) | Root `CLAUDE.md` "Non-negotiable principles" |
 
 When a doc and the code disagree, the code wins: fix the doc as part of the current change, or tell the user if it's out of scope.
