@@ -14,7 +14,7 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 | `stx wt go \| rm \| list \| prune <…>` | Enter, remove, list, or prune worktrees whose branches have merged. |
 | `pnpm cli:link` | Rebuild `stx` and symlink it to `~/.local/bin/stx`. |
 | `pnpm build` / `pnpm typecheck` / `pnpm lint` / `pnpm test` | Run across all packages. CI (`.github/workflows/ci.yml`) runs all four on every PR; the server tests need the web build. |
-| `pnpm --filter @onthestack/server dev` + `pnpm --filter @onthestack/web dev` | What `stx start` runs: the local Worker (game sockets, `/api`) and the Vite dev server, which proxies `/api` to it. The Worker serves `packages/web/dist`, so run `pnpm build` first. |
+| `pnpm --filter @onthestack/server dev` + `pnpm --filter @onthestack/web dev` | What `stx start` runs: the local Worker (game sockets, `/api`) and the Vite dev server, which proxies `/api` to it. `stx start` also builds `packages/web/dist` first, which the Worker serves; run that build yourself if you start these by hand. |
 
 `stx wt` can only `cd` your shell if `eval "$(stx shell-init)"` is in your rc file.
 
