@@ -45,7 +45,7 @@ describe('Game durable object', () => {
     for (const player of [theo, elena]) {
       const msg = await player.next();
       expect(msg.type).toBe('state');
-      expect(msg.type === 'state' && msg.state?.players.map((p) => p.life)).toEqual([40, 40]);
+      expect(msg.type === 'state' && msg.state?.turnOrder.map((id) => msg.state?.players[id]?.life)).toEqual([40, 40]);
     }
   });
 

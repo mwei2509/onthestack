@@ -1,0 +1,35 @@
+import type { CardName, ObjectId, PermanentId, PlayerId } from './ids.js';
+import type { Zone } from './steps.js';
+
+export type Recipient = { playerId: PlayerId } | { permanentId: PermanentId };
+
+export interface Attack {
+  attackerId: PermanentId;
+  target: PlayerId;
+}
+
+export interface Block {
+  blockerId: PermanentId;
+  attackerId: PermanentId;
+}
+
+/** One literal thing done to the board (ADR 0013). Speech and card Translations are both turned into these. */
+export type GameAction =
+  | { type: 'cast'; card: CardName; targets?: ObjectId[] }
+  | { type: 'playLand'; card: CardName }
+  | { type: 'move'; objectId: PermanentId; to: Zone; how?: 'destroy' | 'sacrifice' | 'exile' }
+  | { type: 'tap' | 'untap'; permanentId: PermanentId }
+  | { type: 'gainControl'; permanentId: PermanentId; until?: 'endOfTurn' }
+  | { type: 'counters'; target: Recipient; kind: string; delta: number }
+  | { type: 'modify'; permanentId: PermanentId; power: number; toughness: number; keywords?: string[]; until: 'endOfTurn' }
+  | { type: 'createToken'; token: CardName; count: number }
+  | { type: 'life'; playerId: PlayerId; delta: number }
+  | { type: 'damage'; sourceId: ObjectId; recipient: Recipient; amount: number }
+  | { type: 'attack'; attacks: Attack[] }
+  | { type: 'block'; blocks: Block[] }
+  | { type: 'noBlock' }
+  | { type: 'doneAttacking' }
+  | { type: 'divideDamage'; attackerId: PermanentId; split: Record<string, number> }
+  | { type: 'playerTask'; playerId: PlayerId; text: string };
+
+export type GameActionType = GameAction['type'];

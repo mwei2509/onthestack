@@ -1,43 +1,41 @@
-export type PlayerId = string;
-
-export interface Player {
-  id: PlayerId;
-  name: string;
-  life: number;
-  commanderDamage: Record<string, number>;
-}
-
-export interface GameState {
-  players: Player[];
-  turn: {
-    number: number;
-    activePlayerId: PlayerId;
-  };
-}
-
-export interface NewPlayer {
-  id: PlayerId;
-  name: string;
-}
+import type { CardDefinition } from './cards.js';
+import type { CardName, PlayerId } from './ids.js';
+import type { GameState, Player } from './state.js';
 
 export const STARTING_LIFE = 40;
 
-export function createGame(seating: NewPlayer[]): GameState {
-  const first = seating[0];
+export interface Seat {
+  id: PlayerId;
+  name: string;
+  commander?: CardName;
+}
+
+export function createGame(seats: Seat[], cards: Record<CardName, CardDefinition> = {}): GameState {
+  const first = seats[0];
   if (!first) {
     throw new Error('A game needs at least one player');
   }
-  if (new Set(seating.map((p) => p.id)).size !== seating.length) {
+  if (new Set(seats.map((s) => s.id)).size !== seats.length) {
     throw new Error('Player ids must be unique');
   }
 
+  const players: Record<PlayerId, Player> = {};
+  for (const s of seats) {
+    players[s.id] = { id: s.id, name: s.name, life: STARTING_LIFE, poison: 0, commanderDamage: {}, out: false };
+  }
+
   return {
-    players: seating.map((p) => ({
-      id: p.id,
-      name: p.name,
-      life: STARTING_LIFE,
-      commanderDamage: {},
-    })),
-    turn: { number: 1, activePlayerId: first.id },
+    turn: { number: 1, activePlayerId: first.id, step: 'untap' },
+    turnOrder: seats.map((s) => s.id),
+    players,
+    cards,
+    permanents: {},
+    graveyards: Object.fromEntries(seats.map((s) => [s.id, []])),
+    exile: [],
+    commandZone: Object.fromEntries(seats.map((s) => [s.id, s.commander ? { card: s.commander, casts: 0 } : null])),
+    stack: [],
+    combat: null,
+    delayedTriggers: [],
+    gameEventsThisTurn: [],
   };
 }
