@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { claudeCommand } from './commands/claude.js';
 import { worktreeCommand } from './commands/worktree.js';
 import { shellInitCommand } from './commands/shellInit.js';
+import { startCommand } from './commands/start.js';
 
 const program = new Command()
   .name('stx')
@@ -15,6 +16,7 @@ const program = new Command()
 program.addCommand(claudeCommand);
 program.addCommand(worktreeCommand);
 program.addCommand(shellInitCommand);
+program.addCommand(startCommand);
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   console.error(err);

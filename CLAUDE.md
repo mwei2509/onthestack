@@ -10,10 +10,11 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 | ------- | ----------- |
 | `stx claude [-o \| -e] [args…]` | Launch Claude Code at the checkout root (`-o` skip permissions, `-e` accept edits). Other args pass through. |
 | `stx wt <branch>` | Create the worktree if missing, otherwise enter it. Worktrees live in `../onthestack-worktrees/` (override with `STX_WORKTREE_DIR`). |
+| `stx start [--no-open]` | Run the local Worker (:8790) and Vite (:5190) in a new iTerm2 tab split into two panes (inline with prefixed output elsewhere), then open the browser. Offers to stop whatever already holds those ports. |
 | `stx wt go \| rm \| list \| prune <…>` | Enter, remove, list, or prune worktrees whose branches have merged. |
 | `pnpm cli:link` | Rebuild `stx` and symlink it to `~/.local/bin/stx`. |
 | `pnpm build` / `pnpm typecheck` / `pnpm lint` / `pnpm test` | Run across all packages. CI (`.github/workflows/ci.yml`) runs all four on every PR; the server tests need the web build. |
-| `pnpm --filter @onthestack/server dev` + `pnpm --filter @onthestack/web dev` | Local Worker (game sockets, `/api`) and the Vite dev server, which proxies `/api` to it. |
+| `pnpm --filter @onthestack/server dev` + `pnpm --filter @onthestack/web dev` | What `stx start` runs: the local Worker (game sockets, `/api`) and the Vite dev server, which proxies `/api` to it. The Worker serves `packages/web/dist`, so run `pnpm build` first. |
 
 `stx wt` can only `cd` your shell if `eval "$(stx shell-init)"` is in your rc file.
 
