@@ -1,0 +1,9 @@
+{
+  "name": "onthestack",
+  "private": true,
+  "packageManager": "pnpm@9.1.0",
+  "scripts": {
+    "cli:build": "pnpm --filter @onthestack/cli build",
+    "cli:link": "pnpm --filter @onthestack/cli build && mkdir -p ~/.local/bin && ln -sf \"$PWD/packages/cli/dist/index.js\" ~/.local/bin/stx"
+  }
+}
