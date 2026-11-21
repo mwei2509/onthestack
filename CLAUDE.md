@@ -17,24 +17,25 @@ Voice-driven Magic: The Gathering table companion for casual Commander (onthesta
 
 ## Docs
 
-- [`docs/proposal.md`](docs/proposal.md): the product and architecture proposal (data structures, engine loop, combat, voice layer, phased plan). Read it before designing anything.
-- `docs/adr/`: architecture decision records, one file per decision (`NNNN-short-title.md`). If a decision changes something in the proposal, write an ADR rather than silently editing the proposal.
+- [`GLOSSARY.md`](GLOSSARY.md): the domain language. Use its terms in code, issues and tests.
+- `docs/adr/`: architecture decision records, one file per decision (`NNNN-short-title.md`). They take precedence over the proposal. If a decision changes something, write a new ADR rather than editing an old one or the proposal.
+- [`docs/proposal.md`](docs/proposal.md): the original dictated first draft (data structures, engine loop, combat). Useful background, but read the ADRs and glossary first; much of its product shape has been superseded.
 
 ## Non-negotiable principles
 
-These come from the proposal and override reasoning from first principles:
+These come from the proposal as amended by `docs/adr/`, and override reasoning from first principles:
 
-1. **The AI translates and the code decides.** The LLM only turns speech into a schema-validated `Action`. All rules logic lives in a deterministic engine: `(GameState, Action) -> (GameState, Event[], Prompt[])`. No game logic in prompts.
-2. **Never guess.** Unmodeled cards and ambiguous input become a prompt to the players ("check this", "which zombie?"), never an assumption.
-3. **Flag, don't block.** Illegal-looking actions show a warning with "Do it anyway". Overrides always work and are logged as events with `override: true`.
-4. **Players decide, the app tallies.** Never suggest moves, highlight legal plays or list options.
-5. **The physical board is the source of truth.** The app keeps a correctable shadow copy.
-6. **Event log is replayable.** Replaying the log must rebuild identical state, and undo works through the log.
+1. **The AI translates and the code decides.** An LLM only turns speech into a schema-validated Command and card Oracle text into a validated Translation. All rules logic lives in a deterministic engine. No game logic in prompts.
+2. **Never guess.** Unmodeled cards and ambiguous input become a Question or Task for the players ("check this card", "which zombie?"), never an assumption.
+3. **Flag, don't block.** Illegal-looking actions raise a Warning with "Do it anyway". Players can always do it anyway or Edit the board, and that is recorded in the history.
+4. **Players decide, the app tallies.** Never suggest moves, highlight legal plays or list options. The Rules assistant answers rules questions and refuses strategy.
+5. **The physical board is the source of truth.** The app keeps a correctable copy; Edits are always available.
+6. **Undo works within a turn.** The current turn keeps a snapshot per Command; ended turns are Sealed to one snapshot plus read-only history (ADR 0004).
 
 ## Engineering expectations
 
 - Engine code stays pure and side-effect free, so it can be property-tested with fast-check.
-- Voice-parser changes come with eval cases (transcript → expected `Action`).
+- Voice-parser changes come with eval cases (transcript → expected Command). Card Translation changes come with eval cases (Oracle text → expected Translation).
 - Keep pull requests small and focused.
 - Stay on free tiers. Flag anything that would cost money before adding it.
 - Never store raw audio, only confirmed commands.

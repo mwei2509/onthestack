@@ -1,6 +1,6 @@
 # On The Stack — Rules Engine Proposal
 
-> Imported from the Notion page "On The Stack Rules Engine Proposal" (Tech / Work) on 2026-11-20. This copy is now the canonical version; record changes to decisions as ADRs in `docs/adr/`.
+> Original first draft, dictated and imported from Notion on 2026-11-20. Kept as background: later decisions in `docs/adr/` and the language in `GLOSSARY.md` take precedence wherever they differ.
 
 ## Goal
 
