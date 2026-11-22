@@ -1,4 +1,4 @@
-import type { CardName, ObjectId, PermanentId, PlayerId } from './ids.js';
+import type { CardName, ObjectId, PermanentId, PlayerId, StackItemId } from './ids.js';
 import type { Zone } from './steps.js';
 
 export type Recipient = { playerId: PlayerId } | { permanentId: PermanentId };
@@ -22,7 +22,14 @@ export interface Block {
 
 /** One literal thing done to the board (ADR 0013). Speech and card Translations are both turned into these. */
 export type GameAction =
-  | { type: 'cast'; card: CardName; targets?: ObjectId[] }
+  | {
+      type: 'cast';
+      card: CardName;
+      targets?: ObjectId[];
+      /** What the spell does when it resolves. In M1 players state it ("Murder on Serra Angel"); from M3 the card's Translation supplies it. */
+      effects?: GameAction[];
+    }
+  | { type: 'counter'; stackItemId: StackItemId }
   | { type: 'playLand'; card: CardName }
   | { type: 'move'; objectId: PermanentId; to: Zone; how?: 'destroy' | 'sacrifice' | 'exile' }
   | { type: 'tap' | 'untap'; permanentId: PermanentId }

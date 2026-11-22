@@ -1,7 +1,7 @@
 import type { Attack, Block, Recipient } from './actions.js';
 import type { CardName, GameEventId, ObjectId, PermanentId, PlayerId, PlayerStatementId, StackItemId } from './ids.js';
 import type { Effect } from './state.js';
-import type { TokenDefinition } from './actions.js';
+import type { GameAction, TokenDefinition } from './actions.js';
 import type { Step, Zone } from './steps.js';
 
 /** Why a GameEvent happened. Every GameEvent has exactly one cause, so the chain can always be followed back. */
@@ -19,7 +19,8 @@ export type GameEventBody =
   | { type: 'BlockersDeclared'; blocks: Block[] }
   | { type: 'DamageDealt'; damage: DamageItem[] }
   | { type: 'LifeChanged'; playerId: PlayerId; delta: number; lifeAfter: number; reason: 'damage' | 'gain' | 'loss' | 'payment' }
-  | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId; from: Zone }
+  | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId; from: Zone; gameActions: GameAction[] }
+  | { type: 'StackItemResolved'; stackItemId: StackItemId; status: 'resolved' | 'countered' | 'fizzled' }
   | {
       type: 'ZoneChanged';
       objects: ObjectId[];
@@ -28,7 +29,7 @@ export type GameEventBody =
       from: Zone | 'nowhere';
       /** 'nowhere' means the object left the game, such as a token or a departed player's cards. */
       to: Zone | 'nowhere';
-      how?: 'destroy' | 'sacrifice' | 'exile' | 'resolve' | 'stateBased' | 'token';
+      how?: 'destroy' | 'sacrifice' | 'exile' | 'resolve' | 'stateBased' | 'token' | 'countered' | 'fizzled';
       /** Set when entering the battlefield. */
       controllerId?: PlayerId;
       tapped?: boolean;

@@ -47,6 +47,15 @@ export function reduceInto(draft: GameState, event: GameEvent): void {
     }
 
     case 'SpellCast':
+      draft.stack.push({
+        id: event.stackItemId,
+        kind: 'spell',
+        controllerId: event.casterId,
+        source: { card: event.card },
+        targets: event.targets,
+        gameActions: event.gameActions,
+        status: 'pending',
+      });
       if (event.from === 'command') {
         const cz = draft.commandZone[event.casterId];
         if (cz) {
@@ -145,6 +154,10 @@ export function reduceInto(draft: GameState, event: GameEvent): void {
       if (p) p.effects.push(event.effect);
       return;
     }
+
+    case 'StackItemResolved':
+      draft.stack = draft.stack.filter((item) => item.id !== event.stackItemId);
+      return;
 
     case 'PlayerTaskCreated':
       return;

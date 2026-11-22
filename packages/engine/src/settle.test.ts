@@ -6,6 +6,7 @@ import type { CardDefinition } from './cards.js';
 import type { GameEvent } from './events.js';
 import { createGame } from './game.js';
 import { settle } from './settle.js';
+import { resolveTop } from './stack.js';
 import type { GameState } from './state.js';
 import { stats } from './stats.js';
 
@@ -35,6 +36,11 @@ function play(state: GameState, steps: [GameAction, string][]) {
     const r = applyAction(state, action, { playerId, cause: { playerStatement: `s${i + 1}` } });
     state = r.state;
     events.push(...r.events);
+    while (state.stack.length > 0) {
+      const x = resolveTop(state);
+      state = x.state;
+      events.push(...x.events);
+    }
   });
   return { state, events };
 }
@@ -215,6 +221,7 @@ function randomBoard(ops: Op[]): GameState {
       steal: { type: 'gainControl', permanentId: target } as GameAction,
     }[o.kind];
     state = applyAction(state, action, { playerId: o.player, cause: { playerStatement: `s${i + 1}` } }).state;
+    while (state.stack.length > 0) state = resolveTop(state).state;
   });
   return state;
 }
