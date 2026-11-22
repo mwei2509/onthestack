@@ -30,7 +30,7 @@ Every PlayerStatement of the current turn, in the order the buttons were pressed
 _Avoid_: conversation, chat log
 
 **InterpretedTimeline**:
-The app's current reading of the TurnTranscript: an ordered account of what happened this turn, each part placed in its Step. It is redone after every new PlayerStatement, so later statements and take-backs can change it.
+The app's current reading of the TurnTranscript: an ordered account of what happened this turn, each part placed in its Step, plus any PlayerQuestions about what it couldn't settle. It is redone after every new PlayerStatement, so later statements and take-backs can change it.
 _Avoid_: interpretation, parse
 
 **TimelineCorrection**:
@@ -102,7 +102,7 @@ A flag on something that looks illegal ("Hinterland Sanctifier has summoning sic
 _Avoid_: warning, error, block
 
 **PlayerQuestion**:
-Something the app needs a specific player to answer before it can finish its bookkeeping ("Which creature?", "Did Theo pay 2?"). That player's next Hold-to-talk answers it.
+Something the app needs a specific player to answer before it can finish its bookkeeping ("Which creature?", "Did Theo pay 2?", "Did you say Serra Angel or Savannah Lions?"). The engine asks when it can't fill a blank; the interpreter asks instead of guessing at what was said. Each has a typed kind, and that player's next Hold-to-talk answers it.
 _Avoid_: question, prompt, clarification
 
 **PlayerTask**:

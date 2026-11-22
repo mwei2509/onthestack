@@ -25,7 +25,7 @@ flowchart LR
   V -. "next PlayerStatement" .-> T
 ```
 
-The LLM never calculates. It places what was said into Steps, as literal GameActions. A stated outcome ("Y survives") is passed through as a claim that the engine checks, with a RulesWarning if it doesn't add up. In-flight handling follows ADR 0017: order by button press, one request in flight, re-send with everything when a response returns, drop stale responses.
+The LLM never calculates. It places what was said into Steps, as literal GameActions, referring to cards by name; the interpreter resolves names to IDs by replaying (ADR 0038). What it can't settle it leaves out and returns as a typed PlayerQuestion instead of guessing; the answer is simply the next PlayerStatement (ADR 0043). A stated outcome ("Y survives") is passed through as a claim that the engine checks, with a RulesWarning if it doesn't add up. In-flight handling follows ADR 0017: order by button press, one request in flight, re-send with everything when a response returns, drop stale responses.
 
 Example. After the third statement, the InterpretedTimeline places Shock between the two damage steps. The engine works out that Fencing Ace hits the Wall once, dies, and never gets its second hit.
 
