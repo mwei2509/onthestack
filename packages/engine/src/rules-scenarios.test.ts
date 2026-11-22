@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CardDefinition } from './cards.js';
-import { scenario } from './scenario.js';
+import { scenario, type ScenarioResult } from './scenario.js';
 
 const creature = (name: string, power: number, toughness: number, keywords: string[] = []): CardDefinition => ({ name, types: ['Creature'], power, toughness, keywords, abilities: [] });
 const spell = (name: string, type: 'Instant' | 'Sorcery'): CardDefinition => ({ name, types: [type], abilities: [] });
@@ -58,12 +58,8 @@ const combatCards: Record<string, CardDefinition> = {
 };
 
 /** PlayerTasks that came from a card's ability, as "player: text". */
-const tasks = (events: { type: string; causedBy?: object }[]) =>
-  events.flatMap((e) => {
-    if (e.type !== 'PlayerTaskCreated' || !e.causedBy || !('stackItem' in e.causedBy)) return [];
-    const t = e as unknown as { playerId: string; text: string };
-    return [`${t.playerId}: ${t.text}`];
-  });
+const tasks = (r: ScenarioResult) =>
+  r.tableEvents.flatMap((e) => (e.type === 'PlayerTaskCreated' && 'stackItem' in e.causedBy ? [`${e.playerId}: ${e.text}`] : []));
 
 const damage = (permanentId: string, amount: number) => ({ type: 'damage' as const, sourceId: 'spell', recipient: { permanentId }, amount });
 
@@ -142,7 +138,7 @@ describe('"deals combat damage to a player" triggers (#37)', () => {
     s.say(1, 'declareAttackers', 'A', attack(cutpurse, 'C'));
     s.say(1, 'declareBlockers', 'B', { type: 'noBlock' });
     s.say(1, 'declareBlockers', 'C', { type: 'noBlock' });
-    expect(tasks(s.runUntil(1, 'main2').events)).toEqual(['C: Dimir Cutpurse: Discard a card', 'A: Dimir Cutpurse: Draw a card']);
+    expect(tasks(s.runUntil(1, 'main2'))).toEqual(['C: Dimir Cutpurse: Discard a card', 'A: Dimir Cutpurse: Draw a card']);
   });
 
   it('"whenever a creature you control deals combat damage to an opponent" triggers once per creature', () => {
@@ -153,7 +149,7 @@ describe('"deals combat damage to a player" triggers (#37)', () => {
     s.battlefield('B', 'Coastal Piracy');
     s.say(1, 'declareAttackers', 'A', { type: 'attack', attacks: [{ attackerId: bears, target: 'B' }, { attackerId: lion, target: 'B' }] });
     s.say(1, 'declareBlockers', 'B', { type: 'noBlock' });
-    expect(tasks(s.runUntil(1, 'main2').events)).toEqual(['A: Coastal Piracy: You may draw a card', 'A: Coastal Piracy: You may draw a card']);
+    expect(tasks(s.runUntil(1, 'main2'))).toEqual(['A: Coastal Piracy: You may draw a card', 'A: Coastal Piracy: You may draw a card']);
   });
 
   it('damage to a blocking creature does not trigger it', () => {
@@ -162,7 +158,7 @@ describe('"deals combat damage to a player" triggers (#37)', () => {
     const bears = s.battlefield('B', 'Grizzly Bears');
     s.say(1, 'declareAttackers', 'A', attack(cutpurse));
     s.say(1, 'declareBlockers', 'B', { type: 'block', blocks: [{ blockerId: bears, attackerId: cutpurse }] });
-    expect(tasks(s.runUntil(1, 'main2').events)).toEqual([]);
+    expect(tasks(s.runUntil(1, 'main2'))).toEqual([]);
   });
 
   it('noncombat damage to a player does not trigger it', () => {
@@ -171,7 +167,7 @@ describe('"deals combat damage to a player" triggers (#37)', () => {
     s.say(1, 'main1', 'A', { type: 'damage', sourceId: cutpurse, recipient: { playerId: 'B' }, amount: 2 });
     const r = s.runUntil(1, 'main2');
     expect(r.life('B')).toBe(18);
-    expect(tasks(r.events)).toEqual([]);
+    expect(tasks(r)).toEqual([]);
   });
 
   it('double strike that connects in both damage steps triggers twice', () => {
@@ -182,6 +178,6 @@ describe('"deals combat damage to a player" triggers (#37)', () => {
     s.say(1, 'declareBlockers', 'B', { type: 'noBlock' });
     const r = s.runUntil(1, 'main2');
     expect(r.life('B')).toBe(18);
-    expect(tasks(r.events)).toHaveLength(2);
+    expect(tasks(r)).toHaveLength(2);
   });
 });

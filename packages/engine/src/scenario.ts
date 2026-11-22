@@ -2,7 +2,7 @@ import type { GameAction } from './actions.js';
 import type { CardDefinition } from './cards.js';
 import { clone } from './clone.js';
 import { emit } from './emit.js';
-import type { GameEvent } from './events.js';
+import type { GameEvent, TableEvent } from './events.js';
 import { createGame } from './game.js';
 import type { CardName, PermanentId, PlayerId } from './ids.js';
 import type { GameState } from './state.js';
@@ -28,6 +28,7 @@ export interface ScenarioResult {
   state: GameState;
   sealed: SealedTurn[];
   events: GameEvent[];
+  tableEvents: TableEvent[];
   warnings: RulesWarning[];
   life(playerId: PlayerId): number;
   /** Cards on the battlefield controlled by this player. */
@@ -60,22 +61,26 @@ export function scenario(options: { seats: PlayerId[]; life?: number; cards: Rec
       let turnStart = setup;
       const sealed: SealedTurn[] = [];
       const events: GameEvent[] = [];
+      const tableEvents: TableEvent[] = [];
       const warnings: RulesWarning[] = [];
       for (let t = 1; t < turn; t++) {
         const r = sealTurn(turnStart, timelineFor(t));
         sealed.push(r.sealed);
         events.push(...r.sealed.gameEvents);
+        tableEvents.push(...r.sealed.tableEvents);
         warnings.push(...r.warnings);
         turnStart = r.nextTurnStart;
       }
       const last: ReplayResult = replayTurn(turnStart, timelineFor(turn), { currentStep: step });
       events.push(...last.events);
+      tableEvents.push(...last.tableEvents);
       warnings.push(...last.warnings);
       const state = last.state;
       return {
         state,
         sealed,
         events,
+        tableEvents,
         warnings,
         life: (p) => state.players[p]!.life,
         controls: (p) => Object.values(state.permanents).filter((x) => x.controllerId === p).map((x) => x.card).sort(),
