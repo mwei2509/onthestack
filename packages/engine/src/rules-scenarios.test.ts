@@ -61,9 +61,7 @@ describe('ported from XMage', () => {
   });
 
   // Mage.Tests/src/test/java/org/mage/test/multiplayer/PlayerLeftGameRangeAllTest.java#TestControlledBySorcery (CR 800.4a)
-  // Expected to fail until the departing-player fix (#31 step 4): effects giving the departing player control end
-  // first, so Wall of Air returns to A instead of being exiled.
-  it.fails('when a player leaves, what they had taken returns to its previous controller', () => {
+  it('when a player leaves, what they had taken returns to its previous controller', () => {
     const s = scenario({ seats: ['A', 'D', 'C', 'B'], life: 2, cards });
     const commando = s.battlefield('C', 'Rootwater Commando');
     const wall = s.battlefield('A', 'Wall of Air');

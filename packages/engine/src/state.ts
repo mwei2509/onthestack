@@ -36,8 +36,11 @@ export interface Permanent {
   counters: Record<string, number>;
   effects: Effect[];
   isToken: boolean;
-  /** A temporary control change, reverted at cleanup. */
-  controlUntil?: { revertTo: PlayerId; until: 'endOfTurn' };
+  /**
+   * Who it was taken from, when an effect changed its control: they get it back when an "until end of turn" change
+   * ends at cleanup, or when the player who took it leaves the game (CR 800.4a, ADR 0029).
+   */
+  controlChange?: { revertTo: PlayerId; until?: 'endOfTurn' };
 }
 
 export interface StackItem {

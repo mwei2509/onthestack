@@ -152,7 +152,7 @@ describe('settle', () => {
     ]);
   });
 
-  it('when a player leaves, what they own leaves the game and what they controlled but didn’t own is exiled', () => {
+  it('when a player leaves, what they own leaves the game and what they’d taken goes back (CR 800.4a, ADR 0029)', () => {
     const { state } = play(newGame(), [
       [{ type: 'cast', card: 'Grizzly Bears' }, 'theo'],
       [{ type: 'cast', card: 'Savannah Lions' }, 'melissa'],
@@ -161,9 +161,18 @@ describe('settle', () => {
     ]);
     const r = settle(state);
     expect(r.state.players.theo!.out).toBe(true);
-    expect(r.state.permanents).toEqual({});
-    expect(r.state.exile).toEqual([{ card: 'Savannah Lions', ownerId: 'melissa' }]);
+    expect(Object.values(r.state.permanents).map((p) => [p.card, p.controllerId])).toEqual([['Savannah Lions', 'melissa']]);
+    expect(r.state.permanents.p2!.controlChange).toBeUndefined();
+    expect(r.state.exile).toEqual([]);
     expect(r.state.graveyards.theo).toEqual([]);
+  });
+
+  it('an indefinite steal remembers who it was taken from', () => {
+    const { state } = play(newGame(), [
+      [{ type: 'cast', card: 'Savannah Lions' }, 'melissa'],
+      [{ type: 'gainControl', permanentId: 'p1' }, 'theo'],
+    ]);
+    expect(state.permanents.p1!.controlChange).toEqual({ revertTo: 'melissa' });
   });
 
   it('+1/+1 and -1/-1 counters cancel out', () => {
