@@ -1,5 +1,7 @@
 # Speech-to-text on Workers AI, with card names matched against Decks
 
+Status: Accepted (decided with Melissa, 2026-11-21).
+
 Hold-to-talk clips are transcribed on Cloudflare Workers AI, starting with `whisper-large-v3-turbo`, which is effectively free at our volume and retains no data. Its `initial_prompt` is seeded with the cards on the battlefield and the speaker's key cards to nudge spelling. If card-name accuracy falls short, we switch to Deepgram Nova-3 on Workers AI, which supports real keyterm biasing, without leaving Cloudflare. Transcription sits behind a replaceable interface.
 
 Whatever the provider, card names in the transcript are fuzzy-matched in our code against the Decks in the game ("you la mog" to Ulamog). Recognising card names is the biggest risk in the product, and this second layer doesn't depend on any one provider's biasing.
