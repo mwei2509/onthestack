@@ -1,6 +1,6 @@
 # Cleanup lists what ended; damage splits and land drops are explicit
 
-Status: Accepted (decided with Melissa, 2026-11-21, in the design session on E2).
+Status: Accepted (decided with Melissa, 2026-11-21, in the design session on E2). Amended by ADR 0036 (`how` uses Arena's zone-transfer categories; `play` becomes `playLand`).
 
 Three refinements to the GameEvent vocabulary:
 
