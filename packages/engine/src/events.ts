@@ -56,9 +56,22 @@ export type GameEventBody =
   | { type: 'PlayerLost'; playerId: PlayerId; reason: 'life' | 'poison' | 'commanderDamage' | 'conceded' }
   | { type: 'TapChanged'; permanentId: PermanentId; tapped: boolean }
   | { type: 'ControlChanged'; permanentId: PermanentId; controllerId: PlayerId; until?: 'endOfTurn' }
-  | { type: 'EffectAdded'; permanentId: PermanentId; effect: Effect }
-  | { type: 'PlayerTaskCreated'; playerId: PlayerId; text: string };
+  | { type: 'EffectAdded'; permanentId: PermanentId; effect: Effect };
 
 export type GameEvent = GameEventBody & { id: GameEventId; causedBy: Cause };
 
 export type GameEventType = GameEventBody['type'];
+
+/**
+ * The app's own record of something at the table that isn't part of the game (ADR 0020): it never changes the
+ * board, no trigger sees it, and it isn't stored in GameState, so folding GameEvents alone still rebuilds the board.
+ */
+export type TableEventBody =
+  | { type: 'PlayerTaskCreated'; playerId: PlayerId; text: string }
+  /** A BoardCorrection (ADR 0034): who corrected what, and the GameEvents it produced. */
+  | { type: 'BoardCorrectionMade'; playerId: PlayerId; gameAction: GameAction; gameEvents: GameEventId[] };
+
+/** A TableEvent before replay has given it an ID. */
+export type TableEventDraft = TableEventBody & { causedBy: Cause };
+
+export type TableEvent = TableEventDraft & { id: string };

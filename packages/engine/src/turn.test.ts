@@ -197,6 +197,22 @@ describe('replayTurn', () => {
     expect(Object.values(r.state.permanents).map((p) => p.card)).toEqual(['Grizzly Bears']);
   });
 
+  it('a board correction is recorded as a pair: a TableEvent and the GameEvents it produced (ADR 0020, 0034)', () => {
+    const start = twoBears();
+    const r = applyBoardCorrection(start, { type: 'counters', target: { permanentId: 'p1' }, kind: '+1/+1', delta: 2 }, 'melissa');
+    expect(r.tableEvents).toEqual([
+      { id: 't1', type: 'BoardCorrectionMade', playerId: 'melissa', gameAction: { type: 'counters', target: { permanentId: 'p1' }, kind: '+1/+1', delta: 2 }, gameEvents: r.events.map((x) => x.id), causedBy: { rule: 'boardCorrection' } },
+    ]);
+    expect(r.events.map((x) => x.type)).toEqual(['CountersChanged']);
+  });
+
+  it('TableEvents are numbered in replay order, the same every time', () => {
+    const timeline = [e('main1', 'theo', { type: 'playerTask', playerId: 'michael', text: 'Reveal your top card' })];
+    const a = replayTurn(newGame(), timeline);
+    expect(a.tableEvents.map((t) => [t.id, t.type, t.type === 'PlayerTaskCreated' ? t.text : ''])).toEqual([['t1', 'PlayerTaskCreated', 'Draw a card'], ['t2', 'PlayerTaskCreated', 'Reveal your top card']]);
+    expect(replayTurn(newGame(), timeline).tableEvents).toEqual(a.tableEvents);
+  });
+
   it('a board correction changes the board, is caused by the correction, and settles', () => {
     const start = twoBears();
     const r = applyBoardCorrection(start, { type: 'counters', target: { permanentId: 'p1' }, kind: '-1/-1', delta: 2 }, 'theo');

@@ -132,7 +132,8 @@ describe('triggers', () => {
     const push = applyAction(state, { type: 'cast', card: 'Fatal Push', targets: ['p1'], effects: [{ type: 'move', objectId: 'p1', to: 'graveyard', how: 'destroy' }] }, { playerId: 'theo', cause: { playerStatement: 's2' } });
     const s = settle(push.state);
     expect(s.state.permanents.p1).toBeUndefined();
-    expect(s.events.find((e) => e.type === 'PlayerTaskCreated')).toMatchObject({ playerId: 'theo', text: expect.stringContaining('Goblin Guide: Reveal the top card') });
+    expect(s.tableEvents.find((e) => e.type === 'PlayerTaskCreated')).toMatchObject({ playerId: 'theo', text: expect.stringContaining('Goblin Guide: Reveal the top card') });
+    expect(s.events.map((e) => e.type)).not.toContain('PlayerTaskCreated');
   });
 
   it('a creature’s own "dies" trigger sees it as it left (look-back)', () => {
@@ -147,10 +148,10 @@ describe('triggers', () => {
   it('an intervening-if is checked when it would trigger: Haliya draws only after 3 life gained', () => {
     const base = act(newGame(), [[{ type: 'cast', card: 'Haliya, Guided by Light' }, 'theo']]).state;
     const endStep = (s: GameState) => settle(inject(s, { type: 'PhaseStarted', step: 'end', activePlayerId: 'theo', turn: 1 }));
-    expect(endStep(base).events.some((e) => e.type === 'PlayerTaskCreated')).toBe(false);
+    expect(endStep(base).tableEvents).toEqual([]);
 
     const more = act(base, [[{ type: 'life', playerId: 'theo', delta: 2 }, 'theo']]).state;
-    expect(endStep(more).events.find((e) => e.type === 'PlayerTaskCreated')).toMatchObject({ playerId: 'theo', text: 'Haliya, Guided by Light: Draw a card' });
+    expect(endStep(more).tableEvents).toMatchObject([{ type: 'PlayerTaskCreated', playerId: 'theo', text: 'Haliya, Guided by Light: Draw a card' }]);
   });
 
   it('an intervening-if no longer true on resolution does nothing', () => {

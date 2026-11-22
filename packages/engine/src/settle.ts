@@ -1,4 +1,4 @@
-import type { GameEvent, GameEventBody } from './events.js';
+import type { GameEvent, GameEventBody, TableEventDraft } from './events.js';
 import type { GameEventId, PermanentId } from './ids.js';
 import { clone } from './clone.js';
 import { emit } from './emit.js';
@@ -15,6 +15,7 @@ const MAX_PASSES = 100;
 export interface SettleResult {
   state: GameState;
   events: GameEvent[];
+  tableEvents: TableEventDraft[];
   warnings: RulesWarning[];
 }
 
@@ -28,6 +29,7 @@ export function settle(state: GameState, options: { resolveStack?: boolean } = {
   const resolveStack = options.resolveStack ?? true;
   let draft = clone(state);
   const events: GameEvent[] = [];
+  const tableEvents: TableEventDraft[] = [];
   const warnings: RulesWarning[] = [];
 
   for (let pass = 0; ; pass++) {
@@ -53,9 +55,10 @@ export function settle(state: GameState, options: { resolveStack?: boolean } = {
     const r = resolveTop(draft);
     draft = r.state;
     events.push(...r.events);
+    tableEvents.push(...r.tableEvents);
     warnings.push(...r.warnings);
   }
-  return { state: draft, events, warnings };
+  return { state: draft, events, tableEvents, warnings };
 }
 
 /**
