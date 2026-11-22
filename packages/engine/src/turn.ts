@@ -1,7 +1,7 @@
 import type { GameAction } from './actions.js';
 import { applyAction } from './apply.js';
 import { clone } from './clone.js';
-import { dealCombatDamage, endCombat, firstStrikeStepNeeded } from './combat.js';
+import { dealCombatDamage, endCombat, firstStrikeStepNeeded, menaceShortOfBlockers } from './combat.js';
 import { emit } from './emit.js';
 import type { GameEvent, TableEvent, TableEventDraft } from './events.js';
 import type { PermanentId, PlayerId } from './ids.js';
@@ -209,9 +209,14 @@ export function tableView(result: ReplayResult): TableView {
     awaitingResponseFrom,
     combatPreview,
     playerTasks: result.tableEvents.flatMap((e) => (e.type === 'PlayerTaskCreated' ? [{ playerId: e.playerId, text: e.text, from: e.id }] : [])),
-    reminders: stepReminders(state),
+    reminders: [...stepReminders(state), ...combatReminders(state)],
     warnings: result.warnings,
   };
+}
+
+function combatReminders(state: GameState): TableView['reminders'] {
+  if (stepIndex(state.turn.step) >= stepIndex('firstStrikeDamage')) return [];
+  return menaceShortOfBlockers(state).map((p) => ({ text: 'Menace: needs another blocker', permanentId: p.id }));
 }
 
 function stepReminders(state: GameState): TableView['reminders'] {

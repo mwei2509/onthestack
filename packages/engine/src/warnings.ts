@@ -17,4 +17,6 @@ export interface RulesWarning {
   code: RulesWarningCode;
   message: string;
   objectIds?: string[];
+  /** Offer "Go back" (a take-back to fix the mistake) alongside "Do it anyway" (ADR 0027). */
+  goBack?: boolean;
 }

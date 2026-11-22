@@ -9,6 +9,7 @@ import { clone } from './clone.js';
 import { emit } from './emit.js';
 import { createGame } from './game.js';
 import { settle } from './settle.js';
+import { tableView } from './turn.js';
 import type { GameState } from './state.js';
 
 const creature = (name: string, power: number, toughness: number, keywords: string[] = []): CardDefinition => ({ name, types: ['Creature'], power, toughness, keywords, abilities: [] });
@@ -115,14 +116,14 @@ describe('declaring blockers', () => {
     expect(warnings).toMatchObject([{ code: 'cantBlockFlyer' }]);
   });
 
-  it('reach can block a flyer; only the attacked player can block; menace needs two blockers', () => {
+  it('reach can block a flyer; only the attacked player can block; a lone menace block is not a warning yet', () => {
     const s = board([['Serra Angel', 'theo'], ['Boggart Brute', 'theo'], ['Giant Spider', 'michael'], ['Grizzly Bears', 'melissa']]);
     const { warnings, state } = act(s, [
       [{ type: 'attack', attacks: [{ attackerId: 'p1', target: 'michael' }, { attackerId: 'p2', target: 'michael' }] }, 'theo'],
       [{ type: 'block', blocks: [{ blockerId: 'p3', attackerId: 'p2' }] }, 'michael'],
       [{ type: 'block', blocks: [{ blockerId: 'p4', attackerId: 'p1' }] }, 'melissa'],
     ]);
-    expect(warnings.map((w) => w.code)).toEqual(['menace', 'notTheDefender', 'cantBlockFlyer']);
+    expect(warnings.map((w) => w.code)).toEqual(['notTheDefender', 'cantBlockFlyer']);
     expect(state.combat!.ready).toEqual(['michael', 'melissa']);
   });
 
@@ -133,6 +134,39 @@ describe('declaring blockers', () => {
       [{ type: 'noBlock' }, 'michael'],
     ]);
     expect(state.combat!.ready).toEqual(['michael']);
+  });
+});
+
+describe('menace (ADR 0027)', () => {
+  const view = (state: GameState) => tableView({ state, events: [], tableEvents: [], warnings: [] });
+  const oneBlock = () => {
+    const s = board([['Boggart Brute', 'theo'], ['Grizzly Bears', 'michael'], ['Hill Giant', 'michael']]);
+    return act(s, [
+      [{ type: 'attack', attacks: [{ attackerId: 'p1', target: 'michael' }] }, 'theo'],
+      [{ type: 'block', blocks: [{ blockerId: 'p2', attackerId: 'p1' }] }, 'michael'],
+    ]);
+  };
+
+  it('one blocker shows a reminder on the attacker, not a RulesWarning', () => {
+    const { state, warnings } = oneBlock();
+    expect(warnings).toEqual([]);
+    expect(view(state).reminders).toEqual([{ text: 'Menace: needs another blocker', permanentId: 'p1' }]);
+  });
+
+  it('a second blocker clears the reminder', () => {
+    const { state } = act(oneBlock().state, [[{ type: 'block', blocks: [{ blockerId: 'p3', attackerId: 'p1' }] }, 'michael']]);
+    expect(view(state).reminders).toEqual([]);
+  });
+
+  it('damage starting with one blocker raises a RulesWarning offering "Go back", once', () => {
+    const r = damage(oneBlock().state);
+    expect(r.warnings).toEqual([{ code: 'menace', message: 'Boggart Brute has menace but only one blocker.', objectIds: ['p1'], goBack: true }]);
+  });
+
+  it('with a first-strike step, the warning still comes only once', () => {
+    const s = oneBlock().state;
+    s.permanents.p2!.effects.push({ kind: 'add', power: 0, toughness: 0, keywords: ['First strike'], until: 'endOfTurn', timestamp: 1 });
+    expect(damage(s).warnings.filter((w) => w.code === 'menace')).toHaveLength(1);
   });
 });
 

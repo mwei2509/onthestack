@@ -75,7 +75,7 @@ flowchart TD
 | Main 1 | | | |
 | Combat | Beginning of combat | triggers | prompt: Declare attackers |
 | | Declare attackers | attackers tap unless vigilance; one `AttackersDeclared` batch | ends on "that's it" or a defender's response |
-| | Declare blockers | one `BlockersDeclared` batch | each attacked player blocks or takes it → Ready |
+| | Declare blockers | one `BlockersDeclared` batch | each attacked player blocks or takes it → Ready; reminder on a menace attacker with one blocker (ADR 0027) |
 | | First-strike damage | exists only if a first or double striker is in combat when damage begins | runs on its own |
 | | Combat damage | everyone else, plus double strikers again | runs on its own |
 | | End of combat | attacking and blocking end | |
@@ -272,7 +272,7 @@ Interpretation produces the whole turn's timeline every time (ADR 0015, 0016), s
 | Function | Contract |
 | --- | --- |
 | `replayTurn(turnStart, timeline, { currentStep })` | Walks the Steps from the snapshot: each Step's automatic actions, then its timeline entries, settling after each (the Stack waits when the next entry is a Response). Returns the `GameState`, the turn's `GameEvent[]`, its TableEvents (numbered `t1`, `t2`… in replay order; never stored in `GameState`) and RulesWarnings. Deterministic: same inputs, same output, IDs included. The card catalog lives in the state. |
-| `tableView(result)` | What screens show: board with stats, Stack, zones, who still owes a combat response, the combat preview once everyone is Ready, PlayerTasks and RulesWarnings. |
+| `tableView(result)` | What screens show: board with stats, Stack, zones, who still owes a combat response, the combat preview once everyone is Ready, PlayerTasks, reminders (the draw, menace short of blockers; computed, never stored) and RulesWarnings. |
 | `sealTurn(turnStart, timeline)` | Replays through cleanup, then returns the `SealedTurn` (with GameEvents and summary) and the next turn's `turnStart`, passing to the next player still in the game. |
 | `applyBoardCorrection(state, correction, playerId)` | Applies a correction ("Heliod has two counters"), caused by `{ rule: 'boardCorrection' }`, then settles, and records it as a pair: a `BoardCorrectionMade` TableEvent plus the GameEvents it produced (ADR 0020, 0034). Corrections never trigger abilities. |
 | `stats(permanent, state)` | Current power, toughness and keywords, calculated whenever asked. |

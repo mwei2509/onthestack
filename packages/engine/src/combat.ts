@@ -59,14 +59,32 @@ export function blockWarnings(state: GameState, blocks: Block[], defenderId: Pla
       warnings.push({ code: 'cantBlockFlyer', message: `${attacker.card} has flying; ${blocker.card} has neither flying nor reach.`, objectIds: [blocker.id, attacker.id] });
     }
   }
-  for (const attackerId of new Set(blocks.map((b) => b.attackerId))) {
-    const attacker = state.permanents[attackerId];
-    const total = [...(state.combat?.blocks ?? []), ...blocks].filter((b) => b.attackerId === attackerId).length;
-    if (attacker && total === 1 && has(attacker, state, 'Menace')) {
-      warnings.push({ code: 'menace', message: `${attacker.card} has menace and needs two or more blockers.`, objectIds: [attackerId] });
-    }
-  }
   return warnings;
+}
+
+/** Attackers with menace blocked by exactly one creature that's still there (CR 702.111b). */
+export function menaceShortOfBlockers(state: GameState): Permanent[] {
+  const combat = state.combat;
+  if (!combat) return [];
+  return combat.attacks
+    .map((a) => state.permanents[a.attackerId])
+    .filter((p): p is Permanent => p !== undefined && has(p, state, 'Menace'))
+    .filter((p) => combat.blocks.filter((b) => b.attackerId === p.id && state.permanents[b.blockerId]).length === 1);
+}
+
+/**
+ * At the first combat damage step, menace still blocked by a single creature becomes a RulesWarning offering
+ * "Go back" (ADR 0027). Before that it's only a reminder on the board, since another block may be coming.
+ */
+function menaceWarnings(state: GameState, step: DamageStep): RulesWarning[] {
+  const firstStrikeStepHappened = state.gameEventsThisTurn.some((e) => e.type === 'PhaseStarted' && e.step === 'firstStrikeDamage');
+  if (step === 'combatDamage' && firstStrikeStepHappened) return [];
+  return menaceShortOfBlockers(state).map((p) => ({
+    code: 'menace' as const,
+    message: `${p.card} has menace but only one blocker.`,
+    objectIds: [p.id],
+    goBack: true,
+  }));
 }
 
 /** The first-strike damage step exists only if a creature in combat has first or double strike when damage begins (CR 510.4). */
@@ -117,6 +135,7 @@ export function dealCombatDamage(state: GameState, step: DamageStep): CombatResu
   const warnings: RulesWarning[] = [];
   const combat = draft.combat;
   if (!combat) return { state: draft, events, warnings };
+  warnings.push(...menaceWarnings(draft, step));
 
   const damage: DamageItem[] = [];
   const add = (source: Permanent, recipient: DamageItem['recipient'], amount: number) => {
