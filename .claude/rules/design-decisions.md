@@ -30,7 +30,7 @@ Not a design decision: private helpers, names, refactors that change none of the
 
 ## On GitHub
 
-- PRs touching `docs/adr/`, `docs/engine-model.md` or `GLOSSARY.md` get the `design-decision` label automatically.
+- PRs touching `docs/adr/` get the `design-decision` label automatically. PRs touching `docs/engine-model.md` or `GLOSSARY.md` get `design-updated`, so a PR that only brings the summary docs in line with existing decisions isn't mistaken for one making a new decision. A PR can have both.
 - The required `decisions` check fails while any ADR in the PR is `Proposed`.
-- Such a PR starts its description with a **Decisions** section: each decision in a sentence, its ADR, and where it was discussed.
+- A `design-decision` PR starts its description with a **Decisions** section: each decision in a sentence, its ADR, and where it was discussed.
 - When the user comments `@claude grill me on the decisions in this PR`, ask about each Proposed ADR in the PR thread: numbered questions, a recommended answer for each, phrased so "yes" accepts it. Then update each ADR's status and the docs from her answers.
