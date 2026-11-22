@@ -115,7 +115,7 @@ Every board change is a GameEvent, a Magic rules happening; the app's own record
 | `PhaseStarted` | step, active player, turn | upkeep, end step, combat steps |
 | `AttackersDeclared` | attacker → target pairs, one batch | "attacks", "attacks you" |
 | `BlockersDeclared` | blocker → attacker pairs, one batch | "blocks", "becomes blocked" |
-| `DamageDealt` | source, recipient, amount, combat flag, one batch per step | combat and other damage, commander damage |
+| `DamageDealt` | source, recipient, amount, combat flag, one batch per step | combat and other damage, commander damage; "deals combat damage to a player" (once per source and player per batch) |
 | `LifeChanged` | player, delta, cause | gain, loss, payment |
 | `SpellCast` | caster, card, targets, from where | "whenever you cast" |
 | `ZoneChanged` | from, to, how, and every object that moved at that moment (each with its card and owner); simultaneous moves are one event (ADR 0026) | enters, dies, leaves, exiled, landfall |
@@ -158,8 +158,16 @@ The card catalog is built from the game's Decks and stored once per game. Each c
     { id: "case-of-the-uneaten-feast#1", kind: "triggered",
       when:   { event: "ZoneChanged", to: "battlefield", object: { types: ["Creature"], controller: "you" } },
       effect: [{ gameAction: "life", who: "you", delta: +1 }] },
-    { id: "case-of-the-uneaten-feast#2", kind: "unmodeled", text: "To solve — ... Solved — ..." } ] }
+    { id: "case-of-the-uneaten-feast#2", kind: "unmodeled", text: "To solve — ... Solved — ..." } ] },
+
+"Coastal Piracy": { cost: "{2}{U}{U}", types: ["Enchantment"],
+  abilities: [
+    { id: "coastal-piracy#1", kind: "triggered",
+      when:   { event: "DamageDealt", combat: true, player: "opponent", object: { types: ["Creature"], controller: "you" } },
+      effect: [{ playerTask: "You may draw a card", who: "you" }] } ] }
 ```
+
+A `DamageDealt` trigger matches only damage to a player: `object` filters the source, `player` is who was dealt damage relative to the ability's controller, and `combat` keeps it to combat damage. The damaged player is the trigger's `defendingPlayer`, so "that player" templates name them. Each damage step is its own batch, so double strike that connects twice triggers twice.
 
 The kinds are:
 - `triggered` (with `when` and an optional `if`)
