@@ -19,6 +19,7 @@ export type GameEventBody =
   | { type: 'BlockersDeclared'; defenderId: PlayerId; blocks: Block[] }
   | { type: 'DamageAssignmentSet'; attackerId: PermanentId; split: Record<string, number> }
   | { type: 'CombatEnded' }
+  | { type: 'CleanedUp' }
   | { type: 'DamageDealt'; damage: DamageItem[] }
   | { type: 'LifeChanged'; playerId: PlayerId; delta: number; lifeAfter: number; reason: 'damage' | 'gain' | 'loss' | 'payment' }
   | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId; from: Zone; gameActions: GameAction[] }

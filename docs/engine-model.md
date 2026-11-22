@@ -271,10 +271,10 @@ Interpretation produces the whole turn's timeline every time (ADR 0015, 0016), s
 
 | Function | Contract |
 | --- | --- |
-| `replayTurn(turnStart, timeline, cards)` | Runs every entry through the event loop from the snapshot, including automatic step actions and combat damage. Returns the resulting `GameState`, the turn's `GameEvent[]`, RulesWarnings, PlayerQuestions, PlayerTasks and the combat preview. Deterministic: same inputs, same output. |
-| `tableView(result)` | Shapes a replay result into what screens show. |
-| `sealTurn(turnStart, timeline, cards)` | Replays, then returns the `SealedTurn` (with GameEvents and summary) and the next turn's `turnStart` (after cleanup). |
-| `applyBoardCorrection(state, correction)` | Applies a correction to a sealed board ("Heliod has two counters"), recorded as a GameEvent caused by the correction. |
+| `replayTurn(turnStart, timeline, { currentStep })` | Walks the Steps from the snapshot: each Step's automatic actions, then its timeline entries, settling after each (the Stack waits when the next entry is a Response). Returns the `GameState`, the turn's `GameEvent[]` and RulesWarnings. Deterministic: same inputs, same output, IDs included. The card catalog lives in the state. |
+| `tableView(result)` | What screens show: board with stats, Stack, zones, who still owes a combat response, the combat preview once everyone is Ready, PlayerTasks and RulesWarnings. |
+| `sealTurn(turnStart, timeline)` | Replays through cleanup, then returns the `SealedTurn` (with GameEvents and summary) and the next turn's `turnStart`, passing to the next player still in the game. |
+| `applyBoardCorrection(state, correction, playerId)` | Applies a correction ("Heliod has two counters"), caused by `{ rule: 'boardCorrection' }`, then settles. Corrections never trigger abilities. |
 | `stats(permanent, state)` | Current power, toughness and keywords, calculated whenever asked. |
 
 IDs for new permanents, GameEvents and Stack items are derived from the replay position, never random, so a replay always produces the same IDs.
@@ -389,7 +389,7 @@ The interactive version, with the board, TurnTranscript, InterpretedTimeline and
 }
 ```
 
-This game becomes an engine test: its M1 InterpretedTimelines in, these life totals and zones out.
+This game is an engine test (`packages/engine/src/turn.test.ts`): its M1 timelines go in, and these life totals and zones come out, with no RulesWarnings.
 
 ## 12. Open
 
