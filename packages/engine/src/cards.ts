@@ -61,6 +61,10 @@ export interface TriggerCondition {
   from?: Zone;
   object?: ObjectFilter | 'self' | { selfOr: ObjectFilter };
   includes?: 'self';
+  /** For LifeChanged and SpellCast: whose life or whose spell, relative to the ability's controller. */
+  player?: 'you' | 'opponent';
+  /** For LifeChanged: only life gained. */
+  gained?: boolean;
 }
 
 export interface ObjectFilter {

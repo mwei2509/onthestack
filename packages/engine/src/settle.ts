@@ -3,6 +3,7 @@ import type { GameEventId, PermanentId } from './ids.js';
 import { clone } from './clone.js';
 import { emit } from './emit.js';
 import { resolveTop } from './stack.js';
+import { apnapOrder, toStackItem } from './triggers.js';
 import type { GameState } from './state.js';
 import { stats } from './stats.js';
 import type { RulesWarning } from './warnings.js';
@@ -19,8 +20,9 @@ export interface SettleResult {
 
 /**
  * Settles the board: state-based actions until none apply (CR 704.3), each pass found against the same state and
- * performed together so simultaneous deaths really are simultaneous. Then, unless a Response is pending, the top
- * Stack item resolves and the board settles again, until the Stack is empty.
+ * performed together so simultaneous deaths really are simultaneous. Then waiting triggers go on the Stack in APNAP
+ * order and the check repeats (CR 603.3b). Then, unless a Response is pending, the top Stack item resolves and the
+ * board settles again, until the Stack is empty.
  */
 export function settle(state: GameState, options: { resolveStack?: boolean } = {}): SettleResult {
   const resolveStack = options.resolveStack ?? true;
@@ -37,6 +39,13 @@ export function settle(state: GameState, options: { resolveStack?: boolean } = {
     if (found.length > 0) {
       for (const { body, after } of found) {
         emit(draft, events, body, after ? { rule: 'stateBasedAction', after } : { rule: 'stateBasedAction' });
+      }
+      continue;
+    }
+    if (draft.pendingTriggers.length > 0) {
+      for (const trigger of apnapOrder(draft, draft.pendingTriggers)) {
+        const stackItem = toStackItem(draft, trigger, `k${draft.nextIds.stackItem}`);
+        emit(draft, events, { type: 'AbilityTriggered', stackItem }, { gameEvent: trigger.triggeredBy });
       }
       continue;
     }

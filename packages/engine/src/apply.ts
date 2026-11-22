@@ -4,6 +4,7 @@ import type { PermanentId, PlayerId } from './ids.js';
 import { clone } from './clone.js';
 import { reduceInto } from './reduce.js';
 import { hasKeyword } from './stats.js';
+import { entersTappedBecause } from './triggers.js';
 import type { GameState, Permanent } from './state.js';
 import type { RulesWarning } from './warnings.js';
 
@@ -51,7 +52,17 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
       if (def && !def.types.includes('Land')) {
         warnings.push({ code: 'notALand', message: `${action.card} isn't a land.` });
       }
-      emit({ type: 'ZoneChanged', objects: [newPermanentId()], card: action.card, ownerId: ctx.playerId, from: 'hand', to: 'battlefield', controllerId: ctx.playerId });
+      const because = entersTappedBecause(draft, action.card, ctx.playerId);
+      emit({
+        type: 'ZoneChanged',
+        objects: [newPermanentId()],
+        card: action.card,
+        ownerId: ctx.playerId,
+        from: 'hand',
+        to: 'battlefield',
+        controllerId: ctx.playerId,
+        ...(because ? { tapped: true, entersTappedBecause: because } : {}),
+      });
       break;
     }
 
@@ -123,7 +134,20 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
 
     case 'createToken': {
       const ids = Array.from({ length: action.count }, newPermanentId);
-      emit({ type: 'ZoneChanged', objects: ids, card: action.token, ownerId: ctx.playerId, from: 'nowhere', to: 'battlefield', how: 'token', controllerId: ctx.playerId, isToken: true, tokenDefinition: action.definition });
+      const because = entersTappedBecause(draft, action.token, ctx.playerId, action.definition?.types);
+      emit({
+        type: 'ZoneChanged',
+        objects: ids,
+        card: action.token,
+        ownerId: ctx.playerId,
+        from: 'nowhere',
+        to: 'battlefield',
+        how: 'token',
+        controllerId: ctx.playerId,
+        isToken: true,
+        tokenDefinition: action.definition,
+        ...(because ? { tapped: true, entersTappedBecause: because } : {}),
+      });
       break;
     }
 

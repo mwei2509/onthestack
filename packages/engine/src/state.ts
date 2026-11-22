@@ -50,7 +50,16 @@ export interface StackItem {
   matched?: Record<string, ObjectId | PlayerId>;
   targets: ObjectId[];
   gameActions: GameAction[];
-  status: 'pending' | 'resolved' | 'countered' | 'fizzled';
+  status: 'pending' | 'resolved' | 'countered' | 'fizzled' | 'conditionNotMet';
+}
+
+/** A triggered ability that matched a GameEvent and waits for the board to settle before going on the Stack. */
+export interface PendingTrigger {
+  ability: AbilityId;
+  controllerId: PlayerId;
+  source: { card: CardName; permanentId?: PermanentId; lastKnown?: Partial<Permanent> };
+  triggeredBy: GameEventId;
+  matched: Record<string, ObjectId | PlayerId>;
 }
 
 export interface DelayedTrigger {
@@ -78,6 +87,7 @@ export interface GameState {
   stack: StackItem[];
   combat: CombatState | null;
   delayedTriggers: DelayedTrigger[];
+  pendingTriggers: PendingTrigger[];
   gameEventsThisTurn: GameEvent[];
   /** IDs come from these counters, never from randomness, so a replay always produces the same IDs. */
   nextIds: { permanent: number; gameEvent: number; stackItem: number };

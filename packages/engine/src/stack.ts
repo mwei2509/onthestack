@@ -3,6 +3,7 @@ import { clone } from './clone.js';
 import { emit } from './emit.js';
 import type { GameEvent } from './events.js';
 import type { GameState, StackItem } from './state.js';
+import { conditionHolds, entersTappedBecause, findAbility } from './triggers.js';
 import type { RulesWarning } from './warnings.js';
 
 export interface ResolveResult {
@@ -31,6 +32,12 @@ export function resolveTop(state: GameState): ResolveResult {
     return { state: draft, events, warnings };
   }
 
+  const ability = item.kind === 'trigger' ? findAbility(draft, item.source.card, item.ability) : undefined;
+  if (ability?.kind === 'triggered' && ability.if && !conditionHolds(draft, ability.if, item.controllerId)) {
+    emit(draft, events, { type: 'StackItemResolved', stackItemId: item.id, status: 'conditionNotMet' }, { stackItem: item.id });
+    return { state: draft, events, warnings };
+  }
+
   item.gameActions.forEach((gameAction, i) => {
     const r = applyAction(draft, gameAction, {
       playerId: item.controllerId,
@@ -51,10 +58,21 @@ export function resolveTop(state: GameState): ResolveResult {
       message: `${item.source.card} resolved, but it isn't in this game's card list, so the app can't tell where it went. Correct the board if needed.`,
     });
   } else if (def.types.some((t) => PERMANENT_TYPES.has(t))) {
+    const because = entersTappedBecause(draft, item.source.card, item.controllerId);
     emit(
       draft,
       events,
-      { type: 'ZoneChanged', objects: [`p${draft.nextIds.permanent++}`], card: item.source.card, ownerId: item.controllerId, from: 'stack', to: 'battlefield', how: 'resolve', controllerId: item.controllerId },
+      {
+        type: 'ZoneChanged',
+        objects: [`p${draft.nextIds.permanent++}`],
+        card: item.source.card,
+        ownerId: item.controllerId,
+        from: 'stack',
+        to: 'battlefield',
+        how: 'resolve',
+        controllerId: item.controllerId,
+        ...(because ? { tapped: true, entersTappedBecause: because } : {}),
+      },
       { stackItem: item.id },
     );
   } else {

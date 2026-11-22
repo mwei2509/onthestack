@@ -1,6 +1,6 @@
 import type { Attack, Block, Recipient } from './actions.js';
-import type { CardName, GameEventId, ObjectId, PermanentId, PlayerId, PlayerStatementId, StackItemId } from './ids.js';
-import type { Effect } from './state.js';
+import type { AbilityId, CardName, GameEventId, ObjectId, PermanentId, PlayerId, PlayerStatementId, StackItemId } from './ids.js';
+import type { Effect, StackItem } from './state.js';
 import type { GameAction, TokenDefinition } from './actions.js';
 import type { Step, Zone } from './steps.js';
 
@@ -20,7 +20,8 @@ export type GameEventBody =
   | { type: 'DamageDealt'; damage: DamageItem[] }
   | { type: 'LifeChanged'; playerId: PlayerId; delta: number; lifeAfter: number; reason: 'damage' | 'gain' | 'loss' | 'payment' }
   | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId; from: Zone; gameActions: GameAction[] }
-  | { type: 'StackItemResolved'; stackItemId: StackItemId; status: 'resolved' | 'countered' | 'fizzled' }
+  | { type: 'StackItemResolved'; stackItemId: StackItemId; status: 'resolved' | 'countered' | 'fizzled' | 'conditionNotMet' }
+  | { type: 'AbilityTriggered'; stackItem: StackItem }
   | {
       type: 'ZoneChanged';
       objects: ObjectId[];
@@ -36,6 +37,8 @@ export type GameEventBody =
       isToken?: boolean;
       /** A token's characteristics, recorded in the card catalog when it is created. */
       tokenDefinition?: TokenDefinition;
+      /** The static ability that made it enter tapped, if any. */
+      entersTappedBecause?: AbilityId;
     }
   | { type: 'CountersChanged'; target: Recipient; kind: string; delta: number }
   | { type: 'PlayerLost'; playerId: PlayerId; reason: 'life' | 'poison' | 'commanderDamage' | 'conceded' }

@@ -36,6 +36,7 @@ export function createGame(seats: Seat[], cards: Record<CardName, CardDefinition
     stack: [],
     combat: null,
     delayedTriggers: [],
+    pendingTriggers: [],
     gameEventsThisTurn: [],
     nextIds: { permanent: 1, gameEvent: 1, stackItem: 1 },
   };
