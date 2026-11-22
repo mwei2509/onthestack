@@ -48,8 +48,12 @@ One literal thing done to the board: cast, play a land, move a card between zone
 _Avoid_: action, command, move
 
 **GameEvent**:
-Something that happened in the game as a result of a GameAction, the rules or a resolving spell or ability ("Serra Angel died", "Theo gained 1 life"). Triggered abilities listen for GameEvents, and each GameEvent remembers what caused it.
-_Avoid_: event, outcome
+Something that happened in the game, by the rules, as a result of a GameAction, the rules or a resolving spell or ability ("Serra Angel died", "Theo gained 1 life"). Triggered abilities listen for GameEvents, and each GameEvent remembers what caused it.
+_Avoid_: event, outcome, bookkeeping event
+
+**TableEvent**:
+The app's own record of something at the table that isn't part of the game: a PlayerTask given, a PlayerQuestion asked or answered, a RulesWarning raised, a correction said. It shares the history and its causes with GameEvents, but never changes the board and no trigger sees it.
+_Avoid_: log entry, notification
 
 **Stack**:
 The spells and triggered or activated abilities waiting to resolve, last in, first out. Casting something puts it on the Stack; it takes effect when it resolves.

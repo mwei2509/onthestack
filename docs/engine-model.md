@@ -108,7 +108,7 @@ For each attacker:
 
 ## 6. GameEvents and state-based actions
 
-These 9 GameEvents cover about 89% of trigger clauses on Commander-legal cards. The smaller ones arrive with M3.
+Every board change is a GameEvent, a Magic rules happening; the app's own records (PlayerTasks, PlayerQuestions, RulesWarnings, corrections said) are TableEvents, which never change the board and which triggers never see (ADR 0020). How often cards listen to a GameEvent is documentation, not a type distinction. These 9 GameEvents cover about 89% of trigger clauses on Commander-legal cards. The smaller ones arrive with M3.
 
 | GameEvent | Carries | Serves |
 | --- | --- | --- |
