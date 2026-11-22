@@ -96,7 +96,7 @@ flowchart TD
 flowchart TD
   S["<b>Blocks done</b><br/><i>every attacked player Ready</i>"] --> FS{"<b>First or double striker</b><br/><i>when damage begins?</i>"}
   FS -- yes --> P1["<b>First-strike step</b>"] --> L1["<b>Settle</b><br/><i>deaths, then triggers</i>"] --> P2
-  FS -- no --> P2["<b>Regular step</b><br/><i>creatures still in combat,<br/>double strikers again</i>"] --> L2["<b>Settle</b>"] --> E["<b>End of combat</b>"]
+  FS -- no --> P2["<b>Regular step</b><br/><i>creatures that didn't deal first-strike<br/>damage, plus double strikers again</i>"] --> L2["<b>Settle</b>"] --> E["<b>End of combat</b>"]
 ```
 
 For each attacker:
