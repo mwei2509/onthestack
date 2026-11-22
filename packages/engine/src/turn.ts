@@ -30,7 +30,6 @@ export function replayTurn(turnStart: GameState, timeline: TimelineEntry[], opti
   let state = clone(turnStart);
   const events: GameEvent[] = [];
   const warnings: RulesWarning[] = [];
-  let firstStrikeHappened = false;
 
   const take = (r: ReplayResult) => {
     state = r.state;
@@ -49,8 +48,7 @@ export function replayTurn(turnStart: GameState, timeline: TimelineEntry[], opti
     const started: GameEvent[] = [];
     emit(draft, started, { type: 'PhaseStarted', step, activePlayerId: draft.turn.activePlayerId, turn: draft.turn.number }, { rule: 'turnStructure' });
     take({ state: draft, events: started, warnings: [] });
-    take(automatic(state, step, firstStrikeHappened));
-    if (step === 'firstStrikeDamage') firstStrikeHappened = true;
+    take(automatic(state, step));
     settleNow();
 
     const entries = timeline.filter((e) => e.step === step);
@@ -62,7 +60,7 @@ export function replayTurn(turnStart: GameState, timeline: TimelineEntry[], opti
   return { state, events, warnings };
 }
 
-function automatic(state: GameState, step: Step, firstStrikeHappened: boolean): ReplayResult {
+function automatic(state: GameState, step: Step): ReplayResult {
   const draft = clone(state);
   const events: GameEvent[] = [];
   const active = draft.turn.activePlayerId;
@@ -78,7 +76,7 @@ function automatic(state: GameState, step: Step, firstStrikeHappened: boolean): 
     case 'firstStrikeDamage':
       return dealCombatDamage(draft, 'firstStrikeDamage');
     case 'combatDamage':
-      return dealCombatDamage(draft, 'combatDamage', firstStrikeHappened);
+      return dealCombatDamage(draft, 'combatDamage');
     case 'endOfCombat':
       return endCombat(draft);
     case 'cleanup':
@@ -164,7 +162,9 @@ export function tableView(result: ReplayResult): TableView {
     const previewEvents: GameEvent[] = [];
     const first = firstStrikeStepNeeded(preview);
     for (const step of first ? (['firstStrikeDamage', 'combatDamage'] as const) : (['combatDamage'] as const)) {
-      const dealt = dealCombatDamage(preview, step, first);
+      const started = clone(preview);
+      emit(started, [], { type: 'PhaseStarted', step, activePlayerId: started.turn.activePlayerId, turn: started.turn.number }, { rule: 'turnStructure' });
+      const dealt = dealCombatDamage(started, step);
       const settled = settle(dealt.state);
       preview = settled.state;
       previewEvents.push(...dealt.events, ...settled.events);

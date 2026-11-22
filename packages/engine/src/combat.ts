@@ -79,11 +79,29 @@ function inCombat(state: GameState): Permanent[] {
   return [...ids].map((id) => state.permanents[id]).filter((p): p is Permanent => p !== undefined);
 }
 
-function dealsDamageIn(step: DamageStep, p: Permanent, state: GameState, firstStrikeHappened: boolean): boolean {
-  const first = has(p, state, 'First strike');
+/**
+ * Creatures that dealt combat damage in this combat's first-strike damage step, read from this turn's GameEvents
+ * (ADR 0032). The regular step asks this rather than current keywords: a creature that gains first strike after the
+ * first-strike step still deals damage, and one that loses it doesn't deal damage again (CR 702.7c).
+ */
+export function dealtFirstStrikeDamage(state: GameState): Set<string> {
+  const dealt = new Set<string>();
+  let inFirstStrikeStep = false;
+  for (const e of state.gameEventsThisTurn) {
+    if (e.type === 'PhaseStarted') {
+      if (e.step === 'beginningOfCombat') dealt.clear();
+      inFirstStrikeStep = e.step === 'firstStrikeDamage';
+    } else if (e.type === 'DamageDealt' && inFirstStrikeStep) {
+      for (const d of e.damage) if (d.combat) dealt.add(d.sourceId);
+    }
+  }
+  return dealt;
+}
+
+function dealsDamageIn(step: DamageStep, p: Permanent, state: GameState, dealtFirstStrike: Set<string>): boolean {
   const double = has(p, state, 'Double strike');
-  if (step === 'firstStrikeDamage') return first || double;
-  return double || !first || !firstStrikeHappened;
+  if (step === 'firstStrikeDamage') return double || has(p, state, 'First strike');
+  return double || !dealtFirstStrike.has(p.id);
 }
 
 /**
@@ -92,8 +110,9 @@ function dealsDamageIn(step: DamageStep, p: Permanent, state: GameState, firstSt
  * blocker in turn with the rest to the last blocker (or through, with trample). An attacker whose blockers are all
  * gone stays blocked and deals no damage unless it has trample.
  */
-export function dealCombatDamage(state: GameState, step: DamageStep, firstStrikeHappened = false): CombatResult {
+export function dealCombatDamage(state: GameState, step: DamageStep): CombatResult {
   const draft = clone(state);
+  const dealtFirstStrike = step === 'combatDamage' ? dealtFirstStrikeDamage(draft) : new Set<string>();
   const events: GameEvent[] = [];
   const warnings: RulesWarning[] = [];
   const combat = draft.combat;
@@ -106,7 +125,7 @@ export function dealCombatDamage(state: GameState, step: DamageStep, firstStrike
 
   for (const attack of combat.attacks) {
     const attacker = draft.permanents[attack.attackerId];
-    if (!attacker || !dealsDamageIn(step, attacker, draft, firstStrikeHappened)) continue;
+    if (!attacker || !dealsDamageIn(step, attacker, draft, dealtFirstStrike)) continue;
     const power = Math.max(0, stats(attacker, draft).power);
     const wasBlocked = combat.blocks.some((b) => b.attackerId === attacker.id);
     const blockers = combat.blocks
@@ -145,7 +164,7 @@ export function dealCombatDamage(state: GameState, step: DamageStep, firstStrike
   for (const block of combat.blocks) {
     const blocker = draft.permanents[block.blockerId];
     const attacker = draft.permanents[block.attackerId];
-    if (!blocker || !attacker || !dealsDamageIn(step, blocker, draft, firstStrikeHappened)) continue;
+    if (!blocker || !attacker || !dealsDamageIn(step, blocker, draft, dealtFirstStrike)) continue;
     add(blocker, { permanentId: attacker.id }, Math.max(0, stats(blocker, draft).power));
   }
 

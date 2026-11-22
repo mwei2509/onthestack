@@ -36,9 +36,7 @@ const damage = (permanentId: string, amount: number) => ({ type: 'damage' as con
 // Ported from XMage (MIT; see THIRD_PARTY_NOTICES.md), commit 7fecba4e. Each test names its source.
 describe('ported from XMage', () => {
   // Mage.Tests/src/test/java/org/mage/test/combat/FirstStrikeTest.java#firstStrikeGainedMidCombat (CR 702.7c)
-  // Expected to fail until the first-strike fix (#31 step 2): a creature that gains first strike after the
-  // first-strike damage step still deals damage in the regular step.
-  it.fails('a creature that gains first strike after the first-strike step still deals regular damage', () => {
+  it('a creature that gains first strike after the first-strike step still deals regular damage', () => {
     const s = scenario({ seats: ['A', 'B'], life: 20, cards });
     const knight = s.battlefield('A', 'White Knight');
     const ghoul = s.battlefield('A', 'Warpath Ghoul');

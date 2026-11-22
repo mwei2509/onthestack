@@ -5,6 +5,8 @@ import { applyAction } from './apply.js';
 import type { CardDefinition } from './cards.js';
 import { dealCombatDamage, endCombat, firstStrikeStepNeeded } from './combat.js';
 import type { GameEvent } from './events.js';
+import { clone } from './clone.js';
+import { emit } from './emit.js';
 import { createGame } from './game.js';
 import { settle } from './settle.js';
 import type { GameState } from './state.js';
@@ -51,20 +53,30 @@ function act(state: GameState, steps: [GameAction, string][]) {
 function damage(state: GameState) {
   const events: GameEvent[] = [];
   const warnings = [];
+  const startStep = (s: GameState, step: 'firstStrikeDamage' | 'combatDamage') => {
+    emit(s, [], { type: 'PhaseStarted', step, activePlayerId: s.turn.activePlayerId, turn: s.turn.number }, { rule: 'turnStructure' });
+    return s;
+  };
   const first = firstStrikeStepNeeded(state);
   if (first) {
-    const r = dealCombatDamage(state, 'firstStrikeDamage');
+    const r = dealCombatDamage(startStep(clone(state), 'firstStrikeDamage'), 'firstStrikeDamage');
     const s = settle(r.state);
     state = s.state;
     events.push(...r.events, ...s.events);
     warnings.push(...r.warnings);
   }
-  const r = dealCombatDamage(state, 'combatDamage', first);
+  const r = dealCombatDamage(startStep(clone(state), 'combatDamage'), 'combatDamage');
   const s = settle(r.state);
   events.push(...r.events, ...s.events);
   warnings.push(...r.warnings);
   return { state: s.state, events, warnings };
 }
+
+const withStep = (s: GameState, step: 'firstStrikeDamage' | 'combatDamage') => {
+  const draft = clone(s);
+  emit(draft, [], { type: 'PhaseStarted', step, activePlayerId: draft.turn.activePlayerId, turn: draft.turn.number }, { rule: 'turnStructure' });
+  return draft;
+};
 
 const life = (s: GameState) => Object.fromEntries(Object.entries(s.players).map(([id, p]) => [id, p.life]));
 
@@ -214,6 +226,17 @@ describe('combat damage', () => {
     const { state } = damage(declared);
     expect(state.permanents.p2).toBeUndefined();
     expect(state.permanents.p1!.damage).toBe(0);
+  });
+
+  it('a creature that loses first strike after dealing first-strike damage doesn’t deal damage again (CR 702.7c)', () => {
+    const s = board([['Hill Giant', 'theo']]);
+    s.permanents.p1!.effects.push({ kind: 'add', power: 0, toughness: 0, keywords: ['First strike'], until: 'endOfTurn', timestamp: 1 });
+    const declared = act(s, [[{ type: 'attack', attacks: [{ attackerId: 'p1', target: 'melissa' }] }, 'theo']]).state;
+    const afterFirst = dealCombatDamage(withStep(declared, 'firstStrikeDamage'), 'firstStrikeDamage').state;
+    expect(afterFirst.players.melissa!.life).toBe(37);
+    afterFirst.permanents.p1!.effects = [];
+    const afterRegular = dealCombatDamage(withStep(afterFirst, 'combatDamage'), 'combatDamage').state;
+    expect(afterRegular.players.melissa!.life).toBe(37);
   });
 
   it('end of combat clears attackers and blockers', () => {
