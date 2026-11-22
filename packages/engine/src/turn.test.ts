@@ -275,3 +275,15 @@ describe('replay properties', () => {
     }
   });
 });
+
+describe('replayTurn with a Response pending', () => {
+  it('leaves the last spell on the Stack instead of resolving it', () => {
+    const cast: TimelineEntry = { step: 'main1', playerId: 'theo', gameAction: { type: 'cast', card: 'Grizzly Bears' }, from: ['s1'] };
+    const held = replayTurn(newGame(), [cast], { currentStep: 'main1', responsePending: true }).state;
+    expect(held.stack.map((k) => [k.source.card, k.status])).toEqual([['Grizzly Bears', 'pending']]);
+    expect(Object.values(held.permanents)).toEqual([]);
+
+    const resolved = replayTurn(newGame(), [cast], { currentStep: 'main1' }).state;
+    expect(Object.values(resolved.permanents).map((p) => p.card)).toEqual(['Grizzly Bears']);
+  });
+});
