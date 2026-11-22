@@ -103,8 +103,8 @@ describe('triggers', () => {
     expect(beforeResolving.state.stack).toEqual([expect.objectContaining({ kind: 'spell' })]);
 
     const s = settle(r.state);
-    const entered = s.events.find((e) => e.type === 'ZoneChanged' && e.card === 'Savannah Lions')!;
-    expect(entered).toMatchObject({ tapped: true, entersTappedBecause: 'authority-of-the-consuls#1' });
+    const entered = s.events.find((e) => e.type === 'ZoneChanged' && e.moves.some((m) => m.card === 'Savannah Lions'))!;
+    expect(entered).toMatchObject({ moves: [{ tapped: true, entersTappedBecause: 'authority-of-the-consuls#1' }] });
 
     const stacked = s.events.filter((e) => e.type === 'AbilityTriggered').map((e) => e.type === 'AbilityTriggered' && e.stackItem.ability);
     expect(stacked).toEqual(['case-of-the-uneaten-feast#1', 'authority-of-the-consuls#2']);
@@ -166,16 +166,16 @@ describe('triggers', () => {
 
   it('Scoured Barrens enters tapped by its own ability and gains 1 when it enters', () => {
     const { state, events } = act(newGame(), [[{ type: 'playLand', card: 'Scoured Barrens' }, 'melissa']]);
-    expect(events[0]).toMatchObject({ tapped: true, entersTappedBecause: 'scoured-barrens#1' });
+    expect(events[0]).toMatchObject({ moves: [{ tapped: true, entersTappedBecause: 'scoured-barrens#1' }] });
     expect(state.players.melissa!.life).toBe(41);
   });
 
   it('Starting Town enters untapped in a player’s first three turns, then tapped', () => {
     const early = act(newGame(), [[{ type: 'playLand', card: 'Starting Town' }, 'melissa']]);
-    expect(early.events[0]).not.toHaveProperty('tapped');
+    expect(early.events[0]!.type === 'ZoneChanged' && early.events[0]!.moves[0]).not.toHaveProperty('tapped');
     const later = newGame();
     later.turn = { number: 15, activePlayerId: 'melissa', step: 'main1' };
-    expect(act(later, [[{ type: 'playLand', card: 'Starting Town' }, 'melissa']]).events[0]).toMatchObject({ tapped: true });
+    expect(act(later, [[{ type: 'playLand', card: 'Starting Town' }, 'melissa']]).events[0]).toMatchObject({ moves: [{ tapped: true }] });
   });
 
   it('Authority taps an opponent’s creature tokens as they enter', () => {

@@ -48,7 +48,7 @@ function run(state: GameState, steps: [GameAction, ApplyContext][]) {
 describe('applyAction', () => {
   it('plays a land onto the battlefield, untapped, controlled by the player', () => {
     const { state, events } = run(newGame(), [[{ type: 'playLand', card: 'Plains' }, said('theo')]]);
-    expect(events).toMatchObject([{ id: 'e1', type: 'ZoneChanged', objects: ['p1'], from: 'hand', to: 'battlefield', causedBy: { playerStatement: 's1' } }]);
+    expect(events).toMatchObject([{ id: 'e1', type: 'ZoneChanged', from: 'hand', to: 'battlefield', moves: [{ objectId: 'p1', card: 'Plains', ownerId: 'theo' }], causedBy: { playerStatement: 's1' } }]);
     expect(state.permanents.p1).toMatchObject({ card: 'Plains', ownerId: 'theo', controllerId: 'theo', tapped: false, controlledSince: 1 });
   });
 
@@ -64,7 +64,7 @@ describe('applyAction', () => {
     expect(events).toMatchObject([
       { type: 'SpellCast', stackItemId: 'k1' },
       { type: 'StackItemResolved', stackItemId: 'k1', status: 'resolved' },
-      { type: 'ZoneChanged', objects: ['p1'], from: 'stack', to: 'battlefield', how: 'resolve', causedBy: { stackItem: 'k1' } },
+      { type: 'ZoneChanged', from: 'stack', to: 'battlefield', how: 'resolve', moves: [{ objectId: 'p1' }], causedBy: { stackItem: 'k1' } },
     ]);
     expect(state.stack).toEqual([]);
     expect(state.permanents.p1?.card).toBe('Savannah Lions');
@@ -107,7 +107,7 @@ describe('applyAction', () => {
       [{ type: 'createToken', token: 'Soldier', count: 3 }, said('melissa')],
       [{ type: 'move', objectId: 'p2', to: 'graveyard', how: 'destroy' }, said('theo', 2)],
     ]);
-    expect(events[0]).toMatchObject({ type: 'ZoneChanged', objects: ['p1', 'p2', 'p3'], from: 'nowhere', isToken: true });
+    expect(events[0]).toMatchObject({ type: 'ZoneChanged', from: 'nowhere', moves: [{ objectId: 'p1', isToken: true }, { objectId: 'p2' }, { objectId: 'p3' }] });
     expect(Object.keys(state.permanents)).toEqual(['p1', 'p3']);
     expect(state.graveyards.melissa).toEqual([]);
   });

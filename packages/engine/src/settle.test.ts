@@ -95,7 +95,7 @@ describe('settle', () => {
     ]);
     const damage = events.find((e) => e.type === 'DamageDealt')!;
     const r = settle(state);
-    expect(r.events).toMatchObject([{ type: 'ZoneChanged', objects: ['p1'], to: 'graveyard', how: 'stateBased', causedBy: { rule: 'stateBasedAction', after: damage.id } }]);
+    expect(r.events).toMatchObject([{ type: 'ZoneChanged', to: 'graveyard', how: 'stateBased', moves: [{ objectId: 'p1', after: damage.id }], causedBy: { rule: 'stateBasedAction' } }]);
     expect(r.state.graveyards.theo).toEqual(['Grizzly Bears']);
   });
 
@@ -105,7 +105,7 @@ describe('settle', () => {
       [{ type: 'modify', permanentId: 'p1', power: -2, toughness: -2, until: 'endOfTurn' }, 'melissa'],
     ]);
     const shrink = events.find((e) => e.type === 'EffectAdded')!;
-    expect(settle(state).events[0]).toMatchObject({ objects: ['p1'], causedBy: { after: shrink.id } });
+    expect(settle(state).events[0]).toMatchObject({ moves: [{ objectId: 'p1', after: shrink.id }] });
   });
 
   it('indestructible survives lethal damage but not 0 toughness', () => {
@@ -115,7 +115,7 @@ describe('settle', () => {
     ]);
     expect(settle(damaged.state).events).toEqual([]);
     const shrunk = play(damaged.state, [[{ type: 'modify', permanentId: 'p1', power: 0, toughness: -1, until: 'endOfTurn' }, 'melissa']]);
-    expect(settle(shrunk.state).events).toMatchObject([{ type: 'ZoneChanged', objects: ['p1'], to: 'graveyard' }]);
+    expect(settle(shrunk.state).events).toMatchObject([{ type: 'ZoneChanged', to: 'graveyard', moves: [{ objectId: 'p1' }] }]);
   });
 
   it('one damage from a deathtouch source is lethal; lifelink gains its controller that much', () => {
@@ -128,7 +128,7 @@ describe('settle', () => {
     expect(settle(state).state.permanents.p2).toBeUndefined();
   });
 
-  it('creatures that are lethal at the same time die in the same pass', () => {
+  it('creatures that are lethal at the same time die in one GameEvent (ADR 0026)', () => {
     const { state } = play(newGame(), [
       [{ type: 'cast', card: 'Savannah Lions' }, 'theo'],
       [{ type: 'cast', card: 'Typhoid Rats' }, 'melissa'],
@@ -136,7 +136,8 @@ describe('settle', () => {
       [{ type: 'damage', sourceId: 'p1', recipient: { permanentId: 'p2' }, amount: 2 }, 'theo'],
     ]);
     const r = settle(state);
-    expect(r.events.map((e) => e.type === 'ZoneChanged' && e.objects[0])).toEqual(['p1', 'p2']);
+    expect(r.events).toHaveLength(1);
+    expect(r.events[0]!.type === 'ZoneChanged' && r.events[0]!.moves.map((m) => m.objectId)).toEqual(['p1', 'p2']);
   });
 
   it('a player at 0 life, with 10 poison, or with 21 commander damage from one commander loses', () => {

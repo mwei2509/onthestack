@@ -103,44 +103,44 @@ function applyEvent(draft: GameState, event: GameEvent): void {
       return;
 
     case 'ZoneChanged':
-      // A card moving between graveyard, exile and the command zone has no permanent ID.
-      for (const id of event.objects.length ? event.objects : ['']) {
+      for (const move of event.moves) {
+        const id = move.objectId ?? '';
         if (event.from === 'battlefield') delete draft.permanents[id];
-        if (event.from === 'graveyard') removeOne(draft.graveyards[event.ownerId], event.card);
+        if (event.from === 'graveyard') removeOne(draft.graveyards[move.ownerId], move.card);
         if (event.from === 'exile') {
-          const i = draft.exile.findIndex((x) => x.card === event.card && x.ownerId === event.ownerId);
+          const i = draft.exile.findIndex((x) => x.card === move.card && x.ownerId === move.ownerId);
           if (i >= 0) draft.exile.splice(i, 1);
         }
 
         switch (event.to) {
           case 'battlefield':
             if (!id) break;
-            if (event.tokenDefinition && !draft.cards[event.card]) {
-              draft.cards[event.card] = { name: event.card, ...event.tokenDefinition, abilities: [] };
+            if (move.tokenDefinition && !draft.cards[move.card]) {
+              draft.cards[move.card] = { name: move.card, ...move.tokenDefinition, abilities: [] };
             }
             draft.permanents[id] = {
               id,
-              card: event.card,
-              ownerId: event.ownerId,
-              controllerId: event.controllerId ?? event.ownerId,
-              tapped: event.tapped ?? false,
+              card: move.card,
+              ownerId: move.ownerId,
+              controllerId: move.controllerId ?? move.ownerId,
+              tapped: move.tapped ?? false,
               controlledSince: draft.turn.number,
               damage: 0,
               deathtouchDamage: false,
               counters: {},
               effects: [],
-              isToken: event.isToken ?? false,
+              isToken: move.isToken ?? false,
             };
             break;
           case 'graveyard':
-            if (!event.isToken) draft.graveyards[event.ownerId]?.push(event.card);
+            if (!move.isToken) draft.graveyards[move.ownerId]?.push(move.card);
             break;
           case 'exile':
-            if (!event.isToken) draft.exile.push({ card: event.card, ownerId: event.ownerId });
+            if (!move.isToken) draft.exile.push({ card: move.card, ownerId: move.ownerId });
             break;
           case 'command': {
-            const cz = draft.commandZone[event.ownerId];
-            if (cz && cz.card === event.card) cz.inZone = true;
+            const cz = draft.commandZone[move.ownerId];
+            if (cz && cz.card === move.card) cz.inZone = true;
             break;
           }
           default:
@@ -227,5 +227,5 @@ function advanceIds(draft: GameState, event: GameEvent): void {
   bump('gameEvent', event.id, 'e');
   if (event.type === 'SpellCast') bump('stackItem', event.stackItemId, 'k');
   if (event.type === 'AbilityTriggered') bump('stackItem', event.stackItem.id, 'k');
-  if (event.type === 'ZoneChanged' && event.to === 'battlefield') for (const id of event.objects) bump('permanent', id, 'p');
+  if (event.type === 'ZoneChanged' && event.to === 'battlefield') for (const m of event.moves) if (m.objectId) bump('permanent', m.objectId, 'p');
 }

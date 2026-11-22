@@ -27,7 +27,7 @@ export function resolveTop(state: GameState): ResolveResult {
   if (allTargetsGone(item, draft)) {
     const fizzled = emit(draft, events, { type: 'StackItemResolved', stackItemId: item.id, status: 'fizzled' }, { stackItem: item.id });
     if (item.kind === 'spell') {
-      emit(draft, events, { type: 'ZoneChanged', objects: [item.id], card: item.source.card, ownerId: item.controllerId, from: 'stack', to: 'graveyard', how: 'fizzled' }, { gameEvent: fizzled.id });
+      emit(draft, events, { type: 'ZoneChanged', from: 'stack', to: 'graveyard', how: 'fizzled', moves: [{ objectId: item.id, card: item.source.card, ownerId: item.controllerId }] }, { gameEvent: fizzled.id });
     }
     return { state: draft, events, warnings };
   }
@@ -64,19 +64,15 @@ export function resolveTop(state: GameState): ResolveResult {
       events,
       {
         type: 'ZoneChanged',
-        objects: [`p${draft.nextIds.permanent++}`],
-        card: item.source.card,
-        ownerId: item.controllerId,
         from: 'stack',
         to: 'battlefield',
         how: 'resolve',
-        controllerId: item.controllerId,
-        ...(because ? { tapped: true, entersTappedBecause: because } : {}),
+        moves: [{ objectId: `p${draft.nextIds.permanent++}`, card: item.source.card, ownerId: item.controllerId, controllerId: item.controllerId, ...(because ? { tapped: true, entersTappedBecause: because } : {}) }],
       },
       { stackItem: item.id },
     );
   } else {
-    emit(draft, events, { type: 'ZoneChanged', objects: [item.id], card: item.source.card, ownerId: item.controllerId, from: 'stack', to: 'graveyard', how: 'resolve' }, { stackItem: item.id });
+    emit(draft, events, { type: 'ZoneChanged', from: 'stack', to: 'graveyard', how: 'resolve', moves: [{ objectId: item.id, card: item.source.card, ownerId: item.controllerId }] }, { stackItem: item.id });
   }
   return { state: draft, events, warnings };
 }

@@ -56,13 +56,9 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
       const because = entersTappedBecause(draft, action.card, ctx.playerId);
       emit({
         type: 'ZoneChanged',
-        objects: [newPermanentId()],
-        card: action.card,
-        ownerId: ctx.playerId,
         from: 'hand',
         to: 'battlefield',
-        controllerId: ctx.playerId,
-        ...(because ? { tapped: true, entersTappedBecause: because } : {}),
+        moves: [{ objectId: newPermanentId(), card: action.card, ownerId: ctx.playerId, controllerId: ctx.playerId, ...(because ? { tapped: true, entersTappedBecause: because } : {}) }],
       });
       break;
     }
@@ -87,7 +83,7 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
       const countered = emit({ type: 'StackItemResolved', stackItemId: item.id, status: 'countered' });
       if (item.kind === 'spell') {
         emit(
-          { type: 'ZoneChanged', objects: [item.id], card: item.source.card, ownerId: item.controllerId, from: 'stack', to: 'graveyard', how: 'countered' },
+          { type: 'ZoneChanged', from: 'stack', to: 'graveyard', how: 'countered', moves: [{ objectId: item.id, card: item.source.card, ownerId: item.controllerId }] },
           { gameEvent: countered.id },
         );
       }
@@ -97,7 +93,7 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
     case 'move': {
       const p = permanent(action.objectId);
       if (!p) break;
-      emit({ type: 'ZoneChanged', objects: [p.id], card: p.card, ownerId: p.ownerId, from: 'battlefield', to: action.to, how: action.how, isToken: p.isToken });
+      emit({ type: 'ZoneChanged', from: 'battlefield', to: action.to, how: action.how, moves: [{ objectId: p.id, card: p.card, ownerId: p.ownerId, isToken: p.isToken }] });
       break;
     }
 
@@ -138,16 +134,18 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
       const because = entersTappedBecause(draft, action.token, ctx.playerId, action.definition?.types);
       emit({
         type: 'ZoneChanged',
-        objects: ids,
-        card: action.token,
-        ownerId: ctx.playerId,
         from: 'nowhere',
         to: 'battlefield',
         how: 'token',
-        controllerId: ctx.playerId,
-        isToken: true,
-        tokenDefinition: action.definition,
-        ...(because ? { tapped: true, entersTappedBecause: because } : {}),
+        moves: ids.map((objectId) => ({
+          objectId,
+          card: action.token,
+          ownerId: ctx.playerId,
+          controllerId: ctx.playerId,
+          isToken: true,
+          tokenDefinition: action.definition,
+          ...(because ? { tapped: true, entersTappedBecause: because } : {}),
+        })),
       });
       break;
     }

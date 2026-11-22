@@ -11,6 +11,24 @@ export type Cause =
   | { stackItem: StackItemId; gameAction?: number; triggeredBy?: GameEventId }
   | { rule: 'turnStructure' | 'combatDamage' | 'stateBasedAction' | 'boardCorrection'; after?: GameEventId };
 
+/** One object's part in a ZoneChanged. */
+export interface ZoneMove {
+  /** Its ID in the zone it left or entered; absent for a card moving between graveyard, exile and the command zone. */
+  objectId?: ObjectId;
+  card: CardName;
+  ownerId: PlayerId;
+  /** Set when entering the battlefield. */
+  controllerId?: PlayerId;
+  tapped?: boolean;
+  isToken?: boolean;
+  /** A token's characteristics, recorded in the card catalog when it is created. */
+  tokenDefinition?: TokenDefinition;
+  /** The static ability that made it enter tapped, if any. */
+  entersTappedBecause?: AbilityId;
+  /** For a state-based move, the GameEvent that brought it about (the lethal damage, the shrinking effect). */
+  after?: GameEventId;
+}
+
 export type DamageItem = { sourceId: ObjectId; recipient: Recipient; amount: number; combat: boolean; deathtouch?: boolean };
 
 export type GameEventBody =
@@ -27,21 +45,12 @@ export type GameEventBody =
   | { type: 'AbilityTriggered'; stackItem: StackItem }
   | {
       type: 'ZoneChanged';
-      objects: ObjectId[];
-      card: CardName;
-      ownerId: PlayerId;
       from: Zone | 'nowhere';
       /** 'nowhere' means the object left the game, such as a token or a departed player's cards. */
       to: Zone | 'nowhere';
       how?: 'destroy' | 'sacrifice' | 'exile' | 'resolve' | 'stateBased' | 'token' | 'countered' | 'fizzled';
-      /** Set when entering the battlefield. */
-      controllerId?: PlayerId;
-      tapped?: boolean;
-      isToken?: boolean;
-      /** A token's characteristics, recorded in the card catalog when it is created. */
-      tokenDefinition?: TokenDefinition;
-      /** The static ability that made it enter tapped, if any. */
-      entersTappedBecause?: AbilityId;
+      /** Everything that moved at this one moment; simultaneous moves share one GameEvent (ADR 0026). */
+      moves: ZoneMove[];
     }
   | { type: 'CountersChanged'; target: Recipient; kind: string; delta: number }
   | { type: 'PlayerLost'; playerId: PlayerId; reason: 'life' | 'poison' | 'commanderDamage' | 'conceded' }
