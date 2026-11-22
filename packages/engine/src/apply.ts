@@ -1,5 +1,5 @@
 import type { GameAction } from './actions.js';
-import type { Cause, GameEvent, GameEventBody } from './events.js';
+import type { Cause, GameEvent, GameEventBody, TableEventDraft } from './events.js';
 import type { PermanentId, PlayerId } from './ids.js';
 import { clone } from './clone.js';
 import { reduceInto } from './reduce.js';
@@ -20,6 +20,7 @@ export interface ApplyContext {
 export interface ApplyResult {
   state: GameState;
   events: GameEvent[];
+  tableEvents: TableEventDraft[];
   warnings: RulesWarning[];
 }
 
@@ -27,6 +28,7 @@ export interface ApplyResult {
 export function applyAction(state: GameState, action: GameAction, ctx: ApplyContext): ApplyResult {
   const draft = clone(state);
   const events: GameEvent[] = [];
+  const tableEvents: TableEventDraft[] = [];
   const warnings: RulesWarning[] = [];
 
   const emit = (body: GameEventBody, causedBy: Cause = ctx.cause): GameEvent => {
@@ -180,7 +182,7 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
 
     case 'playerTask': {
       if (!player(action.playerId)) break;
-      emit({ type: 'PlayerTaskCreated', playerId: action.playerId, text: action.text });
+      tableEvents.push({ type: 'PlayerTaskCreated', playerId: action.playerId, text: action.text, causedBy: ctx.cause });
       break;
     }
 
@@ -221,5 +223,5 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
     }
   }
 
-  return { state: draft, events, warnings };
+  return { state: draft, events, tableEvents, warnings };
 }

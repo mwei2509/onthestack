@@ -1,7 +1,7 @@
 import { applyAction, PERMANENT_TYPES } from './apply.js';
 import { clone } from './clone.js';
 import { emit } from './emit.js';
-import type { GameEvent } from './events.js';
+import type { GameEvent, TableEventDraft } from './events.js';
 import type { GameState, StackItem } from './state.js';
 import { conditionHolds, entersTappedBecause, findAbility } from './triggers.js';
 import type { RulesWarning } from './warnings.js';
@@ -9,6 +9,7 @@ import type { RulesWarning } from './warnings.js';
 export interface ResolveResult {
   state: GameState;
   events: GameEvent[];
+  tableEvents: TableEventDraft[];
   warnings: RulesWarning[];
 }
 
@@ -20,22 +21,23 @@ export interface ResolveResult {
 export function resolveTop(state: GameState): ResolveResult {
   let draft = clone(state);
   const events: GameEvent[] = [];
+  const tableEvents: TableEventDraft[] = [];
   const warnings: RulesWarning[] = [];
   const item = draft.stack.at(-1);
-  if (!item) return { state: draft, events, warnings };
+  if (!item) return { state: draft, events, tableEvents, warnings };
 
   if (allTargetsGone(item, draft)) {
     const fizzled = emit(draft, events, { type: 'StackItemResolved', stackItemId: item.id, status: 'fizzled' }, { stackItem: item.id });
     if (item.kind === 'spell') {
       emit(draft, events, { type: 'ZoneChanged', from: 'stack', to: 'graveyard', how: 'fizzled', moves: [{ objectId: item.id, card: item.source.card, ownerId: item.controllerId }] }, { gameEvent: fizzled.id });
     }
-    return { state: draft, events, warnings };
+    return { state: draft, events, tableEvents, warnings };
   }
 
   const ability = item.kind === 'trigger' ? findAbility(draft, item.source.card, item.ability) : undefined;
   if (ability?.kind === 'triggered' && ability.if && !conditionHolds(draft, ability.if, item.controllerId)) {
     emit(draft, events, { type: 'StackItemResolved', stackItemId: item.id, status: 'conditionNotMet' }, { stackItem: item.id });
-    return { state: draft, events, warnings };
+    return { state: draft, events, tableEvents, warnings };
   }
 
   item.gameActions.forEach((gameAction, i) => {
@@ -45,11 +47,12 @@ export function resolveTop(state: GameState): ResolveResult {
     });
     draft = r.state;
     events.push(...r.events);
+    tableEvents.push(...r.tableEvents);
     warnings.push(...r.warnings);
   });
 
   emit(draft, events, { type: 'StackItemResolved', stackItemId: item.id, status: 'resolved' }, { stackItem: item.id });
-  if (item.kind !== 'spell') return { state: draft, events, warnings };
+  if (item.kind !== 'spell') return { state: draft, events, tableEvents, warnings };
 
   const def = draft.cards[item.source.card];
   if (!def) {
@@ -74,7 +77,7 @@ export function resolveTop(state: GameState): ResolveResult {
   } else {
     emit(draft, events, { type: 'ZoneChanged', from: 'stack', to: 'graveyard', how: 'resolve', moves: [{ objectId: item.id, card: item.source.card, ownerId: item.controllerId }] }, { stackItem: item.id });
   }
-  return { state: draft, events, warnings };
+  return { state: draft, events, tableEvents, warnings };
 }
 
 function allTargetsGone(item: StackItem, state: GameState): boolean {

@@ -125,6 +125,14 @@ describe('applyAction', () => {
     expect(state.players.melissa?.poison).toBe(3);
   });
 
+  it('a PlayerTask is a TableEvent: no GameEvent, and the board is unchanged (ADR 0020)', () => {
+    const before = newGame();
+    const r = applyAction(before, { type: 'playerTask', playerId: 'theo', text: 'Reveal the top card of your library' }, said('michael'));
+    expect(r.events).toEqual([]);
+    expect(r.tableEvents).toEqual([{ type: 'PlayerTaskCreated', playerId: 'theo', text: 'Reveal the top card of your library', causedBy: { playerStatement: 's1' } }]);
+    expect(r.state).toEqual(before);
+  });
+
   it('flags an unknown card instead of guessing what it is', () => {
     const { state, events, warnings } = run(newGame(), [[{ type: 'cast', card: 'Ulamog, the Ceaseless Hunger' }, said('theo')]]);
     expect(events.map((e) => e.type)).toEqual(['SpellCast', 'StackItemResolved']);

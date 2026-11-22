@@ -206,8 +206,6 @@ function applyEvent(draft: GameState, event: GameEvent): void {
       return;
     }
 
-    case 'PlayerTaskCreated':
-      return;
   }
 }
 
