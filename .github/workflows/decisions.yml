@@ -24,8 +24,12 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           BASE: ${{ github.base_ref }}
         run: |
-          if git diff --name-only "origin/$BASE...HEAD" | grep -qE '^(docs/adr/|docs/engine-model\.md$|GLOSSARY\.md$)'; then
+          changed=$(git diff --name-only "origin/$BASE...HEAD")
+          if grep -q '^docs/adr/' <<<"$changed"; then
             gh pr edit "$PR" --add-label design-decision
+          fi
+          if grep -qE '^(docs/engine-model\.md|GLOSSARY\.md)$' <<<"$changed"; then
+            gh pr edit "$PR" --add-label design-updated
           fi
 
       - name: Every ADR in this PR is Accepted
