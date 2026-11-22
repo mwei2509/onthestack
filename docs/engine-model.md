@@ -71,7 +71,7 @@ flowchart TD
 | --- | --- | --- | --- |
 | Beginning | Untap | active player's permanents untap; no one acts | reminder |
 | | Upkeep | upkeep triggers | triggers |
-| | Draw | draw (a PlayerTask: hands aren't tracked) | reminder |
+| | Draw | the active player draws (hands aren't tracked) | reminder: "Draw a card" (ADR 0028) |
 | Main 1 | | | |
 | Combat | Beginning of combat | triggers | prompt: Declare attackers |
 | | Declare attackers | attackers tap unless vigilance; one `AttackersDeclared` batch | ends on "that's it" or a defender's response |
@@ -81,7 +81,7 @@ flowchart TD
 | | End of combat | attacking and blocking end | |
 | Main 2 | | | |
 | End | End step | end-step triggers (conditions such as "if you gained life this turn" are checked on trigger and on resolution) | triggers |
-| | Cleanup | damage wears off and "until end of turn" effects end at the same moment | next turn |
+| | Cleanup | damage wears off, "until end of turn" effects end and borrowed permanents go back, at the same moment; `CleanedUp` lists each (ADR 0021) | next turn |
 
 ## 4. The Stack and the timeline
 
@@ -118,7 +118,7 @@ Every board change is a GameEvent, a Magic rules happening; the app's own record
 | `DamageDealt` | source, recipient, amount, combat flag, one batch per step | combat and other damage, commander damage |
 | `LifeChanged` | player, delta, cause | gain, loss, payment |
 | `SpellCast` | caster, card, targets, from where | "whenever you cast" |
-| `ZoneChanged` | from, to, how, and every object that moved at that moment (each with its card and owner); simultaneous moves are one event (ADR 0026) | enters, dies, leaves, exiled, landfall |
+| `ZoneChanged` | from, to, why (Arena's categories: `castSpell`, `resolve`, `playLand`, `destroy`, `sacrifice`, `exile`, … ADR 0036), and every object that moved at that moment (each with its card and owner); simultaneous moves are one event (ADR 0026) | enters, dies, leaves, exiled, landfall |
 | `CountersChanged` | object or player, kind, delta | +1/+1, poison, loyalty |
 | `PlayerLost` | player, reason | what they own leaves; what they stole is exiled |
 

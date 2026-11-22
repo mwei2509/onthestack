@@ -162,12 +162,28 @@ describe('replayTurn', () => {
     return s;
   };
 
-  it('untaps only the active player’s permanents and gives them a draw task', () => {
+  it('untaps only the active player’s permanents and shows the draw as a reminder, not a task (ADR 0028)', () => {
     const start = twoBears();
     start.permanents.p1!.tapped = true;
     const r = replayTurn(start, [], { currentStep: 'draw' });
     expect(r.state.permanents.p1!.tapped).toBe(true);
-    expect(tableView(r).playerTasks).toMatchObject([{ playerId: 'michael', text: 'Draw a card' }]);
+    expect(tableView(r).reminders).toEqual([{ text: 'Draw a card', playerId: 'michael' }]);
+    expect(tableView(r).playerTasks).toEqual([]);
+  });
+
+  it('cleanup lists what it ended: damage, end-of-turn effects, borrowed creatures (ADR 0021)', () => {
+    const start = twoBears();
+    const r = sealTurn(start, [
+      e('main1', 'michael', { type: 'gainControl', permanentId: 'p1', until: 'endOfTurn' }),
+      e('main1', 'michael', { type: 'modify', permanentId: 'p1', power: 2, toughness: 2, until: 'endOfTurn' }),
+      e('main1', 'elena', { type: 'damage', sourceId: 'k0', recipient: { permanentId: 'p1' }, amount: 1 }),
+    ]);
+    const cleaned = r.sealed.gameEvents.find((x) => x.type === 'CleanedUp');
+    expect(cleaned).toMatchObject({
+      damageRemoved: [{ permanentId: 'p1', amount: 1 }],
+      effectsEnded: [{ permanentId: 'p1' }],
+      controlReturned: [{ permanentId: 'p1', to: 'theo' }],
+    });
   });
 
   it('cleanup removes damage and end-of-turn effects and returns borrowed creatures', () => {
@@ -209,7 +225,7 @@ describe('replayTurn', () => {
   it('TableEvents are numbered in replay order, the same every time', () => {
     const timeline = [e('main1', 'theo', { type: 'playerTask', playerId: 'michael', text: 'Reveal your top card' })];
     const a = replayTurn(newGame(), timeline);
-    expect(a.tableEvents.map((t) => [t.id, t.type, t.type === 'PlayerTaskCreated' ? t.text : ''])).toEqual([['t1', 'PlayerTaskCreated', 'Draw a card'], ['t2', 'PlayerTaskCreated', 'Reveal your top card']]);
+    expect(a.tableEvents.map((t) => [t.id, t.type, t.type === 'PlayerTaskCreated' ? t.text : ''])).toEqual([['t1', 'PlayerTaskCreated', 'Reveal your top card']]);
     expect(replayTurn(newGame(), timeline).tableEvents).toEqual(a.tableEvents);
   });
 

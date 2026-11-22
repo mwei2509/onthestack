@@ -60,6 +60,7 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
         type: 'ZoneChanged',
         from: 'hand',
         to: 'battlefield',
+        how: 'playLand',
         moves: [{ objectId: newPermanentId(), card: action.card, ownerId: ctx.playerId, controllerId: ctx.playerId, ...(because ? { tapped: true, entersTappedBecause: because } : {}) }],
       });
       break;

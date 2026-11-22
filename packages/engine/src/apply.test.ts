@@ -48,7 +48,7 @@ function run(state: GameState, steps: [GameAction, ApplyContext][]) {
 describe('applyAction', () => {
   it('plays a land onto the battlefield, untapped, controlled by the player', () => {
     const { state, events } = run(newGame(), [[{ type: 'playLand', card: 'Plains' }, said('theo')]]);
-    expect(events).toMatchObject([{ id: 'e1', type: 'ZoneChanged', from: 'hand', to: 'battlefield', moves: [{ objectId: 'p1', card: 'Plains', ownerId: 'theo' }], causedBy: { playerStatement: 's1' } }]);
+    expect(events).toMatchObject([{ id: 'e1', type: 'ZoneChanged', from: 'hand', to: 'battlefield', how: 'playLand', moves: [{ objectId: 'p1', card: 'Plains', ownerId: 'theo' }], causedBy: { playerStatement: 's1' } }]);
     expect(state.permanents.p1).toMatchObject({ card: 'Plains', ownerId: 'theo', controllerId: 'theo', tapped: false, controlledSince: 1 });
   });
 
