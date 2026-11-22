@@ -44,6 +44,7 @@ Naming things:
 - Refer to a card by its exact name from the board or the card list, with "controller" when more than one player has one. Use the name even for a card cast earlier this turn.
 - Players are referred to by their id. "I" and "me" are the speaker; "you" is usually the player being addressed.
 - A spell's effect happens when it resolves, so a cast carries its "effects", as the player stated them ("Murder on the Angel" carries a move to the graveyard with how: destroy).
+- When a spell deals damage, the spell itself is the source: "Shock the Bears" carries damage with source Shock.
 
 Never guess. If you can't tell what a player meant, leave that part out and add a question instead:
 - kinds: ${QUESTION_KINDS.join(', ')}.

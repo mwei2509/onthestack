@@ -1,5 +1,5 @@
 import type { GameEvent, GameEventBody, TableEventDraft } from './events.js';
-import type { GameEventId, PermanentId } from './ids.js';
+import { nextStackItemId, type GameEventId, type PermanentId } from './ids.js';
 import { clone } from './clone.js';
 import { emit } from './emit.js';
 import { resolveTop } from './stack.js';
@@ -46,7 +46,7 @@ export function settle(state: GameState, options: { resolveStack?: boolean } = {
     }
     if (draft.pendingTriggers.length > 0) {
       for (const trigger of apnapOrder(draft, draft.pendingTriggers)) {
-        const stackItem = toStackItem(draft, trigger, `k${draft.nextIds.stackItem}`);
+        const stackItem = toStackItem(draft, trigger, nextStackItemId(draft));
         emit(draft, events, { type: 'AbilityTriggered', stackItem }, { gameEvent: trigger.triggeredBy });
       }
       continue;

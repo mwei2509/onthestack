@@ -1,6 +1,6 @@
 import type { GameAction } from './actions.js';
 import type { Cause, GameEvent, GameEventBody, TableEventDraft } from './events.js';
-import type { PermanentId, PlayerId } from './ids.js';
+import { nextStackItemId, type PermanentId, type PlayerId } from './ids.js';
 import { clone } from './clone.js';
 import { reduceInto } from './reduce.js';
 import { hasKeyword } from './stats.js';
@@ -69,7 +69,8 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
     case 'cast': {
       const cz = draft.commandZone[ctx.playerId];
       const from = cz?.inZone && cz.card === action.card ? 'command' : 'hand';
-      const stackItemId = `k${draft.nextIds.stackItem++}`;
+      const stackItemId = nextStackItemId(draft);
+      draft.nextIds.stackItem++;
       emit({ type: 'SpellCast', casterId: ctx.playerId, card: action.card, targets: action.targets ?? [], stackItemId, from, gameActions: action.effects ?? [] });
       if (!draft.cards[action.card]) {
         warnings.push({ code: 'unknownCard', message: `${action.card} isn't in this game's card list. Check the card.` });

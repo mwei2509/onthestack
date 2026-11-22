@@ -36,8 +36,8 @@ export const InterpretedGameAction = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('modify'),
     object: CardRef,
-    power: z.number().int(),
-    toughness: z.number().int(),
+    power: z.number().int().describe('How much power changes: 3 for +3/+3, -2 for -2/-2'),
+    toughness: z.number().int().describe('How much toughness changes'),
     keywords: z.array(z.string()).optional(),
     until,
   }),
