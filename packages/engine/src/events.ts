@@ -16,7 +16,9 @@ export type DamageItem = { sourceId: ObjectId; recipient: Recipient; amount: num
 export type GameEventBody =
   | { type: 'PhaseStarted'; step: Step; activePlayerId: PlayerId; turn: number }
   | { type: 'AttackersDeclared'; attacks: Attack[] }
-  | { type: 'BlockersDeclared'; blocks: Block[] }
+  | { type: 'BlockersDeclared'; defenderId: PlayerId; blocks: Block[] }
+  | { type: 'DamageAssignmentSet'; attackerId: PermanentId; split: Record<string, number> }
+  | { type: 'CombatEnded' }
   | { type: 'DamageDealt'; damage: DamageItem[] }
   | { type: 'LifeChanged'; playerId: PlayerId; delta: number; lifeAfter: number; reason: 'damage' | 'gain' | 'loss' | 'payment' }
   | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId; from: Zone; gameActions: GameAction[] }

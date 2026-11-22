@@ -26,17 +26,33 @@ function applyEvent(draft: GameState, event: GameEvent): void {
       return;
 
     case 'AttackersDeclared':
-      draft.combat ??= { attacks: [], blocks: [], ready: [] };
+      draft.combat ??= { attacks: [], blocks: [], ready: [], divisions: {} };
       draft.combat.attacks.push(...event.attacks);
       return;
 
     case 'BlockersDeclared':
-      draft.combat ??= { attacks: [], blocks: [], ready: [] };
+      draft.combat ??= { attacks: [], blocks: [], ready: [], divisions: {} };
       draft.combat.blocks.push(...event.blocks);
+      if (!draft.combat.ready.includes(event.defenderId)) draft.combat.ready.push(event.defenderId);
+      return;
+
+    case 'DamageAssignmentSet':
+      if (draft.combat) draft.combat.divisions[event.attackerId] = event.split;
+      return;
+
+    case 'CombatEnded':
+      draft.combat = null;
       return;
 
     case 'DamageDealt':
       for (const d of event.damage) {
+        if (d.combat && 'playerId' in d.recipient) {
+          const source = draft.permanents[d.sourceId];
+          const player = draft.players[d.recipient.playerId];
+          if (source && player && draft.commandZone[source.ownerId]?.card === source.card) {
+            player.commanderDamage[source.card] = (player.commanderDamage[source.card] ?? 0) + d.amount;
+          }
+        }
         if ('permanentId' in d.recipient) {
           const p = draft.permanents[d.recipient.permanentId];
           if (p) {
