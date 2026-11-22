@@ -117,7 +117,7 @@ describe('applyAction', () => {
       [{ type: 'cast', card: 'Savannah Lions' }, said('melissa')],
       [{ type: 'gainControl', permanentId: 'p1', until: 'endOfTurn' }, said('theo', 2)],
     ]);
-    expect(state.permanents.p1).toMatchObject({ controllerId: 'theo', controlUntil: { revertTo: 'melissa', until: 'endOfTurn' }, controlledSince: 1 });
+    expect(state.permanents.p1).toMatchObject({ controllerId: 'theo', controlChange: { revertTo: 'melissa', until: 'endOfTurn' }, controlledSince: 1 });
   });
 
   it('poison counters on a player add to their poison', () => {

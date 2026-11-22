@@ -50,10 +50,10 @@ function applyEvent(draft: GameState, event: GameEvent): void {
         p.damage = 0;
         p.deathtouchDamage = false;
         p.effects = p.effects.filter((e) => e.until !== 'endOfTurn');
-        if (p.controlUntil) {
-          p.controllerId = p.controlUntil.revertTo;
+        if (p.controlChange?.until === 'endOfTurn') {
+          p.controllerId = p.controlChange.revertTo;
           p.controlledSince = draft.turn.number;
-          delete p.controlUntil;
+          delete p.controlChange;
         }
       }
       return;
@@ -178,8 +178,8 @@ function applyEvent(draft: GameState, event: GameEvent): void {
     case 'ControlChanged': {
       const p = draft.permanents[event.permanentId];
       if (p) {
-        if (event.until) p.controlUntil = { revertTo: p.controllerId, until: event.until };
-        else delete p.controlUntil;
+        if (event.controllerId === p.controlChange?.revertTo) delete p.controlChange;
+        else p.controlChange = { revertTo: p.controllerId, ...(event.until ? { until: event.until } : {}) };
         p.controllerId = event.controllerId;
         p.controlledSince = draft.turn.number;
       }

@@ -105,7 +105,13 @@ function stateBasedActions(state: GameState): Found[] {
       continue;
     }
     if (controller?.out) {
-      found.push({ body: { type: 'ZoneChanged', from: 'battlefield', to: 'exile', how: 'stateBased', moves: [{ objectId: p.id, card: p.card, ownerId: p.ownerId, isToken: p.isToken }] } });
+      // The effect that gave the departing player control ends first; only what's still theirs is exiled (CR 800.4a).
+      const revertTo = p.controlChange?.revertTo;
+      if (revertTo && !state.players[revertTo]?.out) {
+        found.push({ body: { type: 'ControlChanged', permanentId: p.id, controllerId: revertTo } });
+      } else {
+        found.push({ body: { type: 'ZoneChanged', from: 'battlefield', to: 'exile', how: 'stateBased', moves: [{ objectId: p.id, card: p.card, ownerId: p.ownerId, isToken: p.isToken }] } });
+      }
       continue;
     }
 
