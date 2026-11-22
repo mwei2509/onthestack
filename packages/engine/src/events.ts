@@ -11,6 +11,28 @@ export type Cause =
   | { stackItem: StackItemId; gameAction?: number; triggeredBy?: GameEventId }
   | { rule: 'turnStructure' | 'combatDamage' | 'stateBasedAction' | 'boardCorrection'; after?: GameEventId };
 
+/**
+ * Why something changed zones: the categories Arena's engine attaches to every zone transfer (ADR 0036), plus ours
+ * that Arena expresses differently (`stateBased`, `token`, `fizzled`).
+ */
+export type ZoneMoveReason =
+  | 'castSpell'
+  | 'resolve'
+  | 'draw'
+  | 'playLand'
+  | 'exile'
+  | 'destroy'
+  | 'sacrifice'
+  | 'surveil'
+  | 'mill'
+  | 'return'
+  | 'put'
+  | 'warp'
+  | 'countered'
+  | 'stateBased'
+  | 'token'
+  | 'fizzled';
+
 /** One object's part in a ZoneChanged. */
 export interface ZoneMove {
   /** Its ID in the zone it left or entered; absent for a card moving between graveyard, exile and the command zone. */
@@ -37,7 +59,13 @@ export type GameEventBody =
   | { type: 'BlockersDeclared'; defenderId: PlayerId; blocks: Block[] }
   | { type: 'DamageAssignmentSet'; attackerId: PermanentId; split: Record<string, number> }
   | { type: 'CombatEnded' }
-  | { type: 'CleanedUp' }
+  /** Cleanup's changes, all at one moment (CR 514.2), listed so nothing ends unseen (ADR 0021). */
+  | {
+      type: 'CleanedUp';
+      damageRemoved: { permanentId: PermanentId; amount: number }[];
+      effectsEnded: { permanentId: PermanentId; timestamp: number }[];
+      controlReturned: { permanentId: PermanentId; to: PlayerId }[];
+    }
   | { type: 'DamageDealt'; damage: DamageItem[] }
   | { type: 'LifeChanged'; playerId: PlayerId; delta: number; lifeAfter: number; reason: 'damage' | 'gain' | 'loss' | 'payment' }
   | { type: 'SpellCast'; casterId: PlayerId; card: CardName; targets: ObjectId[]; stackItemId: StackItemId; from: Zone; gameActions: GameAction[] }
@@ -48,7 +76,7 @@ export type GameEventBody =
       from: Zone | 'nowhere';
       /** 'nowhere' means the object left the game, such as a token or a departed player's cards. */
       to: Zone | 'nowhere';
-      how?: 'destroy' | 'sacrifice' | 'exile' | 'resolve' | 'stateBased' | 'token' | 'countered' | 'fizzled';
+      how?: ZoneMoveReason;
       /** Everything that moved at this one moment; simultaneous moves share one GameEvent (ADR 0026). */
       moves: ZoneMove[];
     }

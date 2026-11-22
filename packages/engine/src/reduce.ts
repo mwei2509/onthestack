@@ -46,12 +46,21 @@ function applyEvent(draft: GameState, event: GameEvent): void {
 
     case 'CleanedUp':
       draft.combat = null;
-      for (const p of Object.values(draft.permanents)) {
-        p.damage = 0;
-        p.deathtouchDamage = false;
-        p.effects = p.effects.filter((e) => e.until !== 'endOfTurn');
-        if (p.controlChange?.until === 'endOfTurn') {
-          p.controllerId = p.controlChange.revertTo;
+      for (const { permanentId } of event.damageRemoved) {
+        const p = draft.permanents[permanentId];
+        if (p) {
+          p.damage = 0;
+          p.deathtouchDamage = false;
+        }
+      }
+      for (const { permanentId, timestamp } of event.effectsEnded) {
+        const p = draft.permanents[permanentId];
+        if (p) p.effects = p.effects.filter((e) => e.timestamp !== timestamp);
+      }
+      for (const { permanentId, to } of event.controlReturned) {
+        const p = draft.permanents[permanentId];
+        if (p) {
+          p.controllerId = to;
           p.controlledSince = draft.turn.number;
           delete p.controlChange;
         }

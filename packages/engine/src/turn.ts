@@ -4,7 +4,7 @@ import { clone } from './clone.js';
 import { dealCombatDamage, endCombat, firstStrikeStepNeeded } from './combat.js';
 import { emit } from './emit.js';
 import type { GameEvent, TableEvent, TableEventDraft } from './events.js';
-import type { PlayerId } from './ids.js';
+import type { PermanentId, PlayerId } from './ids.js';
 import { settle } from './settle.js';
 import type { GameState, Permanent, StackItem } from './state.js';
 import { stats, type Stats } from './stats.js';
@@ -78,17 +78,27 @@ function automatic(state: GameState, step: Step): StepResult {
         if (p.controllerId === active && p.tapped) emit(draft, events, { type: 'TapChanged', permanentId: p.id, tapped: false }, { rule: 'turnStructure' });
       }
       break;
-    case 'draw':
-      return { state: draft, events, tableEvents: [{ type: 'PlayerTaskCreated', playerId: active, text: 'Draw a card', causedBy: { rule: 'turnStructure' } }], warnings: [] };
     case 'firstStrikeDamage':
       return dealCombatDamage(draft, 'firstStrikeDamage');
     case 'combatDamage':
       return dealCombatDamage(draft, 'combatDamage');
     case 'endOfCombat':
       return endCombat(draft);
-    case 'cleanup':
-      emit(draft, events, { type: 'CleanedUp' }, { rule: 'turnStructure' });
+    case 'cleanup': {
+      const permanents = Object.values(draft.permanents);
+      emit(
+        draft,
+        events,
+        {
+          type: 'CleanedUp',
+          damageRemoved: permanents.filter((p) => p.damage > 0 || p.deathtouchDamage).map((p) => ({ permanentId: p.id, amount: p.damage })),
+          effectsEnded: permanents.flatMap((p) => p.effects.filter((e) => e.until === 'endOfTurn').map((e) => ({ permanentId: p.id, timestamp: e.timestamp }))),
+          controlReturned: permanents.flatMap((p) => (p.controlChange?.until === 'endOfTurn' ? [{ permanentId: p.id, to: p.controlChange.revertTo }] : [])),
+        },
+        { rule: 'turnStructure' },
+      );
       break;
+    }
     default:
       break;
   }
@@ -161,6 +171,8 @@ export interface TableView {
   /** The damage that would happen, once every attacked player is Ready. */
   combatPreview: GameEvent[] | null;
   playerTasks: { playerId: PlayerId; text: string; from: string }[];
+  /** Things to do now that need no record, like the draw (ADR 0028). Computed for the screen, never stored. */
+  reminders: { text: string; playerId?: PlayerId; permanentId?: PermanentId }[];
   warnings: RulesWarning[];
 }
 
@@ -197,6 +209,12 @@ export function tableView(result: ReplayResult): TableView {
     awaitingResponseFrom,
     combatPreview,
     playerTasks: result.tableEvents.flatMap((e) => (e.type === 'PlayerTaskCreated' ? [{ playerId: e.playerId, text: e.text, from: e.id }] : [])),
+    reminders: stepReminders(state),
     warnings: result.warnings,
   };
+}
+
+function stepReminders(state: GameState): TableView['reminders'] {
+  if (state.turn.step === 'draw') return [{ text: 'Draw a card', playerId: state.turn.activePlayerId }];
+  return [];
 }

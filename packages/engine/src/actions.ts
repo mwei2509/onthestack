@@ -1,4 +1,5 @@
 import type { CardName, ObjectId, PermanentId, PlayerId, StackItemId } from './ids.js';
+import type { ZoneMoveReason } from './events.js';
 import type { Zone } from './steps.js';
 
 export type Recipient = { playerId: PlayerId } | { permanentId: PermanentId };
@@ -31,7 +32,7 @@ export type GameAction =
     }
   | { type: 'counter'; stackItemId: StackItemId }
   | { type: 'playLand'; card: CardName }
-  | { type: 'move'; objectId: PermanentId; to: Zone; how?: 'destroy' | 'sacrifice' | 'exile' }
+  | { type: 'move'; objectId: PermanentId; to: Zone; how?: Extract<ZoneMoveReason, 'destroy' | 'sacrifice' | 'exile' | 'return' | 'put' | 'mill' | 'surveil' | 'warp' | 'draw'> }
   | { type: 'tap' | 'untap'; permanentId: PermanentId }
   | { type: 'gainControl'; permanentId: PermanentId; until?: 'endOfTurn' }
   | { type: 'counters'; target: Recipient; kind: string; delta: number }
