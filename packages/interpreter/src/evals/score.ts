@@ -61,7 +61,7 @@ function summarize({ state, warnings }: ReplayResult): Record<string, unknown> {
           damage: p.damage,
           counters: p.counters,
           token: p.isToken,
-          effects: p.effects.map((e) => ({ kind: e.kind, power: e.power, toughness: e.toughness, keywords: e.keywords, until: e.until })),
+          effects: p.effects.map((e) => ({ kind: e.kind, power: e.power, toughness: e.toughness, keywords: e.keywords?.length ? e.keywords : undefined, until: e.until })),
         }),
       )
       .sort(),

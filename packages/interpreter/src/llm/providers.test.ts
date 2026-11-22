@@ -20,29 +20,40 @@ function fakeFetch(body: unknown, status = 200) {
 }
 
 describe('claudeProvider', () => {
-  const message = (text: string) => ({
+  const message = (content: unknown[]) => ({
     id: 'msg_1',
     type: 'message',
     role: 'assistant',
     model: 'claude-haiku-5-5',
-    content: [{ type: 'text', text }],
-    stop_reason: 'end_turn',
+    content,
+    stop_reason: 'tool_use',
     stop_sequence: null,
     usage: { input_tokens: 120, output_tokens: 8 },
   });
+  const answer = (input: unknown) => message([{ type: 'tool_use', id: 'tu_1', name: 'record_answer', input }]);
 
-  it('asks for structured output with a cacheable system prompt, and parses the answer', async () => {
-    const f = fakeFetch(message('{"answer":4}'));
+  it('offers the schema as a tool with a cacheable system prompt, and parses the tool input', async () => {
+    const f = fakeFetch(answer({ answer: 4 }));
     const result = await claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request);
-    expect(result).toMatchObject({ output: { answer: 4 }, model: 'claude-haiku-5-5', usage: { inputTokens: 120, outputTokens: 8 } });
+    expect(result).toMatchObject({ output: { answer: 4 }, raw: '{"answer":4}', model: 'claude-haiku-5-5', usage: { inputTokens: 120, outputTokens: 8 } });
     const body = f.calls[0]?.json;
-    expect(body).toMatchObject({ model: 'claude-haiku-5-5', system: [{ text: 'You add numbers.', cache_control: { type: 'ephemeral' } }], output_config: { effort: 'low' } });
-    expect(body?.output_config).toHaveProperty('format.schema');
+    expect(body).toMatchObject({
+      model: 'claude-haiku-5-5',
+      system: [{ cache_control: { type: 'ephemeral' } }],
+      tools: [{ name: 'record_answer', input_schema: { type: 'object' } }],
+      output_config: { effort: 'low' },
+    });
+    expect(JSON.stringify(body?.system)).toContain('You add numbers.');
   });
 
-  it('rejects an answer that does not match the schema', async () => {
-    const f = fakeFetch(message('{"answer":"four"}'));
-    await expect(claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request)).rejects.toThrow();
+  it('rejects tool input that does not match the schema', async () => {
+    const f = fakeFetch(answer({ answer: 'four' }));
+    await expect(claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request)).rejects.toBeInstanceOf(LlmOutputError);
+  });
+
+  it('reports an answer given as text instead of through the tool', async () => {
+    const f = fakeFetch(message([{ type: 'text', text: 'It is 4.' }]));
+    await expect(claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request)).rejects.toThrow('no record_answer call');
   });
 });
 

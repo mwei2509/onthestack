@@ -71,6 +71,10 @@ describe('interpretedTimelineJsonSchema', () => {
     expect(text).toContain('never lists legal plays');
   });
 
+  it('has no recursive definitions, which Claude rejects', () => {
+    expect(text).not.toContain('$ref');
+  });
+
   it('uses no free-form maps, which strict structured output rejects', () => {
     expect(text).not.toMatch(/"additionalProperties":\{/);
   });
