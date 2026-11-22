@@ -118,7 +118,7 @@ Every board change is a GameEvent, a Magic rules happening; the app's own record
 | `DamageDealt` | source, recipient, amount, combat flag, one batch per step | combat and other damage, commander damage |
 | `LifeChanged` | player, delta, cause | gain, loss, payment |
 | `SpellCast` | caster, card, targets, from where | "whenever you cast" |
-| `ZoneChanged` | objects, from, to, how (destroy, sacrifice, resolve, state-based) | enters, dies, leaves, exiled, landfall |
+| `ZoneChanged` | from, to, how, and every object that moved at that moment (each with its card and owner); simultaneous moves are one event (ADR 0026) | enters, dies, leaves, exiled, landfall |
 | `CountersChanged` | object or player, kind, delta | +1/+1, poison, loyalty |
 | `PlayerLost` | player, reason | what they own leaves; what they stole is exiled |
 

@@ -150,7 +150,7 @@ describe('the example game (docs/engine-model.md section 11), M1 timelines', () 
     expect(sealed[5]!.sealed.summary).toEqual({ theo: { lifeChange: -2 }, michael: { lifeChange: 0 }, melissa: { lifeChange: 0 }, elena: { lifeChange: 0 } });
     const events = sealed[5]!.sealed.gameEvents;
     const cast = events.find((x) => x.type === 'SpellCast' && x.card === 'Fatal Push');
-    const died = events.find((x) => x.type === 'ZoneChanged' && x.card === 'Goblin Guide' && x.to === 'graveyard');
+    const died = events.find((x) => x.type === 'ZoneChanged' && x.to === 'graveyard' && x.moves.some((m) => m.card === 'Goblin Guide'));
     expect(cast?.type === 'SpellCast' && died?.causedBy).toEqual({ stackItem: cast?.type === 'SpellCast' ? cast.stackItemId : '', gameAction: 0 });
   });
 });

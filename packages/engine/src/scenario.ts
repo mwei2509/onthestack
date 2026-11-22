@@ -45,7 +45,7 @@ export function scenario(options: { seats: PlayerId[]; life?: number; cards: Rec
     battlefield(playerId, card) {
       const draft = clone(setup);
       const id = `p${draft.nextIds.permanent}`;
-      emit(draft, [], { type: 'ZoneChanged', objects: [id], card, ownerId: playerId, from: 'hand', to: 'battlefield', controllerId: playerId }, { rule: 'boardCorrection' });
+      emit(draft, [], { type: 'ZoneChanged', from: 'hand', to: 'battlefield', moves: [{ objectId: id, card, ownerId: playerId, controllerId: playerId }] }, { rule: 'boardCorrection' });
       draft.permanents[id]!.controlledSince = 0;
       draft.gameEventsThisTurn = [];
       draft.pendingTriggers = [];

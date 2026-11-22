@@ -44,13 +44,13 @@ function matches(when: TriggerCondition, event: GameEvent, source: Permanent, st
     case 'ZoneChanged': {
       if (when.to && when.to !== event.to) return [];
       if (when.from && when.from !== event.from) return [];
-      return event.objects
-        .filter((id) => {
-          const object = state.permanents[id];
-          const controllerId = object?.controllerId ?? event.controllerId ?? event.ownerId;
-          return objectMatches(when.object, id, event.card, controllerId, source, state);
+      return event.moves
+        .filter((m) => {
+          if (!m.objectId) return false;
+          const controllerId = state.permanents[m.objectId]?.controllerId ?? m.controllerId ?? m.ownerId;
+          return objectMatches(when.object, m.objectId, m.card, controllerId, source, state);
         })
-        .map((id) => ({ object: id }));
+        .map((m) => ({ object: m.objectId! }));
     }
     case 'PhaseStarted':
       if (when.step && when.step !== event.step) return [];

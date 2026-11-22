@@ -79,7 +79,7 @@ describe('the Stack', () => {
       ['k3', 'resolved'],
       ['k2', 'fizzled'],
     ]);
-    expect(r.events.find((e) => e.type === 'ZoneChanged' && e.card === 'Fatal Push')).toMatchObject({ to: 'graveyard', how: 'fizzled' });
+    expect(r.events.find((e) => e.type === 'ZoneChanged' && e.moves.some((m) => m.card === 'Fatal Push'))).toMatchObject({ to: 'graveyard', how: 'fizzled' });
     expect(r.warnings).toEqual([]);
     expect(r.state.graveyards).toEqual({ theo: ['Murder', 'Fatal Push'], melissa: ['Savannah Lions'] });
   });

@@ -90,9 +90,8 @@ describe('ported from XMage', () => {
 });
 
 describe('our own scenarios', () => {
-  // Expected to fail until simultaneous deaths are one GameEvent (#31 step 3, ADR 0026): Blood Artist dies at the
-  // same moment as Grizzly Bears and should see both deaths.
-  it.fails('Blood Artist dying alongside another creature sees both deaths (Pyroclasm)', () => {
+  // ADR 0026: Blood Artist dies at the same moment as Grizzly Bears and sees both deaths.
+  it('Blood Artist dying alongside another creature sees both deaths (Pyroclasm)', () => {
     const s = scenario({ seats: ['A', 'B'], life: 20, cards });
     const artist = s.battlefield('A', 'Blood Artist');
     const bears = s.battlefield('A', 'Grizzly Bears');

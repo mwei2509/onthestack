@@ -37,7 +37,7 @@ export function settle(state: GameState, options: { resolveStack?: boolean } = {
     }
     const found = stateBasedActions(draft);
     if (found.length > 0) {
-      for (const { body, after } of found) {
+      for (const { body, after } of simultaneous(found)) {
         emit(draft, events, body, after ? { rule: 'stateBasedAction', after } : { rule: 'stateBasedAction' });
       }
       continue;
@@ -56,6 +56,26 @@ export function settle(state: GameState, options: { resolveStack?: boolean } = {
     warnings.push(...r.warnings);
   }
   return { state: draft, events, warnings };
+}
+
+/**
+ * Everything found in one pass happens at the same moment (CR 704.3), so zone changes with the same from, to and
+ * reason are merged into one GameEvent (ADR 0026). "Dies" triggers then look back at the board as it was before all
+ * of them, so Blood Artist dying alongside other creatures sees every death.
+ */
+function simultaneous(found: Found[]): Found[] {
+  const merged: Found[] = [];
+  for (const f of found) {
+    const body = f.body;
+    if (body.type !== 'ZoneChanged') {
+      merged.push(f);
+      continue;
+    }
+    const same = merged.find((m) => m.body.type === 'ZoneChanged' && m.body.from === body.from && m.body.to === body.to && m.body.how === body.how);
+    if (same && same.body.type === 'ZoneChanged') same.body.moves.push(...body.moves);
+    else merged.push({ body: { ...body, moves: [...body.moves] } });
+  }
+  return merged;
 }
 
 interface Found {
@@ -81,11 +101,11 @@ function stateBasedActions(state: GameState): Found[] {
     const owner = state.players[p.ownerId];
     const controller = state.players[p.controllerId];
     if (owner?.out) {
-      found.push({ body: { type: 'ZoneChanged', objects: [p.id], card: p.card, ownerId: p.ownerId, from: 'battlefield', to: 'nowhere', how: 'stateBased', isToken: p.isToken } });
+      found.push({ body: { type: 'ZoneChanged', from: 'battlefield', to: 'nowhere', how: 'stateBased', moves: [{ objectId: p.id, card: p.card, ownerId: p.ownerId, isToken: p.isToken }] } });
       continue;
     }
     if (controller?.out) {
-      found.push({ body: { type: 'ZoneChanged', objects: [p.id], card: p.card, ownerId: p.ownerId, from: 'battlefield', to: 'exile', how: 'stateBased', isToken: p.isToken } });
+      found.push({ body: { type: 'ZoneChanged', from: 'battlefield', to: 'exile', how: 'stateBased', moves: [{ objectId: p.id, card: p.card, ownerId: p.ownerId, isToken: p.isToken }] } });
       continue;
     }
 
@@ -94,7 +114,8 @@ function stateBasedActions(state: GameState): Found[] {
       const indestructible = s.keywords.includes('Indestructible');
       const dies = s.toughness <= 0 || (!indestructible && ((s.toughness > 0 && p.damage >= s.toughness) || (p.deathtouchDamage && p.damage > 0)));
       if (dies) {
-        found.push({ body: { type: 'ZoneChanged', objects: [p.id], card: p.card, ownerId: p.ownerId, from: 'battlefield', to: 'graveyard', how: 'stateBased', isToken: p.isToken }, after: lastTouching(p.id) });
+        const after = lastTouching(p.id);
+        found.push({ body: { type: 'ZoneChanged', from: 'battlefield', to: 'graveyard', how: 'stateBased', moves: [{ objectId: p.id, card: p.card, ownerId: p.ownerId, isToken: p.isToken, ...(after ? { after } : {}) }] } });
         continue;
       }
     }
@@ -112,9 +133,9 @@ function stateBasedActions(state: GameState): Found[] {
   for (const [ownerId, cz] of Object.entries(state.commandZone)) {
     if (!cz || cz.inZone || state.players[ownerId]?.out) continue;
     if (state.graveyards[ownerId]?.includes(cz.card)) {
-      found.push({ body: { type: 'ZoneChanged', objects: [], card: cz.card, ownerId, from: 'graveyard', to: 'command', how: 'stateBased' } });
+      found.push({ body: { type: 'ZoneChanged', from: 'graveyard', to: 'command', how: 'stateBased', moves: [{ card: cz.card, ownerId }] } });
     } else if (state.exile.some((x) => x.card === cz.card && x.ownerId === ownerId)) {
-      found.push({ body: { type: 'ZoneChanged', objects: [], card: cz.card, ownerId, from: 'exile', to: 'command', how: 'stateBased' } });
+      found.push({ body: { type: 'ZoneChanged', from: 'exile', to: 'command', how: 'stateBased', moves: [{ card: cz.card, ownerId }] } });
     }
   }
 
