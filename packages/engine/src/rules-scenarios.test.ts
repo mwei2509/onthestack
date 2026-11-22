@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CardDefinition } from './cards.js';
-import { scenario } from './scenario.js';
+import { scenario, type ScenarioResult } from './scenario.js';
 
 const creature = (name: string, power: number, toughness: number, keywords: string[] = []): CardDefinition => ({ name, types: ['Creature'], power, toughness, keywords, abilities: [] });
 const spell = (name: string, type: 'Instant' | 'Sorcery'): CardDefinition => ({ name, types: [type], abilities: [] });
@@ -30,6 +30,36 @@ const cards: Record<string, CardDefinition> = {
     }],
   },
 };
+
+const combatCards: Record<string, CardDefinition> = {
+  ...cards,
+  'Fencing Ace': creature('Fencing Ace', 1, 1, ['Double strike']),
+  // "Whenever Dimir Cutpurse deals combat damage to a player, that player discards a card and you draw a card."
+  'Dimir Cutpurse': {
+    ...creature('Dimir Cutpurse', 2, 2),
+    abilities: [{
+      id: 'dimir-cutpurse#1',
+      kind: 'triggered',
+      when: { event: 'DamageDealt', combat: true, object: 'self' },
+      effect: [{ playerTask: 'Discard a card', who: 'defendingPlayer' }, { playerTask: 'Draw a card', who: 'you' }],
+    }],
+  },
+  // "Whenever a creature you control deals combat damage to an opponent, you may draw a card."
+  'Coastal Piracy': {
+    name: 'Coastal Piracy',
+    types: ['Enchantment'],
+    abilities: [{
+      id: 'coastal-piracy#1',
+      kind: 'triggered',
+      when: { event: 'DamageDealt', combat: true, player: 'opponent', object: { types: ['Creature'], controller: 'you' } },
+      effect: [{ playerTask: 'You may draw a card', who: 'you' }],
+    }],
+  },
+};
+
+/** PlayerTasks that came from a card's ability, as "player: text". */
+const tasks = (r: ScenarioResult) =>
+  r.tableEvents.flatMap((e) => (e.type === 'PlayerTaskCreated' && 'stackItem' in e.causedBy ? [`${e.playerId}: ${e.text}`] : []));
 
 const damage = (permanentId: string, amount: number) => ({ type: 'damage' as const, sourceId: 'spell', recipient: { permanentId }, amount });
 
@@ -96,5 +126,58 @@ describe('our own scenarios', () => {
     s.say(1, 'main1', 'A', { type: 'cast', card: 'Pyroclasm', effects: [damage(artist, 2), damage(bears, 2)] });
     const r = s.runUntil(1, 'end');
     expect([r.life('A'), r.life('B')]).toEqual([22, 18]);
+  });
+});
+
+describe('"deals combat damage to a player" triggers (#37)', () => {
+  const attack = (attackerId: string, target = 'B') => ({ type: 'attack' as const, attacks: [{ attackerId, target }] });
+
+  it('"whenever this deals combat damage to a player" triggers, and "that player" is the one dealt damage', () => {
+    const s = scenario({ seats: ['A', 'B', 'C'], life: 20, cards: combatCards });
+    const cutpurse = s.battlefield('A', 'Dimir Cutpurse');
+    s.say(1, 'declareAttackers', 'A', attack(cutpurse, 'C'));
+    s.say(1, 'declareBlockers', 'B', { type: 'noBlock' });
+    s.say(1, 'declareBlockers', 'C', { type: 'noBlock' });
+    expect(tasks(s.runUntil(1, 'main2'))).toEqual(['C: Dimir Cutpurse: Discard a card', 'A: Dimir Cutpurse: Draw a card']);
+  });
+
+  it('"whenever a creature you control deals combat damage to an opponent" triggers once per creature', () => {
+    const s = scenario({ seats: ['A', 'B'], life: 20, cards: combatCards });
+    s.battlefield('A', 'Coastal Piracy');
+    const bears = s.battlefield('A', 'Grizzly Bears');
+    const lion = s.battlefield('A', 'Silvercoat Lion');
+    s.battlefield('B', 'Coastal Piracy');
+    s.say(1, 'declareAttackers', 'A', { type: 'attack', attacks: [{ attackerId: bears, target: 'B' }, { attackerId: lion, target: 'B' }] });
+    s.say(1, 'declareBlockers', 'B', { type: 'noBlock' });
+    expect(tasks(s.runUntil(1, 'main2'))).toEqual(['A: Coastal Piracy: You may draw a card', 'A: Coastal Piracy: You may draw a card']);
+  });
+
+  it('damage to a blocking creature does not trigger it', () => {
+    const s = scenario({ seats: ['A', 'B'], life: 20, cards: combatCards });
+    const cutpurse = s.battlefield('A', 'Dimir Cutpurse');
+    const bears = s.battlefield('B', 'Grizzly Bears');
+    s.say(1, 'declareAttackers', 'A', attack(cutpurse));
+    s.say(1, 'declareBlockers', 'B', { type: 'block', blocks: [{ blockerId: bears, attackerId: cutpurse }] });
+    expect(tasks(s.runUntil(1, 'main2'))).toEqual([]);
+  });
+
+  it('noncombat damage to a player does not trigger it', () => {
+    const s = scenario({ seats: ['A', 'B'], life: 20, cards: combatCards });
+    const cutpurse = s.battlefield('A', 'Dimir Cutpurse');
+    s.say(1, 'main1', 'A', { type: 'damage', sourceId: cutpurse, recipient: { playerId: 'B' }, amount: 2 });
+    const r = s.runUntil(1, 'main2');
+    expect(r.life('B')).toBe(18);
+    expect(tasks(r)).toEqual([]);
+  });
+
+  it('double strike that connects in both damage steps triggers twice', () => {
+    const s = scenario({ seats: ['A', 'B'], life: 20, cards: combatCards });
+    s.battlefield('A', 'Coastal Piracy');
+    const ace = s.battlefield('A', 'Fencing Ace');
+    s.say(1, 'declareAttackers', 'A', attack(ace));
+    s.say(1, 'declareBlockers', 'B', { type: 'noBlock' });
+    const r = s.runUntil(1, 'main2');
+    expect(r.life('B')).toBe(18);
+    expect(tasks(r)).toHaveLength(2);
   });
 });

@@ -62,6 +62,23 @@ function matches(when: TriggerCondition, event: GameEvent, source: Permanent, st
     case 'LifeChanged':
       if (when.gained && event.delta <= 0) return [];
       return relation(event.playerId, when.player) ? [{ player: event.playerId }] : [];
+    case 'DamageDealt': {
+      // Only damage to players matches, once per source and player even when the batch holds more than one item.
+      const seen = new Set<string>();
+      const found: Record<string, ObjectId | PlayerId>[] = [];
+      for (const d of event.damage) {
+        if (!('playerId' in d.recipient) || d.amount <= 0 || (when.combat && !d.combat)) continue;
+        const playerId = d.recipient.playerId;
+        const dealer = state.permanents[d.sourceId];
+        if (!dealer || !relation(playerId, when.player)) continue;
+        if (!objectMatches(when.object, dealer.id, dealer.card, dealer.controllerId, source, state)) continue;
+        const key = `${dealer.id}>${playerId}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        found.push({ source: dealer.id, defendingPlayer: playerId });
+      }
+      return found;
+    }
     case 'SpellCast':
       if (!relation(event.casterId, when.player)) return [];
       return objectMatches(when.object, event.stackItemId, event.card, event.casterId, source, state) ? [{ spell: event.stackItemId }] : [];
