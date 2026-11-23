@@ -1,0 +1,66 @@
+name: Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: ${{ github.event.action != 'closed' }}
+
+env:
+  PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  preview:
+    # Fork PRs get no repository secrets (ADR 0062).
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - id: creds
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Cloudflare secrets aren't set; skipping the Preview (see docs/deploy.md)."
+          fi
+      - if: steps.creds.outputs.ok
+        uses: actions/checkout@v4
+      - if: steps.creds.outputs.ok
+        uses: pnpm/action-setup@v4
+      - if: steps.creds.outputs.ok
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - if: steps.creds.outputs.ok
+        run: pnpm install --frozen-lockfile
+
+      - if: steps.creds.outputs.ok && github.event.action != 'closed'
+        run: pnpm build
+      - if: steps.creds.outputs.ok && github.event.action != 'closed'
+        id: deploy
+        env:
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
+        run: |
+          pnpm --filter @onthestack/server exec wrangler preview --name "$PREVIEW_NAME" --message "${{ github.event.pull_request.head.sha }}"
+          url=$(jq -er 'select(.type == "preview") | .preview_urls[0]' "$WRANGLER_OUTPUT_FILE_PATH")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - if: steps.creds.outputs.ok && github.event.action != 'closed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          URL: ${{ steps.deploy.outputs.url }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" \
+            --edit-last --create-if-none \
+            --body "Preview: $URL (deployed from $SHA). It has its own games, separate from production, and is deleted when this PR closes."
+
+      - if: steps.creds.outputs.ok && github.event.action == 'closed'
+        run: pnpm --filter @onthestack/server exec wrangler preview delete --name "$PREVIEW_NAME" --skip-confirmation
