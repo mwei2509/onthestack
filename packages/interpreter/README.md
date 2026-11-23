@@ -27,3 +27,5 @@ Options:
 - `EVAL_RECORD=1` saves every response.
 
 Results, failures and recordings go to `eval-results/` (git-ignored).
+
+The **Interpreter evals** GitHub workflow runs the same thing on demand (Actions → Interpreter evals → Run workflow), reading the keys from repository secrets of the same names, and uploads `eval-results/` as an artifact.

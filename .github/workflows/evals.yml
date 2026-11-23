@@ -1,0 +1,39 @@
+name: Interpreter evals
+
+# Live LLM evals run on demand only (ADR 0042): they cost money, hit rate limits and vary between runs.
+on:
+  workflow_dispatch:
+    inputs:
+      providers:
+        description: 'Providers to run, comma-separated (workers-ai, gemini, claude); empty runs all'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @onthestack/interpreter eval
+        env:
+          EVAL_PROVIDERS: ${{ inputs.providers }}
+          EVAL_RECORD: '1'
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: packages/interpreter/eval-results/
+          if-no-files-found: ignore
