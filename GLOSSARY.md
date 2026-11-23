@@ -20,7 +20,7 @@ _Avoid_: push-to-talk, tap to speak, wake word
 A player in a game who has no account, joined with only a name and a Deck from the shared library (or one imported while joining).
 
 **Lobby**:
-A game before it starts, where each device joins with a name and a Deck, adding a Seat. Seats are put in the order people sit, and Start asks who goes first.
+A game before it starts, where each device joins with a name and (once the Deck library exists) a Deck, adding a Seat. Seats are put in the order people sit, and Start asks who goes first.
 _Avoid_: waiting room, setup
 
 **Seat**:
@@ -52,7 +52,7 @@ _Avoid_: pin, override
 ## How the game moves
 
 **Step**:
-One of the rules' fixed moments within a turn (upkeep, declare attackers, first-strike damage, end step, …). The app always knows which Step the game is in and shows it.
+One of the rules' fixed moments within a turn (upkeep, declare attackers, first-strike damage, end step, …). The app always knows which Step the game is in and shows it; players move it on with Next step, and Next step on cleanup ends the turn.
 _Avoid_: stage, part
 
 **GameAction**:

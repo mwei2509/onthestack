@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42).
 
+Amended by ADR 0064 (the Deck is optional until the Deck library exists).
+
 Creating a game makes an empty lobby, not a game with seats filled in by one person. Each device that opens the game's link joins with a name and a saved Deck (or imports one there), and that adds a seat. The person who created the game joins the same way.
 
 - **Seating order** is the order people join, and anyone can drag the seats to match where people actually sit, clockwise. Anyone can also rename a seat, change its Deck or remove it. It's a trusted table.
