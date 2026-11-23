@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { claudeProvider } from './claude.js';
 import { forGemini, geminiProvider } from './gemini.js';
-import { LlmOutputError, LlmRequestError, type LlmProvider } from './provider.js';
+import { LlmOutputError, LlmRequestError, retryInvalidOutput, type LlmProvider } from './provider.js';
 import { recordedProvider, recordingProvider, type Recording } from './recorded.js';
 import { workersAiProvider } from './workers-ai.js';
 
@@ -129,5 +129,44 @@ describe('recording and replaying', () => {
     const replayed = await recordedProvider(saved).complete(request);
     expect(replayed).toMatchObject({ output: { answer: 4 }, latencyMs: 700 });
     await expect(recordedProvider(saved).complete({ ...request, user: '3 + 3?' })).rejects.toThrow('no recorded response');
+  });
+});
+
+describe('retryInvalidOutput', () => {
+  const flaky = (answers: (() => unknown)[]): LlmProvider & { calls: number } => {
+    const p = {
+      id: 'fake:flaky',
+      calls: 0,
+      complete: async () => {
+        const next = answers[p.calls++]!;
+        return { output: next() as never, raw: '', model: 'flaky', usage: { inputTokens: 1, outputTokens: 1 }, latencyMs: 5 };
+      },
+    };
+    return p;
+  };
+  const invalid = () => {
+    throw new LlmOutputError('fake:flaky', '{"answer":"four"}', 'answer: expected number');
+  };
+
+  it('asks once more after an invalid answer', async () => {
+    const p = flaky([invalid, () => ({ answer: 4 })]);
+    expect((await retryInvalidOutput(p).complete(request)).output).toEqual({ answer: 4 });
+    expect(p.calls).toBe(2);
+  });
+
+  it('gives up after the second invalid answer', async () => {
+    const p = flaky([invalid, invalid]);
+    await expect(retryInvalidOutput(p).complete(request)).rejects.toBeInstanceOf(LlmOutputError);
+    expect(p.calls).toBe(2);
+  });
+
+  it('does not retry request failures', async () => {
+    const p = flaky([
+      () => {
+        throw new LlmRequestError('fake:flaky', 500, 'down');
+      },
+    ]);
+    await expect(retryInvalidOutput(p).complete(request)).rejects.toBeInstanceOf(LlmRequestError);
+    expect(p.calls).toBe(1);
   });
 });

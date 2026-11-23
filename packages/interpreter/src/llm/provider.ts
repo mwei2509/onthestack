@@ -56,3 +56,24 @@ export function parseOutput<T>(providerId: string, schema: z.ZodType<T>, raw: st
 }
 
 export const jsonSchemaOf = (schema: z.ZodType): Record<string, unknown> => z.toJSONSchema(schema) as Record<string, unknown>;
+
+/**
+ * Asks once more when an answer fails validation (ADR 0046): without enforced structured output, a malformed answer
+ * is rare but possible, and a second call is cheaper than a statement left uninterpreted. Usage and latency cover
+ * both calls.
+ */
+export function retryInvalidOutput(provider: LlmProvider): LlmProvider {
+  return {
+    id: provider.id,
+    async complete<T>(request: LlmRequest<T>): Promise<LlmResult<T>> {
+      const started = Date.now();
+      try {
+        return await provider.complete(request);
+      } catch (e) {
+        if (!(e instanceof LlmOutputError)) throw e;
+        const second = await provider.complete(request);
+        return { ...second, latencyMs: Date.now() - started };
+      }
+    },
+  };
+}

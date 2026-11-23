@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it } from 'vitest';
-import { LlmOutputError, LlmRequestError, type LlmProvider, type LlmRequest, type LlmResult } from '../llm/provider.js';
+import { LlmOutputError, LlmRequestError, retryInvalidOutput, type LlmProvider, type LlmRequest, type LlmResult } from '../llm/provider.js';
 import { recordingProvider, type Recording } from '../llm/recorded.js';
 import { buildPrompt } from '../prompt.js';
 import { InterpretedTimeline } from '../schema.js';
@@ -26,7 +26,9 @@ if (providers.length === 0) {
 }
 
 describe.each(providers.map((p) => [p.id, p] as const))('%s', (providerId, live) => {
-  const provider = process.env.EVAL_RECORD ? recordingProvider(live, (r) => (recordings[providerId] ??= []).push(r)) : live;
+  // Evals call providers the way games will, including the retry on an invalid answer.
+  const recorded = process.env.EVAL_RECORD ? recordingProvider(live, (r) => (recordings[providerId] ??= []).push(r)) : live;
+  const provider = retryInvalidOutput(recorded);
 
   it.each(CASES.map((c) => [c.id, c] as const))('%s', async (_id, c) => {
     const prompt = buildPrompt({ turnStart: c.turnStart, statements: c.statements, currentStep: c.currentStep });
