@@ -17,7 +17,19 @@ Speaking while holding the button on your Phone. Only speech captured this way b
 _Avoid_: push-to-talk, tap to speak, wake word
 
 **Guest**:
-A player in a game who has no account, joined with only a name and optionally a deck list pasted for that game.
+A player in a game who has no account, joined with only a name and a Deck from the shared library (or one imported while joining).
+
+**Lobby**:
+A game before it starts, where each device joins with a name and a Deck, adding a Seat. Seats are put in the order people sit, and Start asks who goes first.
+_Avoid_: waiting room, setup
+
+**Seat**:
+A player's place in a game: their name, their Deck, and at most one connected device. The order of Seats is the clockwise order around the table.
+_Avoid_: slot, player slot
+
+**Game code**:
+The readable code that names a game and its link, such as KITE-MOSS-42. Anyone with it can join.
+_Avoid_: room ID, game ID, invite code
 
 ## What players say
 
@@ -34,7 +46,7 @@ The app's current reading of the TurnTranscript: an ordered account of what happ
 _Avoid_: interpretation, parse
 
 **TimelineCorrection**:
-A fix a player makes by hand to the InterpretedTimeline, by tapping an item to change or remove it. Every later reading must respect it, unless that player takes it back by saying so.
+A fix a player makes by hand to the InterpretedTimeline, by tapping an item to change or remove it, or by skipping a trigger the app found ("Not right" on a Readback note). Every later reading must respect it, unless that player takes it back by saying so.
 _Avoid_: pin, override
 
 ## How the game moves
@@ -113,10 +125,18 @@ _Avoid_: task, reminder, todo
 A notice that an ongoing effect is in play and may matter this turn ("Each opponent pays 2 or…").
 _Avoid_: notification, alert
 
+**Readback note**:
+A short note saying what the app just applied on its own, such as a triggered ability ("Blood Artist (Priya): Ana loses 1 life, Priya gains 1"). It never waits for confirmation, and "Not right" takes that change back.
+_Avoid_: toast, notification, confirmation
+
+**Seat detail**:
+What the app thinks one player's state is and why: every change to their life and commander damage with its cause and turn, and a picture of their battlefield where corrections are made.
+_Avoid_: player screen, profile
+
 ## Cards
 
 **Deck**:
-A list of cards imported from Archidekt that exists on its own, independent of any player or account, so it can be shared and reused. Each player picks one for a game. It may be incomplete; cards not on it can still come up in a game.
+A list of cards, imported from an Archidekt link or a pasted list, that exists on its own, independent of any player or account, so it can be shared and reused. Saved Decks form one shared library until accounts arrive. Each player picks one when joining a game, and the game copies it at Start. It may be incomplete; cards not on it can still come up in a game.
 _Avoid_: decklist, list
 
 **Translation**:
