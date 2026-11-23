@@ -17,7 +17,7 @@ export default defineConfig({
   test: {
     include: ['src/**/*.eval.ts'],
     env: readEnvFile('.env'),
-    testTimeout: 120_000,
+    testTimeout: 300_000,
     fileParallelism: false,
   },
 });

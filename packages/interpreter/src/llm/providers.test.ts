@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { claudeProvider } from './claude.js';
-import { geminiProvider } from './gemini.js';
+import { forGemini, geminiProvider } from './gemini.js';
 import { LlmOutputError, LlmRequestError, type LlmProvider } from './provider.js';
 import { recordedProvider, recordingProvider, type Recording } from './recorded.js';
 import { workersAiProvider } from './workers-ai.js';
@@ -70,6 +70,11 @@ describe('geminiProvider', () => {
       contents: [{ role: 'user', parts: [{ text: '2 + 2?' }] }],
       generationConfig: { responseMimeType: 'application/json', responseJsonSchema: { type: 'object' } },
     });
+  });
+
+  it('rewrites oneOf and const, which Gemini ignores, as anyOf and enum', () => {
+    const schema = { oneOf: [{ type: 'object', properties: { type: { const: 'tap' } } }, { properties: { type: { const: 'untap' } } }] };
+    expect(forGemini(schema)).toEqual({ anyOf: [{ type: 'object', properties: { type: { enum: ['tap'] } } }, { properties: { type: { enum: ['untap'] } } }] });
   });
 
   it('reports an HTTP failure with its status', async () => {

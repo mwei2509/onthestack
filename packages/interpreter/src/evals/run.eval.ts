@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it } from 'vitest';
+import { LlmOutputError, LlmRequestError, type LlmProvider, type LlmRequest, type LlmResult } from '../llm/provider.js';
 import { recordingProvider, type Recording } from '../llm/recorded.js';
 import { buildPrompt } from '../prompt.js';
 import { InterpretedTimeline } from '../schema.js';
@@ -32,9 +33,10 @@ describe.each(providers.map((p) => [p.id, p] as const))('%s', (providerId, live)
     const started = Date.now();
     let result;
     try {
-      result = await provider.complete({ ...prompt, schema: InterpretedTimeline });
+      result = await withRetries(provider, { ...prompt, schema: InterpretedTimeline });
     } catch (e) {
-      rows.push({ provider: providerId, caseId: c.id, pass: false, latencyMs: Date.now() - started, cost: 0, failure: String(e) });
+      const raw = e instanceof LlmOutputError ? `\n\nThe model returned:\n${e.raw.slice(0, 4000)}` : '';
+      rows.push({ provider: providerId, caseId: c.id, pass: false, latencyMs: Date.now() - started, cost: 0, failure: `${String(e)}${raw}` });
       throw e;
     }
     const score = scoreCase(c, result.output);
@@ -43,6 +45,19 @@ describe.each(providers.map((p) => [p.id, p] as const))('%s', (providerId, live)
     expect(score.pass, `${c.checks}\n${failure}`).toBe(true);
   });
 });
+
+/** Free tiers limit requests per minute; wait and retry rather than count a rate limit as a failed case. */
+async function withRetries<T>(provider: LlmProvider, request: LlmRequest<T>): Promise<LlmResult<T>> {
+  for (const waitSeconds of [15, 30, 60]) {
+    try {
+      return await provider.complete(request);
+    } catch (e) {
+      if (!(e instanceof LlmRequestError && e.status === 429)) throw e;
+      await new Promise((resolve) => setTimeout(resolve, waitSeconds * 1000));
+    }
+  }
+  return provider.complete(request);
+}
 
 afterAll(() => {
   if (rows.length === 0) return;
