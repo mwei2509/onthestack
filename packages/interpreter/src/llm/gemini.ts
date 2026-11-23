@@ -23,7 +23,7 @@ export function geminiProvider({ apiKey, model = 'gemini-3.5-flash-lite', fetch:
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
           contents: [{ role: 'user', parts: [{ text: user }] }],
-          generationConfig: { responseMimeType: 'application/json', responseJsonSchema: jsonSchemaOf(schema) },
+          generationConfig: { responseMimeType: 'application/json', responseJsonSchema: forGemini(jsonSchemaOf(schema)) },
         }),
       });
       if (!response.ok) throw new LlmRequestError(id, response.status, await response.text());
@@ -38,4 +38,21 @@ export function geminiProvider({ apiKey, model = 'gemini-3.5-flash-lite', fetch:
       };
     },
   };
+}
+
+/**
+ * Gemini's JSON Schema support has no `oneOf` or `const`, and it ignores what it doesn't support rather than
+ * rejecting it, which left action types unconstrained. A discriminated union's branches never overlap, so `anyOf`
+ * means the same here, and `const` is a one-value `enum`.
+ */
+export function forGemini(node: unknown): unknown {
+  if (Array.isArray(node)) return node.map(forGemini);
+  if (!node || typeof node !== 'object') return node;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'oneOf') out.anyOf = forGemini(value);
+    else if (key === 'const') out.enum = [value];
+    else out[key] = forGemini(value);
+  }
+  return out;
 }

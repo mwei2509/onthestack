@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { claudeProvider } from './claude.js';
-import { geminiProvider } from './gemini.js';
-import { LlmOutputError, LlmRequestError, type LlmProvider } from './provider.js';
+import { forGemini, geminiProvider } from './gemini.js';
+import { LlmOutputError, LlmRequestError, retryInvalidOutput, type LlmProvider } from './provider.js';
 import { recordedProvider, recordingProvider, type Recording } from './recorded.js';
 import { workersAiProvider } from './workers-ai.js';
 
@@ -20,29 +20,40 @@ function fakeFetch(body: unknown, status = 200) {
 }
 
 describe('claudeProvider', () => {
-  const message = (text: string) => ({
+  const message = (content: unknown[]) => ({
     id: 'msg_1',
     type: 'message',
     role: 'assistant',
     model: 'claude-haiku-5-5',
-    content: [{ type: 'text', text }],
-    stop_reason: 'end_turn',
+    content,
+    stop_reason: 'tool_use',
     stop_sequence: null,
     usage: { input_tokens: 120, output_tokens: 8 },
   });
+  const answer = (input: unknown) => message([{ type: 'tool_use', id: 'tu_1', name: 'record_answer', input }]);
 
-  it('asks for structured output with a cacheable system prompt, and parses the answer', async () => {
-    const f = fakeFetch(message('{"answer":4}'));
+  it('offers the schema as a tool with a cacheable system prompt, and parses the tool input', async () => {
+    const f = fakeFetch(answer({ answer: 4 }));
     const result = await claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request);
-    expect(result).toMatchObject({ output: { answer: 4 }, model: 'claude-haiku-5-5', usage: { inputTokens: 120, outputTokens: 8 } });
+    expect(result).toMatchObject({ output: { answer: 4 }, raw: '{"answer":4}', model: 'claude-haiku-5-5', usage: { inputTokens: 120, outputTokens: 8 } });
     const body = f.calls[0]?.json;
-    expect(body).toMatchObject({ model: 'claude-haiku-5-5', system: [{ text: 'You add numbers.', cache_control: { type: 'ephemeral' } }], output_config: { effort: 'low' } });
-    expect(body?.output_config).toHaveProperty('format.schema');
+    expect(body).toMatchObject({
+      model: 'claude-haiku-5-5',
+      system: [{ cache_control: { type: 'ephemeral' } }],
+      tools: [{ name: 'record_answer', input_schema: { type: 'object' } }],
+      output_config: { effort: 'low' },
+    });
+    expect(JSON.stringify(body?.system)).toContain('You add numbers.');
   });
 
-  it('rejects an answer that does not match the schema', async () => {
-    const f = fakeFetch(message('{"answer":"four"}'));
-    await expect(claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request)).rejects.toThrow();
+  it('rejects tool input that does not match the schema', async () => {
+    const f = fakeFetch(answer({ answer: 'four' }));
+    await expect(claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request)).rejects.toBeInstanceOf(LlmOutputError);
+  });
+
+  it('reports an answer given as text instead of through the tool', async () => {
+    const f = fakeFetch(message([{ type: 'text', text: 'It is 4.' }]));
+    await expect(claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request)).rejects.toThrow('no record_answer call');
   });
 });
 
@@ -59,6 +70,11 @@ describe('geminiProvider', () => {
       contents: [{ role: 'user', parts: [{ text: '2 + 2?' }] }],
       generationConfig: { responseMimeType: 'application/json', responseJsonSchema: { type: 'object' } },
     });
+  });
+
+  it('rewrites oneOf and const, which Gemini ignores, as anyOf and enum', () => {
+    const schema = { oneOf: [{ type: 'object', properties: { type: { const: 'tap' } } }, { properties: { type: { const: 'untap' } } }] };
+    expect(forGemini(schema)).toEqual({ anyOf: [{ type: 'object', properties: { type: { enum: ['tap'] } } }, { properties: { type: { enum: ['untap'] } } }] });
   });
 
   it('reports an HTTP failure with its status', async () => {
@@ -113,5 +129,44 @@ describe('recording and replaying', () => {
     const replayed = await recordedProvider(saved).complete(request);
     expect(replayed).toMatchObject({ output: { answer: 4 }, latencyMs: 700 });
     await expect(recordedProvider(saved).complete({ ...request, user: '3 + 3?' })).rejects.toThrow('no recorded response');
+  });
+});
+
+describe('retryInvalidOutput', () => {
+  const flaky = (answers: (() => unknown)[]): LlmProvider & { calls: number } => {
+    const p = {
+      id: 'fake:flaky',
+      calls: 0,
+      complete: async () => {
+        const next = answers[p.calls++]!;
+        return { output: next() as never, raw: '', model: 'flaky', usage: { inputTokens: 1, outputTokens: 1 }, latencyMs: 5 };
+      },
+    };
+    return p;
+  };
+  const invalid = () => {
+    throw new LlmOutputError('fake:flaky', '{"answer":"four"}', 'answer: expected number');
+  };
+
+  it('asks once more after an invalid answer', async () => {
+    const p = flaky([invalid, () => ({ answer: 4 })]);
+    expect((await retryInvalidOutput(p).complete(request)).output).toEqual({ answer: 4 });
+    expect(p.calls).toBe(2);
+  });
+
+  it('gives up after the second invalid answer', async () => {
+    const p = flaky([invalid, invalid]);
+    await expect(retryInvalidOutput(p).complete(request)).rejects.toBeInstanceOf(LlmOutputError);
+    expect(p.calls).toBe(2);
+  });
+
+  it('does not retry request failures', async () => {
+    const p = flaky([
+      () => {
+        throw new LlmRequestError('fake:flaky', 500, 'down');
+      },
+    ]);
+    await expect(retryInvalidOutput(p).complete(request)).rejects.toBeInstanceOf(LlmRequestError);
+    expect(p.calls).toBe(1);
   });
 });

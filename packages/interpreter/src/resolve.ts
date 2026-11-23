@@ -1,4 +1,5 @@
 import {
+  nextStackItemId,
   replayTurn,
   STEPS,
   type GameAction,
@@ -63,6 +64,8 @@ class Resolver {
   constructor(
     private state: GameState,
     private entry: TimelineEntry,
+    /** While resolving a spell's effects: the spell itself, which is a damage source but not yet on the Stack. */
+    private self?: { card: string; id: ObjectId },
   ) {}
 
   action(a: InterpretedGameAction): GameAction {
@@ -73,7 +76,7 @@ class Resolver {
           type: 'cast',
           card: a.card,
           ...(a.targets ? { targets: a.targets.map((t) => this.target(t)) } : {}),
-          ...(a.effects ? { effects: a.effects.map((e) => new Resolver(this.state, this.entry).action(e)) } : {}),
+          ...(a.effects ? { effects: a.effects.map((e) => new Resolver(this.state, this.entry, { card: a.card, id: nextStackItemId(this.state) }).action(e)) } : {}),
         };
       case 'counter':
         return { type: 'counter', stackItemId: this.spell(a.spell) };
@@ -103,7 +106,12 @@ class Resolver {
       case 'life':
         return { type: 'life', playerId: this.player(a.player), delta: a.delta };
       case 'damage':
-        return { type: 'damage', sourceId: this.permanent(a.source), recipient: this.recipient(a.recipient), amount: a.amount };
+        return {
+          type: 'damage',
+          sourceId: this.self && sameName(a.source.card, this.self.card) ? this.self.id : this.permanent(a.source),
+          recipient: this.recipient(a.recipient),
+          amount: a.amount,
+        };
       case 'attack':
         return {
           type: 'attack',

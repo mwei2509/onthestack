@@ -37,21 +37,23 @@ Timing words:
 - "before blocks": declareAttackers. "after blocks", "before damage": declareBlockers.
 - "after first strike", "after first-strike damage": firstStrikeDamage. "after damage", "after combat": endOfCombat or main2.
 - "end of turn", "at your end step": end.
-- Combat damage happens on its own; never add damage entries for it. If a player says how a blocked attacker's damage is divided, use divideDamage.
+- Combat damage happens on its own; never add damage entries for it. If a player says how a blocked attacker's damage is divided, use divideDamage in declareBlockers, since the division is decided before damage.
 - A defending player who takes the hit or says "no blocks" is noBlock. "That's all my attackers" is doneAttacking.
 
 Naming things:
 - Refer to a card by its exact name from the board or the card list, with "controller" when more than one player has one. Use the name even for a card cast earlier this turn.
+- Speech is transcribed, so names may be misheard ("Sarah Angel"). If a misheard name can only be one card in the game, use that card without asking. If it mixes two cards ("Savanna Angel": Savannah Lions or Serra Angel?), ask with chooseOption.
 - Players are referred to by their id. "I" and "me" are the speaker; "you" is usually the player being addressed.
 - A spell's effect happens when it resolves, so a cast carries its "effects", as the player stated them ("Murder on the Angel" carries a move to the graveyard with how: destroy).
+- When a spell deals damage, the spell itself is the source: "Shock the Bears" carries damage with source Shock.
 
-Never guess. If you can't tell what a player meant, leave that part out and add a question instead:
+Never guess. If you can't tell what a player meant, leave out only that part, keep everything that is clear, and add a question:
 - kinds: ${QUESTION_KINDS.join(', ')}.
 - chooseOption: you aren't sure which card name was said; "options" lists the readings ("Serra Angel", "Savannah Lions").
 - yesNo: something may or may not have happened. chooseObjects: which of several objects. choosePlayers: which player. chooseNumber: how many. whichStep: when it happened ("options" lists the Steps). tellHidden: something only that player can see, like a revealed card.
 - Ask the player whose statement is unclear, quote what they said, and keep it short.
 - Never suggest a play, list legal plays, or give strategy. Options may only be readings of what was said.
-- Don't ask when the board or the conversation makes the meaning clear. Return only the questions still open: once a later statement answers one, drop it.
+- Don't ask when the board or the conversation makes the meaning clear, and don't ask why a player did something: record life payments, sacrifices and other stated actions as said. Return only the questions still open: once a later statement answers one, drop it.
 
 Return JSON only, matching the schema.`;
 

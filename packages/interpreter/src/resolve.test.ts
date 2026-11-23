@@ -9,6 +9,7 @@ const cards: Record<string, CardDefinition> = {
   'Grizzly Bears': card('Grizzly Bears', ['Creature'], 2, 2),
   Counterspell: card('Counterspell', ['Instant']),
   Murder: card('Murder', ['Instant']),
+  Shock: card('Shock', ['Instant']),
 };
 
 const newGame = () =>
@@ -164,6 +165,25 @@ describe('resolveTimeline', () => {
     const after = replayTurn(start, result.timeline).state;
     expect(Object.values(after.permanents).some((p) => p.card === 'Grizzly Bears')).toBe(false);
     expect(after.graveyards.theo).toContain('Grizzly Bears');
+  });
+
+  it("uses a spell's own Stack item as the source of the damage it deals", () => {
+    const start = boardAfter(said('main1', 'melissa', { type: 'cast', card: 'Grizzly Bears' }));
+    const result = resolveTimeline(
+      start,
+      timeline(
+        said('main1', 'theo', {
+          type: 'cast',
+          card: 'Shock',
+          targets: [{ card: 'Grizzly Bears' }],
+          effects: [{ type: 'damage', source: { card: 'Shock' }, recipient: { card: 'Grizzly Bears' }, amount: 2 }],
+        }),
+      ),
+    );
+    expect(result.questions).toEqual([]);
+    const after = replayTurn(start, result.timeline).state;
+    expect(after.graveyards.melissa).toContain('Grizzly Bears');
+    expect(result.timeline[0]?.gameAction).toMatchObject({ effects: [{ sourceId: `k${start.nextIds.stackItem}` }] });
   });
 
   it('asks who is meant when a player id is unknown', () => {
