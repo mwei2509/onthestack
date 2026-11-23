@@ -2,7 +2,7 @@
 
 Voice-driven Magic: The Gathering table companion for casual Commander (onthestack.gg). Players speak their actions. The app tracks life, combat, triggers and the stack.
 
-**Status:** pre-code. The repo is a pnpm workspace (TypeScript): `packages/engine` (pure rules engine), `packages/interpreter` (turns the TurnTranscript into an InterpretedTimeline with an LLM; schema only so far), `packages/server` (Cloudflare Worker plus the `Game` Durable Object), `packages/web` (React app served by the Worker) and `packages/cli` (the repo-specific `stx` commands). Nothing is deployed yet. The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
+**Status:** pre-code. The repo is a pnpm workspace (TypeScript): `packages/engine` (pure rules engine), `packages/interpreter` (turns the TurnTranscript into an InterpretedTimeline with an LLM; schema, name resolution, prompt and LLM providers so far), `packages/server` (Cloudflare Worker plus the `Game` Durable Object), `packages/web` (React app served by the Worker) and `packages/cli` (the repo-specific `stx` commands). Nothing is deployed yet. The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
 
 ## Dev CLI: `stx`
 

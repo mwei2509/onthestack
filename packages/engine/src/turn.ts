@@ -30,8 +30,13 @@ const stepIndex = (step: Step) => STEPS.indexOf(step);
  * Replays a turn from its starting snapshot (ADR 0014, 0016): each Step in order, its automatic actions, then the
  * timeline entries placed in it, settling the board after each. Pure: the same snapshot and timeline always give
  * the same result, IDs included. Stops after `currentStep`; by default, the last Step the timeline reaches.
+ * `responsePending` leaves the Stack unresolved at the end, as if a Response were about to be applied.
  */
-export function replayTurn(turnStart: GameState, timeline: TimelineEntry[], options: { currentStep?: Step } = {}): ReplayResult {
+export function replayTurn(
+  turnStart: GameState,
+  timeline: TimelineEntry[],
+  options: { currentStep?: Step; responsePending?: boolean } = {},
+): ReplayResult {
   const last = options.currentStep ?? timeline.reduce<Step>((s, e) => (stepIndex(e.step) > stepIndex(s) ? e.step : s), 'untap');
   let state = clone(turnStart);
   const events: GameEvent[] = [];
@@ -57,12 +62,14 @@ export function replayTurn(turnStart: GameState, timeline: TimelineEntry[], opti
     emit(draft, started, { type: 'PhaseStarted', step, activePlayerId: draft.turn.activePlayerId, turn: draft.turn.number }, { rule: 'turnStructure' });
     take({ state: draft, events: started, warnings: [] });
     take(automatic(state, step));
-    settleNow();
-
     const entries = timeline.filter((e) => e.step === step);
+    const holdAtEnd = options.responsePending === true && step === last;
+    settleNow(!(holdAtEnd && entries.length === 0));
+
     entries.forEach((entry, i) => {
       take(applyAction(state, entry.gameAction, { playerId: entry.playerId, cause: entry.from[0] ? { playerStatement: entry.from[0] } : { rule: 'turnStructure' } }));
-      settleNow(!entries[i + 1]?.response);
+      const next = entries[i + 1];
+      settleNow(next ? !next.response : !holdAtEnd);
     });
   }
   return { state, events, tableEvents: numbered(tableEvents), warnings };

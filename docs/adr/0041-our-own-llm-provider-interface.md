@@ -1,6 +1,6 @@
 # A thin LLM provider interface of our own
 
-Status: Accepted (decided with Melissa, 2026-11-22, in the planning session for #38).
+Status: Accepted (decided with Melissa, 2026-11-22, in the planning session for #38). Amended by ADR 0046 (Claude answers through a non-strict tool).
 
 The interpreter calls an LLM through one small interface of its own: send this prompt, get back JSON that matches this schema (ADR 0037). Each provider is a small adapter behind it. The Claude adapter uses the official `@anthropic-ai/sdk`, whose structured-output helper validates against the Zod schema directly; the others call their HTTP APIs with `fetch`. A recorded-response adapter replays saved responses, so the pure parts are tested without a network.
 

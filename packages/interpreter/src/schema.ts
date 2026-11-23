@@ -15,19 +15,12 @@ const Recipient = z.union([PlayerRef, CardRef]);
 
 const until = z.literal('endOfTurn');
 
-const Cast = z.object({
-  type: z.literal('cast'),
-  card: z.string(),
-  targets: z.array(Recipient).optional(),
-  get effects(): z.ZodOptional<z.ZodArray<typeof InterpretedGameAction>> {
-    return z.array(InterpretedGameAction).optional().describe('What the spell does when it resolves, as the player said it');
-  },
-});
-
-export const InterpretedGameAction = z.discriminatedUnion('type', [
-  Cast,
+/**
+ * What a spell can do when it resolves. Casting, combat and land drops aren't among them, which keeps the schema
+ * non-recursive and small enough for Claude's structured output.
+ */
+const EFFECT_ACTIONS = [
   z.object({ type: z.literal('counter'), spell: CardRef.describe('The spell on the Stack being countered') }),
-  z.object({ type: z.literal('playLand'), card: z.string() }),
   z.object({ type: z.literal('move'), object: CardRef, to: z.enum(ZONES), how: z.enum(['destroy', 'sacrifice', 'exile']).optional() }),
   z.object({ type: z.literal('tap'), object: CardRef }),
   z.object({ type: z.literal('untap'), object: CardRef }),
@@ -36,8 +29,8 @@ export const InterpretedGameAction = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('modify'),
     object: CardRef,
-    power: z.number().int(),
-    toughness: z.number().int(),
+    power: z.number().int().describe('How much power changes: 3 for +3/+3, -2 for -2/-2'),
+    toughness: z.number().int().describe('How much toughness changes'),
     keywords: z.array(z.string()).optional(),
     until,
   }),
@@ -56,6 +49,14 @@ export const InterpretedGameAction = z.discriminatedUnion('type', [
   }),
   z.object({ type: z.literal('life'), player: PlayerId, delta: z.number().int() }),
   z.object({ type: z.literal('damage'), source: CardRef, recipient: Recipient, amount: z.number().int().nonnegative() }),
+  z.object({ type: z.literal('playerTask'), player: PlayerId, text: z.string() }),
+] as const;
+
+export const EffectAction = z.discriminatedUnion('type', [...EFFECT_ACTIONS]);
+
+/** Actions players take that spells don't. */
+const TURN_ACTIONS = [
+  z.object({ type: z.literal('playLand'), card: z.string() }),
   z.object({ type: z.literal('attack'), attacks: z.array(z.object({ attacker: CardRef, target: PlayerId })).min(1) }),
   z.object({ type: z.literal('block'), blocks: z.array(z.object({ blocker: CardRef, attacker: CardRef })).min(1) }),
   z.object({ type: z.literal('noBlock') }),
@@ -65,8 +66,16 @@ export const InterpretedGameAction = z.discriminatedUnion('type', [
     attacker: CardRef,
     split: z.array(z.object({ to: Recipient, amount: z.number().int().nonnegative() })).min(1),
   }),
-  z.object({ type: z.literal('playerTask'), player: PlayerId, text: z.string() }),
-]);
+] as const;
+
+const Cast = z.object({
+  type: z.literal('cast'),
+  card: z.string(),
+  targets: z.array(Recipient).optional(),
+  effects: z.array(EffectAction).optional().describe('What the spell does when it resolves, as the player said it'),
+});
+
+export const InterpretedGameAction = z.discriminatedUnion('type', [Cast, ...TURN_ACTIONS, ...EFFECT_ACTIONS]);
 
 export const TimelineEntry = z.object({
   step: z.enum(STEPS),
