@@ -19,7 +19,7 @@ importers:
         version: 8.73.0(eslint@10.15.0)(typescript@5.9.3)
       vitest:
         specifier: ^5.1.1
-        version: 5.1.1(vite@8.3.8(esbuild@0.28.2))
+        version: 5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2))
 
   packages/cli:
     dependencies:
@@ -41,13 +41,16 @@ importers:
     devDependencies:
       '@fast-check/vitest':
         specifier: ^0.5.0
-        version: 0.5.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)))
+        version: 0.5.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)))
       fast-check:
         specifier: ^4.10.3
         version: 4.10.3
 
   packages/interpreter:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^1.12.0
+        version: 1.12.0(zod@4.6.6)
       '@onthestack/engine':
         specifier: workspace:*
         version: link:../engine
@@ -63,10 +66,10 @@ importers:
     devDependencies:
       '@cloudflare/vitest-plugin':
         specifier: ^1.9.0
-        version: 1.9.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)))
+        version: 1.9.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)))
       wrangler:
         specifier: ^4.166.0
-        version: 4.166.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)))
+        version: 4.166.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)))
 
   packages/web:
     dependencies:
@@ -94,6 +97,19 @@ importers:
         version: 8.3.8(@types/node@20.19.43)(esbuild@0.28.2)
 
 packages:
+
+  '@anthropic-ai/sdk@1.12.0':
+    resolution: {integrity: sha512-0j9zwiQdkvr90LoiiBDUh7kae1lsNW2EqeE0vGceYne4BrmMDdDVoQ4KGOieUee0zWZbVJKsf/06JY8U5i63Xg==}
+    hasBin: true
+    peerDependencies:
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
+  '@babel/runtime@7.29.15':
+    resolution: {integrity: sha512-304gsbbGVmQc+cNGHzwHBlqepYdWLKj3VXCQBGt/EGcV7PUPfKI7kAUNW1FZEOCwlQiLvQjg1JEaAlRQ616h+Q==}
+    engines: {node: '>=6.9.0'}
 
   '@cacheable/memory@2.2.0':
     resolution: {integrity: sha512-CTLKqLItRCEixEAewD3/j9DB3/o96gpTPD4eJ1v+DGOlxZRZncRQkGYqqnAGCscYd6RNeXfGeiuCphsPtqyIfQ==}
@@ -721,6 +737,10 @@ packages:
       '@emnapi/core': ^1.7.1 || 2.0.0-beta.2
       '@emnapi/runtime': ^1.7.1 || 2.0.0-beta.2
 
+  '@opentelemetry/api@1.10.0':
+    resolution: {integrity: sha512-lMkyes8iHrG+mk6WH7X70MdCLI2RS0FwNBY1PyQ8UemaijE2m5mv5A0Niy3HtbYTFrgkUEQjFMXmSAk2hQDuPQ==}
+    engines: {node: '>=8.0.0'}
+
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
 
@@ -967,6 +987,9 @@ packages:
 
   '@speed-highlight/core@1.2.24':
     resolution: {integrity: sha512-qeW2e1l78afw8VhRPfPQ1Gjj+KU5XFQ/OFV5ti6eTa9bruO7mJyZtA4vw0ofqmA3tKCkROE9xLk3VZoeRc98nw==}
+
+  '@stablelib/base64@1.0.1':
+    resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
 
   '@tybys/wasm-util@0.10.5':
     resolution: {integrity: sha512-dOGOPxlaNV+G046mZzN+9C0dAcQZeSKcXiVaM0TYy/LM4ttTmgSBDxYfovcYI8Em3+eAbiAYpvWLOv8+ZVRJKA==}
@@ -1339,6 +1362,9 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
+  fast-sha256@1.3.0:
+    resolution: {integrity: sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==}
+
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
     engines: {node: '>=12.0.0'}
@@ -1450,6 +1476,10 @@ packages:
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
+
+  json-schema-to-ts@3.1.1:
+    resolution: {integrity: sha512-+DWg8jCJG2TEnpy7kOm/7/AxaYoaRbjVB4LFZLySZlWn8exGs3A4OLJR966cVvU26N7X9TWxl+Jsw7dzAqKT6g==}
+    engines: {node: '>=16'}
 
   json-schema-traverse@0.4.1:
     resolution: {integrity: sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==}
@@ -1760,6 +1790,9 @@ packages:
     resolution: {integrity: sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==}
     engines: {node: '>= 12'}
 
+  standardwebhooks@1.3.0:
+    resolution: {integrity: sha512-5W9skHjqAm2dlA9wWvglTP+oX47JX4lFXVk1aJV7+TG1snvTR4QXaVgPscEzvOw9GRreeavMwbqEeL+MGhZHCg==}
+
   std-env@4.3.0:
     resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
 
@@ -1800,6 +1833,9 @@ packages:
   tree-kill@1.2.2:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
+
+  ts-algebra@2.0.0:
+    resolution: {integrity: sha512-FPAhNPFMrkwz76P7cdjdmiShwMynZYN6SgOujD1urY4oNm80Ou9oMdmbR45LotcKOXoy7wSmHkRFE6Mxbrhefw==}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -2017,6 +2053,16 @@ packages:
 
 snapshots:
 
+  '@anthropic-ai/sdk@1.12.0(zod@4.6.6)':
+    dependencies:
+      '@opentelemetry/api': 1.10.0
+      json-schema-to-ts: 3.1.1
+      standardwebhooks: 1.3.0
+    optionalDependencies:
+      zod: 4.6.6
+
+  '@babel/runtime@7.29.15': {}
+
   '@cacheable/memory@2.2.0':
     dependencies:
       '@cacheable/utils': 2.5.0
@@ -2037,12 +2083,12 @@ snapshots:
     optionalDependencies:
       workerd: 1.20261119.1
 
-  '@cloudflare/vitest-plugin@1.9.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)))':
+  '@cloudflare/vitest-plugin@1.9.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)))':
     dependencies:
       cjs-module-lexer: 1.2.3
       esbuild: 0.28.2
       miniflare: 5.20261119.0-beta
-      vitest: 5.1.1(vite@8.3.8(esbuild@0.28.2))
+      vitest: 5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2))
       zod: 4.6.6
     transitivePeerDependencies:
       - '@types/node'
@@ -2065,14 +2111,14 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20261119.1':
     optional: true
 
-  '@cloudflare/workers-utils@0.56.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)))':
+  '@cloudflare/workers-utils@0.56.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)))':
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       chalk: 5.3.0
       dotenv: 16.3.1
       undici: 7.30.2
     optionalDependencies:
-      vitest: 5.1.1(vite@8.3.8(esbuild@0.28.2))
+      vitest: 5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2))
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -2285,10 +2331,10 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@fast-check/vitest@0.5.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)))':
+  '@fast-check/vitest@0.5.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)))':
     dependencies:
       fast-check: 4.10.3
-      vitest: 5.1.1(vite@8.3.8(esbuild@0.28.2))
+      vitest: 5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2))
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -2448,6 +2494,8 @@ snapshots:
       '@tybys/wasm-util': 0.10.5
     optional: true
 
+  '@opentelemetry/api@1.10.0': {}
+
   '@oxc-project/types@0.156.0': {}
 
   '@poppinss/colors@4.1.6':
@@ -2597,6 +2645,8 @@ snapshots:
   '@sindresorhus/is@7.2.0': {}
 
   '@speed-highlight/core@1.2.24': {}
+
+  '@stablelib/base64@1.0.1': {}
 
   '@tybys/wasm-util@0.10.5':
     dependencies:
@@ -3032,6 +3082,8 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
+  fast-sha256@1.3.0: {}
+
   fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
       picomatch: 4.0.7
@@ -3140,6 +3192,11 @@ snapshots:
   isexe@2.0.0: {}
 
   joycon@3.1.1: {}
+
+  json-schema-to-ts@3.1.1:
+    dependencies:
+      '@babel/runtime': 7.29.15
+      ts-algebra: 2.0.0
 
   json-schema-traverse@0.4.1: {}
 
@@ -3448,6 +3505,11 @@ snapshots:
 
   source-map@0.7.6: {}
 
+  standardwebhooks@1.3.0:
+    dependencies:
+      '@stablelib/base64': 1.0.1
+      fast-sha256: 1.3.0
+
   std-env@4.3.0: {}
 
   sucrase@3.35.1:
@@ -3484,6 +3546,8 @@ snapshots:
   tr46@0.0.3: {}
 
   tree-kill@1.2.2: {}
+
+  ts-algebra@2.0.0: {}
 
   ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:
@@ -3568,7 +3632,7 @@ snapshots:
       esbuild: 0.28.2
       fsevents: 2.3.3
 
-  vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)):
+  vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/mocker': 5.1.1(vite@8.3.8(esbuild@0.28.2))
@@ -3584,6 +3648,8 @@ snapshots:
       tinyglobby: 0.2.17
       vite: 8.3.8(@types/node@20.19.43)(esbuild@0.28.2)
       why-is-node-running: 3.2.1
+    optionalDependencies:
+      '@opentelemetry/api': 1.10.0
     transitivePeerDependencies:
       - msw
 
@@ -3612,11 +3678,11 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20261119.1
       '@cloudflare/workerd-windows-64': 1.20261119.1
 
-  wrangler@4.166.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2))):
+  wrangler@4.166.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2))):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.1
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20261119.1)
-      '@cloudflare/workers-utils': 0.56.0(vitest@5.1.1(vite@8.3.8(esbuild@0.28.2)))
+      '@cloudflare/workers-utils': 0.56.0(vitest@5.1.1(@opentelemetry/api@1.10.0)(vite@8.3.8(esbuild@0.28.2)))
       '@cspotcode/source-map-support': 0.8.1
       '@types/yargs': 17.0.24
       cloudflare: 5.2.0
