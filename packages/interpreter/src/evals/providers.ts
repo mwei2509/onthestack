@@ -14,12 +14,12 @@ export const costOf = (providerId: string, usage: { inputTokens: number; outputT
 };
 
 /**
- * The providers to evaluate, from the environment. EVAL_PROVIDERS picks some ("claude,gemini"); by default every
+ * The providers to evaluate, from the environment. EVAL_PROVIDERS picks some ("claude,gemini"); unset or empty means every
  * provider whose key is set. EVAL_MODEL_WORKERS_AI, EVAL_MODEL_GEMINI and EVAL_MODEL_CLAUDE override the model.
  */
 export function providersFromEnv(env: Record<string, string | undefined>): LlmProvider[] {
-  const wanted = env.EVAL_PROVIDERS?.split(',').map((s) => s.trim());
-  const pick = (name: string, ready: boolean) => ready && (!wanted || wanted.includes(name));
+  const wanted = (env.EVAL_PROVIDERS ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const pick = (name: string, ready: boolean) => ready && (wanted.length === 0 || wanted.includes(name));
   const providers: LlmProvider[] = [];
   if (pick('workers-ai', !!env.CLOUDFLARE_ACCOUNT_ID && !!env.CLOUDFLARE_API_TOKEN)) {
     const model = env.EVAL_MODEL_WORKERS_AI;
