@@ -1,6 +1,6 @@
 # Claude Haiku 5.5 interprets the table
 
-Status: Proposed
+Status: Accepted (decided with Melissa, 2026-11-23, in the session building #38).
 
 Chooses the model ADR 0040 left to the evals. Claude Haiku 5.5 interprets PlayerStatements in games. It was the only candidate to pass every eval, and the only one that reliably asks instead of guessing (ADR 0043), which is the behaviour principle 2 depends on.
 
