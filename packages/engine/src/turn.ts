@@ -195,6 +195,8 @@ export interface TableView {
   /** Things to do now that need no record, like the draw (ADR 0028). Computed for the screen, never stored. */
   reminders: { text: string; playerId?: PlayerId; permanentId?: PermanentId }[];
   warnings: RulesWarning[];
+  /** The Steps still to come this turn (`stepsAhead`), so screens can name the next one without running the engine. */
+  stepsAhead: Step[];
 }
 
 /** What every screen shows for a replay result. */
@@ -232,6 +234,7 @@ export function tableView(result: ReplayResult): TableView {
     playerTasks: result.tableEvents.flatMap((e) => (e.type === 'PlayerTaskCreated' ? [{ playerId: e.playerId, text: e.text, from: e.id }] : [])),
     reminders: [...stepReminders(state), ...combatReminders(state)],
     warnings: result.warnings,
+    stepsAhead: stepsAhead(state),
   };
 }
 
