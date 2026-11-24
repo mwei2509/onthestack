@@ -12,7 +12,7 @@ Do these before the first deploy. Until the secrets exist, the `deploy` job fail
 4. **Create an API token** (My Profile → API Tokens → Create Token → "Edit Cloudflare Workers" template). Scope it to your account and the `onthestack.gg` zone, and add **Zone → DNS → Edit** for that zone, which Wrangler needs to create the Custom Domain's record.
 5. **Add the repository secrets:**
    ```sh
-   gh secret set CLOUDFLARE_API_TOKEN      # the token from step 4
+   gh secret set CLOUDFLARE_DEPLOY_TOKEN   # the token from step 4
    gh secret set CLOUDFLARE_ACCOUNT_ID     # Workers & Pages → Overview, right-hand side
    ```
 6. **Redirect `www`.** Add a DNS record `www`, type `AAAA`, content `100::`, Proxied. Then Rules → Redirect Rules → create from the "Redirect from WWW to root" template (301, keep the path and query string).
