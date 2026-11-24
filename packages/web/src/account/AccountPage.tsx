@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { LoadError, PageHeader } from '../decks/parts.js';
-import { AccountApiError, fetchAccount, signOut, type Account } from './api.js';
+import { AccountApiError, fetchAccount, type Account } from './api.js';
+import { SignedIn } from './SignedIn.js';
 import { SignedOut } from './SignedOut.js';
 
 /** `/account`: sign in or create an account when signed out, the account page when signed in (ADR 0105). */
@@ -21,16 +22,9 @@ export function AccountPage() {
 
   return (
     <div className="phone">
-      <PageHeader title={account ? account.displayName : 'Account'} back="/" backLabel="Back to home" />
+      <PageHeader title="Account" back="/" backLabel="Back to home" />
       {account ? (
-        <section className="panel">
-          <p className="muted" style={{ margin: 0 }}>
-            Signed in as {account.displayName}.
-          </p>
-          <button className="btn" onClick={() => void signOut().then(() => setAccount(null), load)}>
-            Sign out
-          </button>
-        </section>
+        <SignedIn account={account} onChange={setAccount} />
       ) : (
         <SignedOut onSignedIn={setAccount} />
       )}

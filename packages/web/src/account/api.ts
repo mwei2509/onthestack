@@ -4,7 +4,7 @@ import {
   type PublicKeyCredentialCreationOptionsJSON,
   type PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/browser';
-import type { Account } from '@onthestack/server/accounts';
+import type { Account, Passkey } from '@onthestack/server/accounts';
 
 export type { Account, Passkey } from '@onthestack/server/accounts';
 
@@ -61,3 +61,16 @@ export async function signIn(): Promise<Account> {
 }
 
 export const signOut = () => call<null>('/api/account/sign-out', 'POST');
+
+export const signOutEverywhere = () => call<null>('/api/account/sign-out-everywhere', 'POST');
+export const updateAccount = (changes: { displayName?: string; email?: string }) =>
+  call<{ account: Account }>('/api/account', 'PATCH', changes).then((r) => r.account);
+export const deleteAccount = () => call<null>('/api/account', 'DELETE');
+export const listPasskeys = () => call<Passkey[]>('/api/account/passkeys');
+export const removePasskey = (id: string) => call<null>(`/api/account/passkeys/${encodeURIComponent(id)}`, 'DELETE');
+
+export async function addPasskey(): Promise<Passkey[]> {
+  const optionsJSON = await call<PublicKeyCredentialCreationOptionsJSON>('/api/account/passkeys/options', 'POST');
+  const response = await passkeyPrompt(() => startRegistration({ optionsJSON }));
+  return call<Passkey[]>('/api/account/passkeys', 'POST', { response });
+}
