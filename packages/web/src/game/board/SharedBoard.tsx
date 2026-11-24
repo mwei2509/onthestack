@@ -5,6 +5,7 @@ import { Logo } from '../../icons.js';
 import { Avatar, SeatWash } from '../parts.js';
 import { formatJoinCode } from '../joinCode.js';
 import type { ScreenProps } from '../useGame.js';
+import { GameMenuButton } from './GameMenu.js';
 import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
 import { clockTime, cue, EndedPill, NextStepButton, StepMenuButton, StepStrip, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
@@ -35,22 +36,25 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
             {update.joinCode ? `Join ${formatJoinCode(update.joinCode)}` : code}
           </span>
         </div>
-        {ended ? (
-          <EndedPill />
-        ) : online ? (
-          <span className="pill" role="status" style={{ border: 0 }}>
-            <span className="dot on" style={{ width: 10, height: 10 }} />
-            Online
-          </span>
-        ) : (
-          <span className="pill reconnecting" role="status">
-            <span className="spinner" aria-hidden />
-            Reconnecting
-            <button className="btn btn-text" style={{ height: 28, color: 'var(--accent-hover)' }} onClick={game.retry}>
-              Retry
-            </button>
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {ended ? (
+            <EndedPill />
+          ) : online ? (
+            <span className="pill" role="status" style={{ border: 0 }}>
+              <span className="dot on" style={{ width: 10, height: 10 }} />
+              Online
+            </span>
+          ) : (
+            <span className="pill reconnecting" role="status">
+              <span className="spinner" aria-hidden />
+              Reconnecting
+              <button className="btn btn-text" style={{ height: 28, color: 'var(--accent-hover)' }} onClick={game.retry}>
+                Retry
+              </button>
+            </span>
+          )}
+          {!ended && <GameMenuButton game={game} />}
+        </div>
       </header>
 
       <div className="shared-seats" style={rowStyle}>

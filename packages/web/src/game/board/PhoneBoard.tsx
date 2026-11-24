@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { Avatar, SeatWash } from '../parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { createTapCombiner } from './lifeTaps.js';
+import { GameMenuButton } from './GameMenu.js';
 import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
 import { clockTime, Crest, EndedPill, HitChips, NextStepButton, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
@@ -32,19 +33,22 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
             </span>
           </div>
         </div>
-        {ended ? (
-          <EndedPill />
-        ) : online ? (
-          <span className="pill" role="status" style={{ border: 0 }}>
-            <span className="dot on" style={{ width: 8, height: 8 }} />
-            Online
-          </span>
-        ) : (
-          <span className="pill reconnecting" role="status">
-            <span className="spinner" aria-hidden />
-            Reconnecting
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {ended ? (
+            <EndedPill />
+          ) : online ? (
+            <span className="pill" role="status" style={{ border: 0 }}>
+              <span className="dot on" style={{ width: 8, height: 8 }} />
+              Online
+            </span>
+          ) : (
+            <span className="pill reconnecting" role="status">
+              <span className="spinner" aria-hidden />
+              Reconnecting
+            </span>
+          )}
+          {!ended && <GameMenuButton game={game} />}
+        </div>
       </header>
 
       <div className="board-body" style={{ opacity: online ? 1 : 0.6 }}>
