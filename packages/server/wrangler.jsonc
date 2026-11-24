@@ -24,6 +24,7 @@
       "preview_database_id": "0609b2d5-d479-4d7c-b67f-25df8017407d"
     }
   ],
+  "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "onthestack-card-images" }],
   // Previews don't inherit production bindings; repeat each one here.
   "previews": {
     "durable_objects": {
@@ -35,7 +36,8 @@
         "database_name": "onthestack-preview",
         "database_id": "0609b2d5-d479-4d7c-b67f-25df8017407d"
       }
-    ]
+    ],
+    "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "onthestack-card-images" }]
   },
   "dev": { "port": 8790 }
 }

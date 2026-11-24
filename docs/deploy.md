@@ -19,7 +19,7 @@ Do these before the first deploy. Until the secrets exist, the `deploy` job fail
 
 ## Databases and buckets
 
-`packages/server/wrangler.jsonc` names them and holds their IDs. Production binds the `onthestack` D1 database; every Preview binds `onthestack-preview` (ADR 0072). Migrations live in `packages/server/migrations/`: the deploy job applies pending ones to production before deploying, and the Preview job applies them to the preview database (`--preview`, which targets `preview_database_id`). Locally, `pnpm --filter @onthestack/server dev` applies them to the local database first, and `db:migrate` does only that.
+`packages/server/wrangler.jsonc` names them and holds their IDs. Production binds the `onthestack` D1 database; every Preview binds `onthestack-preview` (ADR 0072). Both bind the `onthestack-card-images` R2 bucket, which holds card images copied from Scryfall. Migrations live in `packages/server/migrations/`: the deploy job applies pending ones to production before deploying, and the Preview job applies them to the preview database (`--preview`, which targets `preview_database_id`). Locally, `pnpm --filter @onthestack/server dev` applies them to the local database first, and `db:migrate` does only that.
 
 Migrations run before the new code is live, so a migration must keep working with the code currently deployed: add columns and tables, don't rename or drop them in the same change that stops using them.
 
