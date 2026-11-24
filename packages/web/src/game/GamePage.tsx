@@ -42,7 +42,9 @@ function Screen({ code, game }: { code: string; game: GameConnection }) {
     );
   }
   const props = { code, game, update };
-  if (memory === 'watching') return update.started ? <BoardScreen {...props} /> : <SharedLobby {...props} />;
-  if (update.you) return update.started ? <BoardScreen {...props} /> : <LobbyScreen {...props} you={update.you} />;
+  if (memory === 'watching') return update.started ? <BoardScreen {...props} you={null} /> : <SharedLobby {...props} />;
+  // A remembered seat counts as held until the server refuses the claim, so a reconnect doesn't flash the seat picker.
+  const you = update.you ?? memory?.seatId ?? null;
+  if (you) return update.started ? <BoardScreen {...props} you={you} /> : <LobbyScreen {...props} you={you} />;
   return update.started ? <LateScreen {...props} /> : <JoinScreen {...props} />;
 }

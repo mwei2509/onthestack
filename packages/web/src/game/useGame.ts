@@ -14,6 +14,10 @@ export interface GameConnection {
   watch: () => void;
   /** Forget being a Shared screen, back to choosing a seat. */
   stopWatching: () => void;
+  /** While reconnecting: try again now instead of waiting. */
+  retry: () => void;
+  /** When the last update arrived, to say how old the board is while offline. */
+  updatedAt: Date | null;
 }
 
 const RETRY_MS = [500, 1000, 2000, 4000, 8000];
@@ -24,7 +28,9 @@ export function useGame(code: string): GameConnection {
   const [update, setUpdate] = useState<Update | null>(null);
   const [memory, setMemoryState] = useState<SeatMemory>(() => loadMemory(code));
   const [error, setError] = useState<string | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const socket = useRef<WebSocket | null>(null);
+  const retryNow = useRef<() => void>(() => undefined);
   const memoryRef = useRef(memory);
 
   const setMemory = useCallback(
@@ -76,6 +82,7 @@ export function useGame(code: string): GameConnection {
         setMemory(afterUpdate(memoryRef.current, message, heldBefore));
         heldBefore = message.you;
         setUpdate(message);
+        setUpdatedAt(new Date());
       };
       ws.onclose = () => {
         if (socket.current === ws) socket.current = null;
@@ -85,6 +92,11 @@ export function useGame(code: string): GameConnection {
       };
     };
 
+    retryNow.current = () => {
+      if (socket.current || closed) return;
+      clearTimeout(timer);
+      void connect();
+    };
     void connect();
     return () => {
       closed = true;
@@ -111,7 +123,9 @@ export function useGame(code: string): GameConnection {
 
   const stopWatching = useCallback(() => setMemory(null), [setMemory]);
 
-  return { connection, update, memory, error, send, watch, stopWatching };
+  const retry = useCallback(() => retryNow.current(), []);
+
+  return { connection, update, memory, error, send, watch, stopWatching, retry, updatedAt };
 }
 
 export interface ScreenProps {

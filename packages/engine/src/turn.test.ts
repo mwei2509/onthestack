@@ -256,6 +256,7 @@ describe('stepsAhead', () => {
   it('skips blockers and combat damage when nobody attacks, and ends with cleanup', () => {
     expect(stepsAhead(at(newGame(), 'main1'))).toEqual(['beginningOfCombat', 'declareAttackers', 'endOfCombat', 'main2', 'end', 'cleanup']);
     expect(stepsAhead(at(newGame(), 'cleanup'))).toEqual([]);
+    expect(tableView(replayTurn(newGame(), [], { currentStep: 'end' })).stepsAhead).toEqual(['cleanup']);
   });
 
   it('keeps combat damage once there are attackers, and first-strike damage only for first strikers', () => {
