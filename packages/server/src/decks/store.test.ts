@@ -2,7 +2,7 @@ import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { fakeScryfall } from '../cards/fake-scryfall.js';
 import { createCardStore } from '../cards/store.js';
-import { createDeckStore } from './store.js';
+import { createDeckStore, DeckChanged, NotOnDeck } from './store.js';
 
 const VONA = { oracleId: 'b1c56e23-eae6-47a1-a1cd-3a2d01621768', scryfallId: '27beed9c-a42e-46de-8fbc-885da337ae75' };
 const SOL_RING = { oracleId: '6ad8011d-3471-4369-9d68-b264cc027487', scryfallId: 'fc817e07-c1f3-469f-9cf7-0945dea7400f' };
@@ -72,5 +72,75 @@ describe('the library', () => {
 
   it("returns nothing for a Deck that doesn't exist", async () => {
     expect(await deckStore().get('nope')).toBeNull();
+  });
+});
+
+describe('fixing a Deck', () => {
+  const list = ['1 Sol Ring', '1x Vona, Butcher of Magn [Lifegain]', 'what is this'].join('\n');
+
+  it('matches a fixed line and adds it to the Deck', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', list);
+
+    const deck = await store.fixLine(id, { index: 0, was: '1x Vona, Butcher of Magn [Lifegain]' }, '1 Vona, Butcher of Magan');
+
+    expect(deck!.cards.map((c) => c.name)).toEqual(['Sol Ring', 'Vona, Butcher of Magan']);
+    expect(deck!.unmatched).toEqual([{ text: 'what is this', reason: 'unreadable' }]);
+  });
+
+  it('keeps a fixed line that still matches nothing, in its place, with its new text', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', list);
+
+    const deck = await store.fixLine(id, { index: 0, was: '1x Vona, Butcher of Magn [Lifegain]' }, '1 Vona, Butcher');
+    expect(deck!.unmatched).toEqual([
+      { text: '1 Vona, Butcher', reason: 'not-found' },
+      { text: 'what is this', reason: 'unreadable' },
+    ]);
+
+    const again = await store.fixLine(id, { index: 1, was: 'what is this' }, 'still nonsense');
+    expect(again!.unmatched[1]).toEqual({ text: 'still nonsense', reason: 'unreadable' });
+  });
+
+  it('skips a line', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', list);
+
+    const deck = await store.skipLine(id, { index: 1, was: 'what is this' });
+    expect(deck!.unmatched.map((u) => u.text)).toEqual(['1x Vona, Butcher of Magn [Lifegain]']);
+  });
+
+  it('refuses to change a line someone else already changed', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', list);
+    await store.skipLine(id, { index: 0, was: '1x Vona, Butcher of Magn [Lifegain]' });
+
+    await expect(store.skipLine(id, { index: 0, was: '1x Vona, Butcher of Magn [Lifegain]' })).rejects.toThrow(
+      DeckChanged,
+    );
+  });
+
+  it('marks the commander, replacing any marked before, and only from the Deck', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', '1x Vona, Butcher of Magan (lcc) 293 [Commander]\n1 Sol Ring');
+
+    const deck = await store.markCommanders(id, [SOL_RING.oracleId]);
+    expect(deck!.cards.map((c) => [c.name, c.commander])).toEqual([
+      ['Vona, Butcher of Magan', false],
+      ['Sol Ring', true],
+    ]);
+    await expect(store.markCommanders(id, ['not-on-deck'])).rejects.toThrow(NotOnDeck);
+  });
+
+  it('renames and deletes a Deck, cards and all', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', '1 Sol Ring');
+
+    expect((await store.rename(id, 'Vona lifegain'))!.name).toBe('Vona lifegain');
+    expect(await store.remove(id)).toBe(true);
+    expect(await store.get(id)).toBeNull();
+    expect(await store.remove(id)).toBe(false);
+    const left = await env.DB.prepare('SELECT count(*) AS n FROM deck_cards').first<{ n: number }>();
+    expect(left!.n).toBe(0);
   });
 });

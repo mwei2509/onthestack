@@ -37,3 +37,42 @@ describe('/api/decks', () => {
     expect((await api('/no-such-deck')).status).toBe(404);
   });
 });
+
+describe('/api/decks/:id', () => {
+  const send = (path: string, method: string, body?: unknown) =>
+    api(path, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? null : JSON.stringify(body) });
+
+  async function importDeck() {
+    const res = await post({ name: 'Vona', list: '1 Sol Ring\nnot a card line' });
+    return ((await res.json()) as { id: string }).id;
+  }
+
+  it('renames, marks the commander and deletes', async () => {
+    const id = await importDeck();
+    expect(((await (await send(`/${id}`, 'PATCH', { name: 'Rings' })).json()) as { name: string }).name).toBe('Rings');
+
+    const marked = await send(`/${id}`, 'PATCH', { commanders: ['6ad8011d-3471-4369-9d68-b264cc027487'] });
+    expect(((await marked.json()) as { cards: { commander: boolean }[] }).cards[0]!.commander).toBe(true);
+    expect((await send(`/${id}`, 'PATCH', { commanders: ['nope'] })).status).toBe(400);
+
+    expect((await send(`/${id}`, 'DELETE')).status).toBe(204);
+    expect((await send(`/${id}`, 'DELETE')).status).toBe(404);
+  });
+
+  it('skips an unmatched line, and answers 409 when the line has changed', async () => {
+    const id = await importDeck();
+    const skipped = await send(`/${id}/unmatched/0`, 'POST', { action: 'skip', was: 'not a card line' });
+    expect(((await skipped.json()) as { unmatched: unknown[] }).unmatched).toEqual([]);
+
+    const stale = await send(`/${id}/unmatched/0`, 'POST', { action: 'skip', was: 'not a card line' });
+    expect(stale.status).toBe(409);
+  });
+
+  it('fixes an unmatched line', async () => {
+    const id = await importDeck();
+    const fixed = await send(`/${id}/unmatched/0`, 'POST', { action: 'fix', was: 'not a card line', text: '1 Vona, Butcher of Magan' });
+    const deck = (await fixed.json()) as { cards: { name: string }[]; unmatched: unknown[] };
+    expect(deck.cards.map((c) => c.name)).toEqual(['Sol Ring', 'Vona, Butcher of Magan']);
+    expect(deck.unmatched).toEqual([]);
+  });
+});
