@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deckMeta, lineCount, matchesSearch, nameFromList, sinceDay } from './format.js';
+import { commanderChoices, deckMeta, lineCount, lineWithName, matchesSearch, nameFromList, nameInLine, sinceDay } from './format.js';
 
 const now = new Date(2026, 10, 24, 9, 0);
 const daysAgo = (n: number) => new Date(2026, 10, 24 - n, 20, 0).toISOString();
@@ -53,5 +53,28 @@ describe('nameFromList', () => {
 describe('lineCount', () => {
   it('counts the lines that are not blank', () => {
     expect(lineCount('Commander\n1 Vona\n\n1 Sol Ring\n  \n')).toBe(3);
+  });
+});
+
+describe('fixing a line', () => {
+  it("starts from the line's card name and keeps its quantity", () => {
+    expect(nameInLine('2x Goldspan Dragn (khm) 139 [Ramp]')).toBe('Goldspan Dragn');
+    expect(nameInLine('what is this')).toBe('what is this');
+    expect(lineWithName('2x Goldspan Dragn (khm) 139 [Ramp]', 'Goldspan Dragon')).toBe('2 Goldspan Dragon');
+    expect(lineWithName('what is this', 'Sol Ring')).toBe('1 Sol Ring');
+  });
+});
+
+describe('commanderChoices', () => {
+  it('lists legendary creatures and planeswalkers first, then the rest, A–Z', () => {
+    const card = (name: string, group: string, legendary: boolean) => ({ name, group, legendary });
+    const order = commanderChoices([
+      card('Sol Ring', 'Artifact', false),
+      card('Vona, Butcher of Magan', 'Creature', true),
+      card('Shadowspear', 'Artifact', true),
+      card('Sorin, Vengeful Bloodlord', 'Planeswalker', true),
+      card('Blood Artist', 'Creature', false),
+    ]).map((c) => c.name);
+    expect(order).toEqual(['Sorin, Vengeful Bloodlord', 'Vona, Butcher of Magan', 'Blood Artist', 'Shadowspear', 'Sol Ring']);
   });
 });

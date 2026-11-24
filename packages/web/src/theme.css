@@ -1580,3 +1580,72 @@ h1.title {
   text-transform: uppercase;
   color: var(--accent);
 }
+
+.fix-input {
+  height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--accent);
+  background: var(--ink);
+  padding: 0 12px;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+}
+
+.suggestions,
+.picker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.picker-list {
+  max-height: 45dvh;
+  overflow-y: auto;
+}
+
+.suggestions button,
+.picker-list button {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.suggestions [aria-selected='true'] button,
+.picker-list button[aria-pressed='true'] {
+  background: var(--raised-2);
+  box-shadow: inset 0 0 0 1px var(--line-3);
+}
+
+.picker-list button:disabled {
+  opacity: 0.45;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-list .btn {
+  height: 52px;
+  justify-content: flex-start;
+}
+
+.btn.danger {
+  color: var(--danger);
+  box-shadow: inset 0 0 0 1.5px #6a3e2a;
+}

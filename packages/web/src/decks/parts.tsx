@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { Back } from '../icons.js';
 
@@ -24,6 +24,21 @@ export function LoadError({ message, retry }: { message: string; retry: () => vo
       <button className="btn" onClick={retry}>
         Try again
       </button>
+    </div>
+  );
+}
+
+export function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  const titleId = useId();
+  return (
+    <div className="scrim" onClick={(e) => e.target === e.currentTarget && onClose()} onKeyDown={(e) => e.key === 'Escape' && onClose()}>
+      <section className="sheet" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+        <div className="handle" />
+        <h2 id={titleId} className="display" style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>
+          {title}
+        </h2>
+        {children}
+      </section>
     </div>
   );
 }
