@@ -236,7 +236,13 @@ export class Game extends DurableObject<Env> {
         if (!playerId) throw new Rejected('Say whose statement this is');
         this.seat(playerId);
         // A typed statement has no button press, so it's ordered by when it reached the game; device clocks can't be trusted.
-        turn.statements.push({ id: `s${turn.statements.length + 1}`, playerId, pressedAt: new Date().toISOString(), text: message.text });
+        turn.statements.push({
+          id: `s${turn.statements.length + 1}`,
+          playerId,
+          pressedAt: new Date().toISOString(),
+          text: message.text,
+          ...(message.answering ? { answering: message.answering } : {}),
+        });
         turn.transcriptVersion++;
         return;
       }

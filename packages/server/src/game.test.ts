@@ -495,6 +495,14 @@ describe('Statements', () => {
     expect((await stored()).reading?.transcriptVersion).toBe(3);
   });
 
+  it('keeps the question an answer was given to (ADR 0114)', async () => {
+    const { call, stored, devices } = await interpreting();
+    devices[0]!.send({ type: 'statement', text: 'Yes', answering: 'Did you play a second Godless Shrine?' });
+    await everyone(devices);
+    expect((await call(0)).user).toContain('answering "Did you play a second Godless Shrine?": "Yes"');
+    expect((await stored()).statements).toMatchObject([{ id: 's1', text: 'Yes', answering: 'Did you play a second Godless Shrine?' }]);
+  });
+
   it('keeps the last interpretations, newest first, for any device that asks (ADR 0109)', async () => {
     const { code, devices, call, say } = await interpreting();
     await say(0, 'Elena loses 3 life');

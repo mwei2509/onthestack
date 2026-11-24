@@ -200,7 +200,7 @@ interface Game {
   ended: { at: string; turn: number; by: PlayerId | null } | null;   // ADR 0101; null by = the shared screen
 }
 
-interface PlayerStatement { id: PlayerStatementId; playerId: PlayerId; pressedAt: string; text: string }
+interface PlayerStatement { id: PlayerStatementId; playerId: PlayerId; pressedAt: string; text: string; answering?: string }
 interface TimelineEntry { step: Step; playerId: PlayerId; gameAction: GameAction; from: PlayerStatementId[] }
 
 interface GameState {

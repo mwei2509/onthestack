@@ -1,6 +1,25 @@
-import { before, conversation, entry, table, type EvalCase } from '../case.js';
+import { before, conversation, entry, seatedTable, table, type EvalCase } from '../case.js';
 
 export const questions: EvalCase[] = [
+  {
+    id: 'yes-keeps-its-question',
+    checks: 'a tapped "Yes" answers its question even after that question is closed (ADR 0114; from a real game)',
+    turnStart: seatedTable(),
+    statements: conversation(
+      ['p1', 'i play godless shrine'],
+      ['p1', 'i play godless shrine'],
+      ['p1', 'Yes'],
+      ['p1', 'i cast sol ring'],
+    ).map((s) => (s.id === 's3' ? { ...s, answering: 'Did you play a second Godless Shrine?' } : s)),
+    currentStep: 'main1',
+    expected: {
+      entries: [
+        entry('main1', 'p1', { type: 'playLand', card: 'Godless Shrine' }, ['s1']),
+        entry('main1', 'p1', { type: 'playLand', card: 'Godless Shrine' }, ['s2', 's3']),
+        entry('main1', 'p1', { type: 'cast', card: 'Sol Ring' }, ['s4']),
+      ],
+    },
+  },
   {
     id: 'unclear-card-name',
     checks: 'a name that could be two cards in the game is asked about, not guessed (ADR 0043)',
