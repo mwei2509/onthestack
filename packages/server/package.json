@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@onthestack/engine": "workspace:^",
+    "@onthestack/interpreter": "workspace:^",
     "zod": "^4.6.6"
   }
 }

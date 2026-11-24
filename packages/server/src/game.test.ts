@@ -1,3 +1,4 @@
+import { LlmRequestError, parseOutput, type LlmProvider } from '@onthestack/interpreter';
 import { env, runInDurableObject } from 'cloudflare:test';
 import { exports } from 'cloudflare:workers';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -339,5 +340,137 @@ describe('Game', () => {
     expect(await devices[0]!.next()).toEqual({ type: 'error', message: "The game hasn't started yet" });
     devices[0]!.send({ type: 'adjustLife', delta: 0 });
     expect(await devices[0]!.next()).toEqual({ type: 'error', message: "A life change can't be 0" });
+  });
+});
+
+interface Call {
+  user: string;
+  answer: (timeline: unknown) => void;
+  fail: () => void;
+}
+
+const tick = () => new Promise((r) => setTimeout(r, 5));
+
+/**
+ * Stands in for the LLM: each request waits until the test answers or fails it. Both sides poll rather than resolve
+ * each other's promises, since a continuation runs in the context that resolved it and the Game object can't touch the
+ * test's sockets, nor the test its storage.
+ */
+function fakeInterpreter() {
+  const calls: Call[] = [];
+  const provider: LlmProvider = {
+    id: 'fake',
+    async complete(request) {
+      let outcome: { timeline: unknown } | 'failed' | undefined;
+      calls.push({ user: request.user, answer: (timeline) => (outcome = { timeline }), fail: () => (outcome = 'failed') });
+      while (!outcome) await tick();
+      if (outcome === 'failed') throw new LlmRequestError('fake', 529, 'overloaded');
+      const raw = JSON.stringify(outcome.timeline);
+      return { output: parseOutput('fake', request.schema, raw), raw, model: 'fake', usage: { inputTokens: 0, outputTokens: 0 }, latencyMs: 0 };
+    },
+  };
+  const call = async (n: number): Promise<Call> => {
+    while (calls.length <= n) await tick();
+    return calls[n]!;
+  };
+  return { provider, calls, call };
+}
+
+const reading = (...from: string[]) => ({ entries: [{ step: 'upkeep', player: 'p1', action: { type: 'life', player: 'p2', delta: -3 }, from }], questions: [] });
+
+/** A started game whose Game object interprets with the fake, without the wait between statements. */
+async function interpreting() {
+  const game = await started();
+  const fake = fakeInterpreter();
+  const stub = env.GAME.getByName(game.code);
+  await runInDurableObject(stub, (instance) => {
+    Object.assign(instance, { interpreter: fake.provider, interpretAfterMs: 0 });
+  });
+  const stored = () =>
+    runInDurableObject(stub, async (_instance, state) => (await state.storage.get('turn')) as { statements: { id: string; playerId: string; text: string }[]; transcriptVersion: number; reading?: { transcriptVersion: number; timeline: unknown } });
+  const say = async (device: number, text: string) => {
+    game.devices[device]!.send({ type: 'statement', text });
+    await everyone(game.devices);
+  };
+  return { ...game, ...fake, stored, say };
+}
+
+describe('Statements', () => {
+  it("stores a seated device's statement as its seat's, and the reading of it (ADR 0069)", async () => {
+    const { devices, call, stored, say } = await interpreting();
+    await say(0, '  Elena loses 3 life ');
+    const first = await call(0);
+    expect(first.user).toContain('[s1] Theo (p1): "Elena loses 3 life"');
+
+    first.answer(reading('s1'));
+    await everyone(devices);
+    const turn = await stored();
+    expect(turn.statements).toMatchObject([{ id: 's1', playerId: 'p1', text: 'Elena loses 3 life' }]);
+    expect(turn.reading).toEqual({ transcriptVersion: 1, timeline: reading('s1') });
+  });
+
+  it('takes statements only from seated devices in a started game', async () => {
+    const { devices } = await lobby('Theo');
+    devices[0]!.send({ type: 'statement', text: 'I play a Forest' });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: "The game hasn't started yet" });
+
+    const game = await started();
+    const screen = await connect(game.code);
+    await screen.update();
+    screen.send({ type: 'statement', text: 'Theo loses 3 life' });
+    expect(await screen.next()).toEqual({ type: 'error', message: 'Only a seated device can say what happened' });
+    game.devices[0]!.send({ type: 'statement', text: '   ' });
+    expect(await game.devices[0]!.next()).toEqual({ type: 'error', message: 'Say what happened first' });
+  });
+
+  it('keeps one request in flight, then sends one more with everything said meanwhile (ADR 0017)', async () => {
+    const { devices, calls, call, stored, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    const first = await call(0);
+    await say(1, 'I gain 2 life');
+    await say(2, 'I gain 1 life');
+    expect(calls).toHaveLength(1);
+
+    first.answer(reading('s1'));
+    await everyone(devices);
+    const second = await call(1);
+    expect(second.user).toContain('[s3] Michael (p3): "I gain 1 life"');
+    second.answer(reading('s1'));
+    await everyone(devices);
+    expect(calls).toHaveLength(2);
+    expect((await stored()).reading?.transcriptVersion).toBe(3);
+  });
+
+  it('keeps the last reading when an interpretation fails, and retries with the next statement (ADR 0067)', async () => {
+    const { devices, call, stored, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    (await call(0)).answer(reading('s1'));
+    await everyone(devices);
+
+    await say(0, 'Michael loses 2 life');
+    (await call(1)).fail();
+    await say(1, 'I gain 1 life');
+    const retry = await call(2);
+    expect(retry.user).toContain('[s2] Theo (p1): "Michael loses 2 life"');
+    expect((await stored()).reading?.transcriptVersion).toBe(1);
+    retry.answer(reading('s1'));
+    await everyone(devices);
+    expect((await stored()).reading?.transcriptVersion).toBe(3);
+  });
+
+  it('drops a reading that comes back after its turn was Sealed, then reads the new turn', async () => {
+    const { devices, call, stored, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    const first = await call(0);
+    devices[1]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'endTurn' });
+    await everyone(devices);
+
+    await say(1, 'I play a Forest');
+    first.answer(reading('s1'));
+    const next = await call(1);
+    expect(next.user).toContain('[s1] Elena (p2): "I play a Forest"');
+    const turn = await stored();
+    expect(turn.statements).toMatchObject([{ id: 's1', playerId: 'p2' }]);
+    expect(turn.reading).toBeUndefined();
   });
 });

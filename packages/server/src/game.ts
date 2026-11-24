@@ -1,5 +1,6 @@
 import { DurableObject } from 'cloudflare:workers';
-import { createGame, replayTurn, sealTurn, stepsAhead, tableView, type GameState, type ReplayResult, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
+import { createGame, replayTurn, sealTurn, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
+import { claudeProvider, interpretTurn, type InterpretedTimeline, type LlmProvider } from '@onthestack/interpreter';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { DeviceMessage, type ServerMessage } from './protocol.js';
 
@@ -22,12 +23,21 @@ interface Setup {
   decks?: Record<string, Deck>;
 }
 
-/** The current turn (ADR 0054, 0074). The board is never stored: it's this, replayed. Sealed turns have keys of their own. */
+/** The current turn (ADR 0054, 0069, 0074). The board is never stored: it's this, replayed. Sealed turns have keys of their own. */
 interface Turn {
   turnStart: GameState;
   timeline: TimelineEntry[];
   currentStep: Step;
+  /** The TurnTranscript, in the order statements arrived. */
+  statements: PlayerStatement[];
+  /** Rises with every change to the TurnTranscript, so a reading can say which one it read (ADR 0017). */
+  transcriptVersion: number;
+  /** The last InterpretedTimeline applied, and the transcript version it read. */
+  reading?: { timeline: InterpretedTimeline; transcriptVersion: number };
 }
+
+/** Wait after a statement before interpreting, in case someone else is mid-sentence (ADR 0017). Tuned at game nights. */
+const INTERPRET_AFTER_MS = 300;
 
 /** Kept on each socket with serializeAttachment, so it survives the Durable Object hibernating. */
 interface Attachment {
@@ -44,6 +54,10 @@ export class Game extends DurableObject<Env> {
   private turn: Turn | null = null;
   private board: ReplayResult | null = null;
   private readonly decks: DeckSource;
+  private interpreter: LlmProvider | undefined;
+  private interpretAfterMs = INTERPRET_AFTER_MS;
+  private interpreting = false;
+  private interpretTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -52,7 +66,8 @@ export class Game extends DurableObject<Env> {
       const stored = await ctx.storage.get<unknown>(['setup', 'version', 'turn']);
       this.setup = (stored.get('setup') as Setup | undefined) ?? null;
       this.version = (stored.get('version') as number | undefined) ?? 0;
-      this.turn = (stored.get('turn') as Turn | undefined) ?? null;
+      const turn = stored.get('turn') as Partial<Turn> | undefined;
+      this.turn = turn ? { statements: [], transcriptVersion: 0, ...turn } as Turn : null;
       this.replay();
     });
   }
@@ -102,6 +117,7 @@ export class Game extends DurableObject<Env> {
       throw e;
     }
     await this.changed();
+    if (parsed.data.type === 'statement') this.interpretSoon();
   }
 
   async webSocketClose(ws: WebSocket): Promise<void> {
@@ -170,7 +186,16 @@ export class Game extends DurableObject<Env> {
         setup.started = true;
         setup.firstSeatId = message.firstSeatId;
         setup.decks = decks;
-        this.turn = { turnStart, timeline: [], currentStep: 'upkeep' };
+        this.turn = newTurn(turnStart);
+        return;
+      }
+      case 'statement': {
+        const turn = this.inGame();
+        const playerId = attachment(ws).seatId;
+        if (!playerId) throw new Rejected('Only a seated device can say what happened');
+        // A typed statement has no button press, so it's ordered by when it reached the game; device clocks can't be trusted.
+        turn.statements.push({ id: `s${turn.statements.length + 1}`, playerId, pressedAt: new Date().toISOString(), text: message.text });
+        turn.transcriptVersion++;
         return;
       }
       case 'adjustLife': {
@@ -197,7 +222,47 @@ export class Game extends DurableObject<Env> {
   private async sealTurn(turn: Turn): Promise<void> {
     const { sealed, nextTurnStart } = sealTurn(turn.turnStart, turn.timeline);
     await this.ctx.storage.put(`sealed:${sealed.turn}`, sealed);
-    this.turn = { turnStart: nextTurnStart, timeline: [], currentStep: 'upkeep' };
+    this.turn = newTurn(nextTurnStart);
+  }
+
+  /** Restarts the wait after each statement; while a request is in flight, its return sends the next one (ADR 0017). */
+  private interpretSoon(): void {
+    if (this.interpreting) return;
+    clearTimeout(this.interpretTimer);
+    this.interpretTimer = setTimeout(() => void this.interpret(), this.interpretAfterMs);
+  }
+
+  /** One request at a time, always with the whole turn. A failure keeps the last reading (ADR 0067). */
+  private async interpret(): Promise<void> {
+    const turn = this.turn;
+    if (!turn || this.interpreting) return;
+    const asked = { turn: turn.turnStart.turn.number, transcriptVersion: turn.transcriptVersion };
+    this.interpreting = true;
+    try {
+      const { output } = await interpretTurn(this.provider(), { turnStart: turn.turnStart, statements: [...turn.statements], currentStep: turn.currentStep });
+      const current = this.turn;
+      const stale = !current || current.turnStart.turn.number !== asked.turn || (current.reading?.transcriptVersion ?? 0) >= asked.transcriptVersion;
+      if (!stale) {
+        current.reading = { timeline: output, transcriptVersion: asked.transcriptVersion };
+        await this.changed();
+      }
+    } catch (e) {
+      console.error('Interpretation failed', e);
+    } finally {
+      this.interpreting = false;
+    }
+    const now = this.turn;
+    if (now && (now.turnStart.turn.number !== asked.turn || now.transcriptVersion !== asked.transcriptVersion) && now.statements.length > 0) {
+      await this.interpret();
+    }
+  }
+
+  private provider(): LlmProvider {
+    if (!this.interpreter) {
+      if (!this.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY is not set');
+      this.interpreter = claudeProvider({ apiKey: this.env.ANTHROPIC_API_KEY });
+    }
+    return this.interpreter;
   }
 
   private inGame(): Turn {
@@ -259,6 +324,10 @@ export class Game extends DurableObject<Env> {
       view,
     });
   }
+}
+
+function newTurn(turnStart: GameState): Turn {
+  return { turnStart, timeline: [], currentStep: 'upkeep', statements: [], transcriptVersion: 0 };
 }
 
 function attachment(ws: WebSocket): Attachment {
