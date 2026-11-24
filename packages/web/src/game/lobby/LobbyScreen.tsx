@@ -71,7 +71,7 @@ export function LobbyScreen({ code, game, update, you }: ScreenProps & { you: st
         ))}
       </ol>
 
-      {seats.length < 2 && <Invite code={code} note="Up to 6 seats" />}
+      {seats.length < 2 && <Invite code={code} joinCode={update.joinCode} note="Up to 6 seats" />}
 
       <footer style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
         <p className="faint" style={{ margin: 0, fontSize: 14, textAlign: 'center' }}>

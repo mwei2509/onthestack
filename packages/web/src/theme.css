@@ -1793,3 +1793,41 @@ h1.title {
 .card-sheet-image .card-image {
   width: min(100%, calc(62dvh * 488 / 680));
 }
+
+/* Join codes (ADR 0095) */
+.join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.join-input {
+  height: 64px !important;
+  font-size: 32px !important;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.join-code-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0 4px;
+}
+
+.join-code {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+/* Cinzel's 1 reads as a Roman I, which matters most in a code people type, so codes use Inter's figures. */
+.join-input,
+.join-code,
+.join-digits {
+  font-family: Inter, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}

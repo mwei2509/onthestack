@@ -2,6 +2,7 @@ import type { TableView } from '@onthestack/engine';
 import { useState, type CSSProperties } from 'react';
 import { Logo } from '../../icons.js';
 import { Avatar, SeatWash } from '../parts.js';
+import { formatJoinCode } from '../joinCode.js';
 import type { ScreenProps } from '../useGame.js';
 import { boardPlayers, type BoardPlayer } from './model.js';
 import { cue, NextStepButton, StepMenuButton, StepStrip, Tag, worstHit } from './parts.js';
@@ -29,7 +30,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
             On The Stack
           </span>
           <span className="faint" style={{ fontSize: 14, marginLeft: 8 }}>
-            {code}
+            {update.joinCode ? `Join ${formatJoinCode(update.joinCode)}` : code}
           </span>
         </div>
         {online ? (

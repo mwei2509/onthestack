@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { JoinGame } from './JoinGame.js';
 
 export function Home() {
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [joining, setJoining] = useState(false);
 
   const newGame = async () => {
     setCreating(true);
@@ -35,6 +37,11 @@ export function Home() {
           <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#D6CBDA' }}>Keep the tally. Play the game.</p>
         </div>
       </main>
+      {joining ? (
+        <div style={{ paddingBottom: 20 }}>
+          <JoinGame onCancel={() => setJoining(false)} />
+        </div>
+      ) : (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 20 }}>
         <button className="btn btn-primary" style={{ height: 64, fontSize: 21, borderRadius: 18 }} onClick={newGame} disabled={creating}>
           {creating ? 'Creating…' : 'New game'}
@@ -44,13 +51,17 @@ export function Home() {
             {error}
           </p>
         )}
+        <button className="btn" style={{ height: 56, fontSize: 17, borderRadius: 16 }} onClick={() => setJoining(true)}>
+          Join game
+        </button>
         <Link className="btn" to="/decks" style={{ height: 52, textDecoration: 'none', color: 'var(--text)' }}>
           Decks
         </Link>
         <p className="faint" style={{ margin: 0, fontSize: 14, textAlign: 'center' }}>
-          Joining a friend? Open the link they shared.
+          Joining a friend? Tap Join game and type their code, or open their link.
         </p>
       </div>
+      )}
     </div>
   );
 }
