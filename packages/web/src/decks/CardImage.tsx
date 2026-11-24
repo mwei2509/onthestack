@@ -41,7 +41,7 @@ export function CardImage({ card, back = false, eager = false }: { card: DeckCar
   );
 }
 
-/** The Cards view: each section's cards as images, in the same order as the list (ADR 0088, 0096). */
+/** The Cards view: each section's cards as images, in the same order as the list (ADR 0096, 0099). */
 export function CardGrid({ groups, selected, onOpen }: { groups: CardGroupView[]; selected: DeckCard | null; onOpen: (card: DeckCard) => void }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
