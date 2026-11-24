@@ -75,8 +75,11 @@ function toIdentifier(request: CardRequest): ScryfallIdentifier {
   if ('scryfallId' in request) return { id: request.scryfallId.trim() };
   if ('set' in request) return { set: request.set.trim(), collector_number: request.collectorNumber.trim() };
   if ('oracleId' in request) return { oracle_id: request.oracleId.trim() };
-  return { name: request.name.trim() };
+  return { name: frontName(request.name) };
 }
+
+/** Scryfall's collection lookup never matches a two-faced card's full "Front // Back" name, only its front's. */
+const frontName = (name: string) => name.split(' // ')[0]!.trim();
 
 function fromRow(row: CandidateRow): Candidate | null {
   if (!row.scryfall_id) return null;

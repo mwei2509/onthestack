@@ -7,7 +7,8 @@ function matches(id: ScryfallIdentifier, card: ScryfallCard): boolean {
   if ('id' in id) return card.id === id.id;
   if ('set' in id) return card.set === id.set.toLowerCase() && card.collector_number === id.collector_number;
   if ('oracle_id' in id) return card.oracle_id === id.oracle_id;
-  const names = [card.name, ...(card.card_faces ?? []).map((f) => f.name)].map((n) => n.toLowerCase());
+  // Like Scryfall, a card's full "Front // Back" name never matches; only its own faces' names do.
+  const names = (card.card_faces ?? [card]).map((f) => f.name.toLowerCase());
   return names.includes(id.name.toLowerCase());
 }
 
