@@ -30,10 +30,20 @@
   box-sizing: border-box;
 }
 
+/* The felt is its own fixed layer: a fixed background repaints the whole page on every scroll on phones. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--felt);
+  pointer-events: none;
+}
+
 body {
   margin: 0;
   min-height: 100dvh;
-  background: var(--felt) fixed, var(--ink);
+  background: var(--ink);
   color: var(--text);
   font-family: Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -672,31 +682,33 @@ h1.title {
   }
 }
 
-/* Whose turn it is: the only thing on the board that moves. */
-@keyframes glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1.5px var(--accent),
-      0 0 18px rgba(233, 185, 73, 0.25);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1.5px var(--accent),
-      0 0 28px rgba(233, 185, 73, 0.45);
-  }
+/* Whose turn it is: the only thing on the board that moves. The shadow sits on a pseudo-element and only its opacity
+   animates, so the glow doesn't repaint the seat on every frame. */
+:is(.your-seat, .other).glowing {
+  box-shadow: 0 0 0 1.5px var(--accent);
 }
 
-.glowing {
+.glowing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 28px rgba(233, 185, 73, 0.45);
+  opacity: 0.55;
   animation: glow 3s ease-in-out infinite;
 }
 
+@keyframes glow {
+  50% {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .glowing {
+  .glowing::after {
     animation: none;
-    box-shadow:
-      0 0 0 1.5px var(--accent),
-      0 0 22px rgba(233, 185, 73, 0.35);
+    opacity: 0.75;
   }
 }
 
@@ -758,7 +770,6 @@ h1.title {
 .your-seat {
   position: relative;
   border-radius: 22px;
-  overflow: hidden;
   background: var(--field);
   box-shadow: inset 0 0 0 1px var(--line-3);
 }
@@ -983,21 +994,11 @@ h1.title {
 }
 
 .seat-card.glowing {
-  animation-name: glow-wide;
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
-@keyframes glow-wide {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 2px var(--accent),
-      0 0 30px rgba(233, 185, 73, 0.25);
-  }
-  50% {
-    box-shadow:
-      0 0 0 2px var(--accent),
-      0 0 46px rgba(233, 185, 73, 0.45);
-  }
+.seat-card.glowing::after {
+  box-shadow: 0 0 46px rgba(233, 185, 73, 0.45);
 }
 
 .seat-life {

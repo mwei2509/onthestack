@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { afterClaimRefused, afterUpdate, onOpen } from './seatMemory.js';
+import { afterClaimRefused, afterUpdate, onOpen, sameMemory } from './seatMemory.js';
 
 const update = (you: string | null) => ({ type: 'update' as const, version: 2, you, seats: [], started: false, view: null });
 
@@ -26,5 +26,12 @@ describe('seat memory', () => {
   it('stays a Shared screen', () => {
     expect(afterUpdate('watching', update(null), null)).toBe('watching');
     expect(afterClaimRefused('watching')).toBe('watching');
+  });
+
+  it('compares memories by seat, so an unchanged seat is not written again', () => {
+    expect(sameMemory({ seatId: 'p1' }, { seatId: 'p1' })).toBe(true);
+    expect(sameMemory({ seatId: 'p1' }, { seatId: 'p2' })).toBe(false);
+    expect(sameMemory('watching', 'watching')).toBe(true);
+    expect(sameMemory(null, 'watching')).toBe(false);
   });
 });

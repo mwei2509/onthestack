@@ -10,6 +10,11 @@ import { useGame, type GameConnection } from './useGame.js';
 
 export function GamePage() {
   const code = (useParams().code ?? '').toUpperCase();
+  return <GameSession key={code} code={code} />;
+}
+
+/** Keyed by the code, so moving straight to another game starts its connection and seat memory afresh. */
+function GameSession({ code }: { code: string }) {
   const game = useGame(code);
   return (
     <>

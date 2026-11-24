@@ -26,6 +26,11 @@ export function saveMemory(code: string, memory: SeatMemory): void {
   }
 }
 
+export function sameMemory(a: SeatMemory, b: SeatMemory): boolean {
+  if (a === null || b === null || a === 'watching' || b === 'watching') return a === b;
+  return a.seatId === b.seatId;
+}
+
 /** What to send when a socket opens. Never `takeOver`: a reload must not take a seat another device has claimed since. */
 export function onOpen(memory: SeatMemory): DeviceMessage | null {
   if (memory === 'watching') return { type: 'watch' };
