@@ -27,10 +27,12 @@ export function quickAnswers(q: Question, view: Pick<TableView, 'players'>): str
 }
 
 /** One of the reading's questions, as the canvas's "Question for you" card (ADR 0068). */
-export function QuestionCard({ q, view, you, game }: { q: Question; view: TableView; you?: string | null; game?: ScreenProps['game'] }) {
+export function QuestionCard({ q, view, you, game, forAnyone }: { q: Question; view: TableView; you?: string | null; game?: ScreenProps['game']; forAnyone?: boolean }) {
   const names = namesFor(view);
   const mine = you === q.askPlayer;
-  const answers = mine && game ? quickAnswers(q, view) : [];
+  /** A Shared screen answers for the asked player (ADR 0107); a phone answers only its own questions. */
+  const canAnswer = !!game && (mine || !!forAnyone);
+  const answers = canAnswer ? quickAnswers(q, view) : [];
   return (
     <section className={`question-card${mine ? ' mine' : ''}`} aria-label={mine ? 'Question for you' : `Question for ${names.player(q.askPlayer)}`}>
       <span className="question-label display">{mine ? 'Question for you' : `Question for ${names.player(q.askPlayer)}`}</span>
@@ -38,14 +40,20 @@ export function QuestionCard({ q, view, you, game }: { q: Question; view: TableV
       {answers.length > 0 && (
         <div className="question-answers">
           {answers.map((a) => (
-            <button key={a} className="btn" onClick={() => game!.send({ type: 'statement', text: a })}>
+            <button key={a} className="btn" onClick={() => game!.send({ type: 'statement', text: a, ...(mine ? {} : { seatId: q.askPlayer }) })}>
               {a}
             </button>
           ))}
         </div>
       )}
       <span className="faint" style={{ fontSize: 13 }}>
-        {mine ? (answers.length ? 'Or say it in your own words.' : 'Say what happened, in your own words.') : `Waiting for ${names.player(q.askPlayer)}`}
+        {mine
+          ? answers.length
+            ? 'Or say it in your own words.'
+            : 'Say what happened, in your own words.'
+          : forAnyone
+            ? `Answer for ${names.player(q.askPlayer)}, or use Say… on their card.`
+            : `Waiting for ${names.player(q.askPlayer)}`}
       </span>
     </section>
   );
@@ -64,22 +72,26 @@ export function QuestionTray({ log, view, you, game }: { log: TurnLog | null; vi
 }
 
 /** The turn's log: open questions, each statement with who said it and how it was read, then what was tapped (ADR 0106). */
-export function TurnLogList({ log, view, game }: { log: TurnLog; view: TableView; game?: ScreenProps['game'] }) {
+export function TurnLogList({ log, view, game, answerQuestions }: { log: TurnLog; view: TableView; game?: ScreenProps['game']; answerQuestions?: boolean }) {
   const names = namesFor(view);
   const taps = log.entries.filter((e) => e.from.length === 0);
   if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0) {
     return <p className="faint" style={{ margin: 0, fontSize: 14 }}>Nothing yet this turn.</p>;
   }
   const anyFailed = log.statements.some((s) => s.status === 'failed');
+  /** An entry from several statements is listed once, under the last of them ("2 or 3?" … "3"). */
+  const order = new Map(log.statements.map((s, i) => [s.id, i]));
+  const lastSaidIn = (from: string[]) => from.reduce((last, id) => ((order.get(id) ?? -1) > (order.get(last) ?? -1) ? id : last), from[0] ?? '');
   return (
     <div className="turn-log">
       {log.questions.map((q) => (
-        <QuestionCard key={`${q.kind}:${q.askPlayer}:${q.about.join(',')}`} q={q} view={view} />
+        <QuestionCard key={`${q.kind}:${q.askPlayer}:${q.about.join(',')}`} q={q} view={view} game={answerQuestions ? game : undefined} forAnyone={answerQuestions} />
       ))}
       {log.statements.length > 0 && (
         <ol className="log-statements">
           {log.statements.map((s) => {
-            const readings = log.entries.filter((e) => e.from.includes(s.id));
+            const readings = log.entries.filter((e) => lastSaidIn(e.from) === s.id);
+            const readLater = log.entries.some((e) => e.from.includes(s.id) && lastSaidIn(e.from) !== s.id);
             const asked = log.questions.find((q) => q.about.includes(s.id));
             return (
               <li key={s.id} className={`log-statement ${s.status}`}>
@@ -92,6 +104,8 @@ export function TurnLogList({ log, view, game }: { log: TurnLog; view: TableView
                         <li key={i}>{describeEntry(e, names, view.turn.step)}</li>
                       ))}
                     </ul>
+                  ) : readLater ? (
+                    <span className="log-status faint">Read with a later statement</span>
                   ) : asked ? (
                     <span className="log-status">
                       Asked {names.player(asked.askPlayer)}: {asked.text}
@@ -163,17 +177,58 @@ export function ThisTurn({ log, view, game }: { log: TurnLog; view: TableView; g
   );
 }
 
-/** The "Say what happened…" bar in the dock, where Hold to talk will go (ADR 0106). */
-export function SayBar({ game, disabled }: { game: ScreenProps['game']; disabled?: boolean }) {
-  const [open, setOpen] = useState(false);
+/** The text box for saying what happened, above the keyboard; `as` names the seat a Shared screen speaks for (ADR 0106, 0107). */
+export function Compose({ game, as, onClose }: { game: ScreenProps['game']; as?: { id: string; name: string }; onClose: () => void }) {
   const [text, setText] = useState('');
   const send = () => {
     const said = text.trim();
     if (!said) return;
-    game.send({ type: 'statement', text: said });
-    setText('');
-    setOpen(false);
+    game.send({ type: 'statement', text: said, ...(as ? { seatId: as.id } : {}) });
+    onClose();
   };
+  return (
+    <div className="scrim" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <form
+        className="compose"
+        onSubmit={(e) => {
+          e.preventDefault();
+          send();
+        }}
+      >
+        <label className="field" style={{ fontSize: 13 }}>
+          {as ? `Saying as ${as.name}` : 'What happened?'}
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+              if (e.key === 'Escape') onClose();
+            }}
+            maxLength={500}
+            rows={2}
+            placeholder={as ? `I play a land (as ${as.name})` : "I take 3 from Theo's Raging Goblin"}
+            autoFocus
+          />
+        </label>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button type="button" className="btn" style={{ height: 52, padding: '0 18px' }} onClick={onClose}>
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary" style={{ flexGrow: 1, height: 52 }} disabled={!text.trim()}>
+            Send
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/** The "Say what happened…" bar in the dock, where Hold to talk will go (ADR 0106). */
+export function SayBar({ game, disabled }: { game: ScreenProps['game']; disabled?: boolean }) {
+  const [open, setOpen] = useState(false);
   return (
     <>
       <button className="say-bar" onClick={() => setOpen(true)} disabled={disabled}>
@@ -182,44 +237,23 @@ export function SayBar({ game, disabled }: { game: ScreenProps['game']; disabled
         </svg>
         Say what happened…
       </button>
-      {open && (
-        <div className="scrim" onClick={(e) => e.target === e.currentTarget && setOpen(false)}>
-          <form
-            className="compose"
-            onSubmit={(e) => {
-              e.preventDefault();
-              send();
-            }}
-          >
-            <label className="field" style={{ fontSize: 13 }}>
-              What happened?
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    send();
-                  }
-                  if (e.key === 'Escape') setOpen(false);
-                }}
-                maxLength={500}
-                rows={2}
-                placeholder="I take 3 from Theo's Raging Goblin"
-                autoFocus
-              />
-            </label>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button type="button" className="btn" style={{ height: 52, padding: '0 18px' }} onClick={() => setOpen(false)}>
-                Cancel
-              </button>
-              <button type="submit" className="btn btn-primary" style={{ flexGrow: 1, height: 52 }} disabled={!text.trim()}>
-                Send
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      {open && <Compose game={game} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+/** "Say…" on a seat's card at the Shared screen: speaks for that player (ADR 0107). */
+export function SayFor({ game, seat, disabled }: { game: ScreenProps['game']; seat: { id: string; name: string }; disabled?: boolean }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button className="say-for" onClick={() => setOpen(true)} disabled={disabled} aria-label={`Say what happened as ${seat.name}`}>
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M4 5h12v8H9l-4 3v-3H4z" />
+        </svg>
+        Say…
+      </button>
+      {open && <Compose game={game} as={seat} onClose={() => setOpen(false)} />}
     </>
   );
 }

@@ -217,8 +217,11 @@ export class Game extends DurableObject<Env> {
       }
       case 'statement': {
         const turn = this.inGame();
-        const playerId = attachment(ws).seatId;
-        if (!playerId) throw new Rejected('Only a seated device can say what happened');
+        const own = attachment(ws).seatId;
+        if (own && message.seatId && message.seatId !== own) throw new Rejected('A phone speaks only for its own seat');
+        const playerId = own ?? message.seatId;
+        if (!playerId) throw new Rejected('Say whose statement this is');
+        this.seat(playerId);
         // A typed statement has no button press, so it's ordered by when it reached the game; device clocks can't be trusted.
         turn.statements.push({ id: `s${turn.statements.length + 1}`, playerId, pressedAt: new Date().toISOString(), text: message.text });
         turn.transcriptVersion++;

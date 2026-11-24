@@ -10,7 +10,7 @@ import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
 import { clockTime, cue, EndedPill, NextStepButton, StepMenuButton, StepStrip, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
 import { STEP_NAMES } from './steps.js';
-import { TurnLogList } from '../log/TurnLog.js';
+import { SayFor, TurnLogList } from '../log/TurnLog.js';
 
 /** The board on a Shared screen: every seat around the table, clockwise from the top left, with the step controls. */
 export function SharedBoard({ code, game, update, view }: ScreenProps & { view: TableView }) {
@@ -63,7 +63,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
         <div className="shared-table-col">
           <div className="shared-seats" style={rowStyle}>
             {top.map((p) => (
-              <SeatCard key={p.id} player={p} players={byId} />
+              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} />
             ))}
           </div>
 
@@ -99,7 +99,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
 
           <div className="shared-seats" style={rowStyle}>
             {bottom.map((p) => (
-              <SeatCard key={p.id} player={p} players={byId} />
+              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} />
             ))}
           </div>
         </div>
@@ -108,7 +108,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
             <h2 className="section-label" style={{ fontSize: 12 }}>
               This turn
             </h2>
-            <TurnLogList log={update.log} view={view} />
+            <TurnLogList log={update.log} view={view} game={ended ? undefined : game} answerQuestions={!ended} />
           </aside>
         )}
       </div>
@@ -118,7 +118,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
   );
 }
 
-function SeatCard({ player, players }: { player: BoardPlayer; players: Record<string, BoardPlayer> }) {
+function SeatCard({ player, players, game, disabled }: { player: BoardPlayer; players: Record<string, BoardPlayer>; game?: ScreenProps['game']; disabled?: boolean }) {
   const hit = worstHit(player.hits);
   return (
     <section aria-label={player.name} className={`seat-card${player.active ? ' glowing' : ''}${player.out ? ' out' : ''}`}>
@@ -131,6 +131,7 @@ function SeatCard({ player, players }: { player: BoardPlayer; players: Record<st
         <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           {player.active && <Tag kind="their turn" />}
           {!player.connected && <span className="muted" style={{ fontSize: 12 }}>no device</span>}
+          {game && !player.out && <SayFor game={game} seat={{ id: player.id, name: player.name }} disabled={disabled} />}
         </span>
       </div>
       {player.commander && <span className="seat-sub" style={{ fontSize: 14 }}>{player.commander}</span>}
