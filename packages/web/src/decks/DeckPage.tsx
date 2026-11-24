@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Chevron, More } from '../icons.js';
-import { DeckApiError, deleteDeck, fixLine, getDeck, markCommanders, renameDeck, skipLine, type DeckDetail } from './api.js';
+import { DeckApiError, deleteDeck, fixLine, getDeck, markCommanders, renameDeck, skipLine, type DeckCard, type DeckDetail } from './api.js';
+import { CardGrid, CardSheet } from './CardImage.js';
 import { CommanderPicker } from './CommanderPicker.js';
 import { groupCards } from './groups.js';
 import { Gems, IdentityWash } from './identity.js';
@@ -9,6 +10,25 @@ import { LoadError, PageHeader, Sheet } from './parts.js';
 import { ProblemLine } from './ProblemLine.js';
 
 type Open = 'menu' | 'rename' | 'delete' | 'commander' | null;
+type CardView = 'list' | 'cards';
+
+const VIEW_KEY = 'onthestack.deckView:v1';
+
+function loadView(): CardView {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'cards' ? 'cards' : 'list';
+  } catch {
+    return 'list';
+  }
+}
+
+function saveView(view: CardView): void {
+  try {
+    localStorage.setItem(VIEW_KEY, view);
+  } catch {
+    // Storage can be refused (private windows); the view just isn't remembered.
+  }
+}
 
 /** One Deck: its commander, what needs a look and how to fix it, and its cards by type (ADR 0077, 0079, 0083, 0084). */
 export function DeckPage() {
@@ -21,6 +41,13 @@ export function DeckPage() {
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+  const [view, setView] = useState<CardView>(loadView);
+  const [shown, setShown] = useState<DeckCard | null>(null);
+
+  const chooseView = (next: CardView) => {
+    setView(next);
+    saveView(next);
+  };
 
   const load = useCallback(() => {
     setError(null);
@@ -121,37 +148,55 @@ export function DeckPage() {
       )}
 
       <section style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <h2 className="section-label" style={{ fontSize: 12 }}>
-          Cards
-        </h2>
-        <div className="card-groups">
-          {groupCards(deck.cards).map((g) => {
-            const expanded = open === g.group;
-            return (
-              <div key={g.group}>
-                <button className="card-group" aria-expanded={expanded} onClick={() => setOpen(expanded ? null : g.group)}>
-                  <span>{g.label}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="count muted">{g.count}</span>
-                    <Chevron open={expanded} />
-                  </span>
-                </button>
-                {expanded && (
-                  <ul className="card-names">
-                    {g.cards.map((c) => (
-                      <li key={c.scryfallId + c.name}>
-                        <span className="count faint">{c.quantity}</span>
-                        <span>{c.name}</span>
-                        {c.commander && <span className="commander-tag">Commander</span>}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 className="section-label" style={{ fontSize: 12 }}>
+            Cards
+          </h2>
+          <div className="segmented" role="group" aria-label="Show cards as">
+            <button aria-pressed={view === 'list'} onClick={() => chooseView('list')}>
+              List
+            </button>
+            <button aria-pressed={view === 'cards'} onClick={() => chooseView('cards')}>
+              Cards
+            </button>
+          </div>
         </div>
+        {view === 'cards' ? (
+          <CardGrid groups={groupCards(deck.cards)} onOpen={setShown} />
+        ) : (
+          <div className="card-groups">
+            {groupCards(deck.cards).map((g) => {
+              const expanded = open === g.group;
+              return (
+                <div key={g.group}>
+                  <button className="card-group" aria-expanded={expanded} onClick={() => setOpen(expanded ? null : g.group)}>
+                    <span>{g.label}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span className="count muted">{g.count}</span>
+                      <Chevron open={expanded} />
+                    </span>
+                  </button>
+                  {expanded && (
+                    <ul className="card-names">
+                      {g.cards.map((c) => (
+                        <li key={c.scryfallId + c.name}>
+                          <span className="count faint">{c.quantity}</span>
+                          <button className="card-name" onClick={() => setShown(c)}>
+                            {c.name}
+                          </button>
+                          {c.commander && <span className="commander-tag">Commander</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
+
+      {shown && <CardSheet card={shown} onClose={() => setShown(null)} />}
 
       {sheet === 'menu' && (
         <Sheet title={deck.name} onClose={() => setSheet(null)}>

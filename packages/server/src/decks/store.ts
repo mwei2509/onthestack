@@ -63,6 +63,7 @@ interface CardRow {
   commander: number;
   type_line: string | null;
   color_identity: string | null;
+  double_faced: number;
 }
 
 interface SummaryRow {
@@ -114,8 +115,10 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
       db
         .prepare(
           `SELECT dc.oracle_id, dc.scryfall_id, c.name, dc.quantity, dc.commander,
-             ${TYPE_LINE} AS type_line, c.data -> '$.color_identity' AS color_identity
+             ${TYPE_LINE} AS type_line, c.data -> '$.color_identity' AS color_identity,
+             coalesce(p.back_image_url, '') != '' AS double_faced
            FROM deck_cards dc JOIN cards c ON c.oracle_id = dc.oracle_id
+           LEFT JOIN printings p ON p.scryfall_id = dc.scryfall_id
            WHERE dc.deck_id = ? ORDER BY dc.position`,
         )
         .bind(id),
@@ -135,6 +138,7 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
         commander: r.commander === 1,
         group: groupOf(r.type_line ?? ''),
         legendary: isLegendary(r.type_line ?? ''),
+        doubleFaced: r.double_faced === 1,
       })),
       unmatched: JSON.parse(deck.unmatched) as UnmatchedLine[],
       importedAt: deck.imported_at,
