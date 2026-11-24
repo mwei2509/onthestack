@@ -21,7 +21,7 @@ interface Setup {
   decks?: Record<string, Deck>;
 }
 
-/** The current turn (ADR 0054, 0065). The board is never stored: it's this, replayed. Sealed turns have keys of their own. */
+/** The current turn (ADR 0054, 0074). The board is never stored: it's this, replayed. Sealed turns have keys of their own. */
 interface Turn {
   turnStart: GameState;
   timeline: TimelineEntry[];

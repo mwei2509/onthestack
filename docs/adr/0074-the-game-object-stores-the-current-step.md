@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the build session for #42).
 
+First merged as ADR 0065 (#74), which #77 also used; renumbered. ADR 0066 lets statements move the stored Step forward too.
+
 Extends ADR 0054. `replayTurn` stops at the last Step the timeline reaches, so a turn where nothing has been said yet would never leave untap. The Game Durable Object therefore stores the current Step next to the turn's starting snapshot and timeline, and replays to it (`replayTurn(turnStart, timeline, { currentStep })`). It's an input to the replay, not a copy of the board, so it can't drift from the snapshot and timeline.
 
 - **Next step** moves to the following Step and stores it. Steps the engine skips (first-strike damage when no creature has first strike, combat damage with no attackers) are skipped by Next step too.

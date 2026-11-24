@@ -82,7 +82,7 @@ function stepSkipped(step: Step, state: GameState, recorded: boolean): boolean {
 }
 
 /**
- * The Steps still to come this turn, given the board now, leaving out the ones the rules skip (ADR 0065). Next step
+ * The Steps still to come this turn, given the board now, leaving out the ones the rules skip (ADR 0074). Next step
  * moves to the first; after the last, the turn ends.
  */
 export function stepsAhead(state: GameState): Step[] {
