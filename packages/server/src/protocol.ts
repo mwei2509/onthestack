@@ -2,18 +2,18 @@ import { STEPS, type TableView } from '@onthestack/engine';
 import { z } from 'zod';
 
 const seatId = z.string().min(1).max(16);
-const name = z.string().trim().min(1, 'A name is needed').max(24, 'Names are at most 24 characters');
+export const SeatName = z.string().trim().min(1, 'A name is needed').max(24, 'Names are at most 24 characters');
 const deckId = z.string().min(1).max(64);
 const step = z.enum(STEPS);
 
 /** Everything a device can send. Devices are untrusted, so every message is parsed against this (ADR 0055). */
 export const DeviceMessage = z.discriminatedUnion('type', [
   /** A seat needs a Deck from the library (ADR 0080). */
-  z.object({ type: z.literal('join'), name, deckId }),
+  z.object({ type: z.literal('join'), name: SeatName, deckId }),
   /** "That's me". Without `takeOver`, it fails while another device holds the seat, so a reload never steals one back. */
   z.object({ type: z.literal('claim'), seatId, takeOver: z.boolean().optional() }),
   z.object({ type: z.literal('watch') }),
-  z.object({ type: z.literal('editSeat'), seatId, name: name.optional(), deckId: deckId.optional() }),
+  z.object({ type: z.literal('editSeat'), seatId, name: SeatName.optional(), deckId: deckId.optional() }),
   z.object({ type: z.literal('removeSeat'), seatId }),
   z.object({ type: z.literal('reorder'), seatIds: z.array(seatId).max(16) }),
   z.object({ type: z.literal('start'), firstSeatId: seatId }),
