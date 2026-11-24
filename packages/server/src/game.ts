@@ -1,9 +1,9 @@
 import { DurableObject } from 'cloudflare:workers';
-import { createGame, replayTurn, sealTurn, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
+import { createGame, replayTurn, sealTurn, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type RulesWarning, type SealedTurn, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
 import { claudeProvider, interpretTurn, type InterpretedTimeline, type LlmProvider } from '@onthestack/interpreter';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
-import { claimJoinCode, touchJoinCode } from './joinCodes.js';
-import { DeviceMessage, type ServerMessage } from './protocol.js';
+import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
+import { DeviceMessage, type Ended, type ServerMessage } from './protocol.js';
 
 interface Seat {
   id: string;
@@ -20,6 +20,7 @@ interface Setup {
   nextSeat: number;
   started: boolean;
   firstSeatId?: string;
+  ended?: Ended;
   /** The six-digit code typed into Join game; null once retired (ADR 0095). */
   joinCode?: string | null;
   /** Each seat's Deck, copied at Start so later edits never change the game (ADR 0050). */
@@ -37,6 +38,12 @@ interface Turn {
   transcriptVersion: number;
   /** The last InterpretedTimeline applied, and the transcript version it read. */
   reading?: { timeline: InterpretedTimeline; transcriptVersion: number };
+}
+
+/** What a sealed turn's key holds: the engine's record plus the turn's TurnTranscript and the warnings it ended with. */
+interface StoredSealedTurn extends SealedTurn {
+  statements: PlayerStatement[];
+  warnings: RulesWarning[];
 }
 
 /** Wait after a statement before interpreting, in case someone else is mid-sentence (ADR 0017). Tuned at game nights. */
@@ -60,6 +67,8 @@ export class Game extends DurableObject<Env> {
   private joinCodeTouchedAt = 0;
   private turn: Turn | null = null;
   private board: ReplayResult | null = null;
+  /** The frozen board of an ended game: its last sealed turn, never replayed again (ADR 0100). */
+  private endedBoard: ReplayResult | null = null;
   private readonly decks: DeckSource;
   private interpreter: LlmProvider | undefined;
   private interpretAfterMs = INTERPRET_AFTER_MS;
@@ -75,6 +84,10 @@ export class Game extends DurableObject<Env> {
       this.version = (stored.get('version') as number | undefined) ?? 0;
       const turn = stored.get('turn') as Partial<Turn> | undefined;
       this.turn = turn ? { statements: [], transcriptVersion: 0, ...turn } as Turn : null;
+      if (this.setup?.ended) {
+        const last = await ctx.storage.get<StoredSealedTurn>(`sealed:${this.setup.ended.turn}`);
+        if (last) this.endedBoard = { state: last.finalBoard, events: [], tableEvents: [], warnings: last.warnings ?? [] };
+      }
       this.replay();
     });
   }
@@ -225,13 +238,37 @@ export class Game extends DurableObject<Env> {
         turn.currentStep = to;
         return;
       }
+      case 'end':
+        if (setup.ended) throw new Rejected('The game has already ended');
+        return this.end(this.inGame(), attachment(ws).seatId);
     }
   }
 
   private async sealTurn(turn: Turn): Promise<void> {
-    const { sealed, nextTurnStart } = sealTurn(turn.turnStart, turn.timeline);
-    await this.ctx.storage.put(`sealed:${sealed.turn}`, sealed);
+    const { sealed, nextTurnStart, warnings } = sealTurn(turn.turnStart, turn.timeline);
+    await this.storeSealed(sealed, turn, warnings);
     this.turn = newTurn(nextTurnStart);
+  }
+
+  /** Seals the turn where the table is and freezes the game (ADR 0100, 0101). */
+  private async end(turn: Turn, by: string | null): Promise<void> {
+    const setup = this.setup!;
+    const { sealed, warnings } = sealTurn(turn.turnStart, turn.timeline, { through: turn.currentStep });
+    await this.storeSealed(sealed, turn, warnings);
+    clearTimeout(this.interpretTimer);
+    this.turn = null;
+    this.endedBoard = { state: sealed.finalBoard, events: [], tableEvents: [], warnings };
+    setup.ended = { at: new Date().toISOString(), turn: sealed.turn, by };
+    const joinCode = setup.joinCode;
+    setup.joinCode = null;
+    await this.save();
+    // Saved first, so a D1 failure leaves the code to the 24-hour rule instead of failing the end (ADR 0101).
+    if (joinCode) await retireJoinCode(this.env.DB, joinCode, setup.code).catch((e: unknown) => console.error('Retiring the join code failed', e));
+  }
+
+  private async storeSealed(sealed: SealedTurn, turn: Turn, warnings: RulesWarning[]): Promise<void> {
+    const stored: StoredSealedTurn = { ...sealed, statements: turn.statements, warnings };
+    await this.ctx.storage.put(`sealed:${sealed.turn}`, stored);
   }
 
   /** Restarts the wait after each statement; while a request is in flight, its return sends the next one (ADR 0017). */
@@ -275,6 +312,7 @@ export class Game extends DurableObject<Env> {
   }
 
   private inGame(): Turn {
+    if (this.setup!.ended) throw new Rejected('This game has ended.');
     if (!this.turn) throw new Rejected('The game hasn\'t started yet');
     return this.turn;
   }
@@ -320,6 +358,9 @@ export class Game extends DurableObject<Env> {
   }
 
   private view(): TableView | null {
+    if (this.endedBoard) {
+      return { ...tableView(this.endedBoard), awaitingResponseFrom: [], combatPreview: null, reminders: [], stepsAhead: [] };
+    }
     return this.board ? tableView(this.board) : null;
   }
 
@@ -340,6 +381,7 @@ export class Game extends DurableObject<Env> {
       you: attachment(ws).seatId,
       seats: setup.seats.map((s) => ({ ...s, connected: this.holders(s.id, closing).length > 0 })),
       started: setup.started,
+      ended: setup.ended ?? null,
       joinCode: setup.joinCode ?? null,
       view,
     });

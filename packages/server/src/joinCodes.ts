@@ -41,6 +41,11 @@ export async function touchJoinCode(db: D1Database, code: string, gameCode: stri
   return result.meta.changes === 1;
 }
 
+/** Frees a game's code at once, as when the game ends, so a new game can have it. */
+export async function retireJoinCode(db: D1Database, code: string, gameCode: string): Promise<void> {
+  await db.prepare('DELETE FROM join_codes WHERE code = ? AND game_code = ?').bind(code, gameCode).run();
+}
+
 function randomInt(n: number): number {
   return crypto.getRandomValues(new Uint32Array(1))[0]! % n;
 }

@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { fakeScryfall } from './cards/fake-scryfall.js';
 import { createCardStore } from './cards/store.js';
 import { createDeckStore } from './decks/store.js';
+import { Game } from './game.js';
 import type { DeviceMessage, ServerMessage } from './protocol.js';
 
 const VONA_DECK = 'vona-deck';
@@ -129,7 +130,7 @@ describe('Lobby', () => {
   it('sends an empty lobby on connect', async () => {
     const code = await createGame();
     const device = await connect(code);
-    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false, joinCode: expect.stringMatching(/^\d{6}$/), view: null });
+    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false, ended: null, joinCode: expect.stringMatching(/^\d{6}$/), view: null });
   });
 
   it('adds a seat per device that joins, in order, and tells each device which seat is theirs', async () => {
@@ -501,5 +502,103 @@ describe('Statements', () => {
     const turn = await stored();
     expect(turn.statements).toMatchObject([{ id: 's1', playerId: 'p2' }]);
     expect(turn.reading).toBeUndefined();
+  });
+});
+
+describe('Ending a game (ADR 0100, 0101)', () => {
+  const join = (digits: string) => exports.default.fetch(`http://test/api/join/${digits}`, { headers: { 'CF-Connecting-IP': '203.0.113.9' } });
+
+  it('seals the turn where the table is, freezes the board for everyone and retires the join code', async () => {
+    const { code, devices } = await started();
+    const joinCode = (await (await connect(code)).update()).joinCode!;
+    devices[1]!.send({ type: 'adjustLife', delta: 2 });
+    await everyone(devices);
+    devices[1]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'draw' });
+    expect((await everyone(devices)).reminders).not.toEqual([]);
+
+    devices[0]!.send({ type: 'end' });
+    const updates = await Promise.all(devices.map((d) => d.update()));
+    const { view, ended } = updates[0]!;
+    expect(ended).toEqual({ at: expect.any(String), turn: 1, by: 'p1' });
+    expect(updates.every((u) => u.joinCode === null && u.ended?.at === ended!.at)).toBe(true);
+    expect(view!.turn).toEqual({ number: 1, activePlayerId: 'p2', step: 'draw' });
+    expect(view!.players.p2!.life).toBe(42);
+    expect(view).toMatchObject({ reminders: [], stepsAhead: [], combatPreview: null, awaitingResponseFrom: [] });
+    expect((await join(joinCode)).status).toBe(404);
+
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      expect(await state.storage.get('turn')).toBeNull();
+      expect(await state.storage.get('sealed:1')).toMatchObject({ turn: 1, warnings: [], finalBoard: { turn: { step: 'draw' } } });
+    });
+  });
+
+  it('records the shared screen as nobody, and refuses ending a game still in the lobby', async () => {
+    const { devices } = await lobby('Theo');
+    devices[0]!.send({ type: 'end' });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: "The game hasn't started yet" });
+
+    const game = await started();
+    const screen = await connect(game.code);
+    await screen.update();
+    screen.send({ type: 'end' });
+    expect((await screen.update()).ended?.by).toBeNull();
+  });
+
+  it('refuses anything that would change the game, but still lets a device take a seat or watch', async () => {
+    const { code, devices } = await started();
+    devices[0]!.send({ type: 'end' });
+    await everyone(devices);
+
+    const refused: DeviceMessage[] = [
+      { type: 'statement', text: 'I play a Forest' },
+      { type: 'adjustLife', delta: -1 },
+      { type: 'nextStep', from: 'upkeep' },
+      { type: 'jumpToStep', from: 'upkeep', to: 'endTurn' },
+    ];
+    for (const message of refused) {
+      devices[1]!.send(message);
+      expect(await devices[1]!.next()).toEqual({ type: 'error', message: 'This game has ended.' });
+    }
+    devices[2]!.send({ type: 'end' });
+    expect(await devices[2]!.next()).toEqual({ type: 'error', message: 'The game has already ended' });
+
+    const reloaded = await connect(code);
+    expect((await reloaded.update()).ended).not.toBeNull();
+    reloaded.send({ type: 'claim', seatId: 'p3', takeOver: true });
+    expect((await reloaded.update()).you).toBe('p3');
+    reloaded.send({ type: 'watch' });
+    expect((await reloaded.update()).you).toBeNull();
+  });
+
+  it('keeps the statements of every sealed turn, and the frozen board after the Game object wakes up', async () => {
+    const { code, devices } = await started();
+    devices[0]!.send({ type: 'statement', text: 'Elena loses 3 life' });
+    await everyone(devices);
+    devices[1]!.send({ type: 'adjustLife', delta: -4 });
+    await everyone(devices);
+    devices[1]!.send({ type: 'end' });
+    const frozen = await everyone(devices);
+
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      expect(await state.storage.get('sealed:1')).toMatchObject({ statements: [{ id: 's1', playerId: 'p1', text: 'Elena loses 3 life' }] });
+      const woken = new Game(state, env);
+      await state.blockConcurrencyWhile(async () => {});
+      expect((woken as unknown as { view(): unknown }).view()).toEqual(frozen);
+    });
+  });
+
+  it('drops a reading that comes back after the game ended', async () => {
+    const { code, devices, call, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    const first = await call(0);
+    devices[1]!.send({ type: 'end' });
+    const frozen = await everyone(devices);
+
+    first.answer(reading('s1'));
+    const screen = await connect(code);
+    expect((await screen.update()).view).toEqual(frozen);
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      expect(await state.storage.get('turn')).toBeNull();
+    });
   });
 });
