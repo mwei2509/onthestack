@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Logo, Plus } from '../icons.js';
 
 export function Home() {
   const navigate = useNavigate();
@@ -23,38 +22,32 @@ export function Home() {
 
   return (
     <div className="phone">
-      <header className="game-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Logo size={26} />
-          <span className="display" style={{ fontSize: 17, fontWeight: 600 }}>
-            On The Stack
+      <main className="home-main">
+        <div className="home-cards" aria-hidden>
+          <span className="home-card left" />
+          <span className="home-card right" />
+          <span className="home-card front">
+            <span className="home-crest num">40</span>
           </span>
         </div>
-      </header>
-      <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 36 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <h1 className="display" style={{ margin: 0, fontSize: 34, lineHeight: 1.1, fontWeight: 600, letterSpacing: '-0.02em' }}>
-            The tally for your Commander table.
-          </h1>
-          <p className="muted" style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>
-            Life, commander damage, turns and steps, on every phone at the table. Your cards stay in charge.
-          </p>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <button className="btn btn-primary" style={{ height: 64, fontSize: 19 }} onClick={newGame} disabled={creating}>
-            <Plus />
-            {creating ? 'Creating…' : 'New game'}
-          </button>
-          {error && (
-            <p role="alert" style={{ margin: 0, color: 'var(--danger)', textAlign: 'center' }}>
-              {error}
-            </p>
-          )}
-          <p className="faint" style={{ margin: 0, fontSize: 14, textAlign: 'center' }}>
-            Joining a friend? Open the link they shared.
-          </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <h1 className="home-title display">On The Stack</h1>
+          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#D6CBDA' }}>Keep the tally. Play the game.</p>
         </div>
       </main>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 20 }}>
+        <button className="btn btn-primary" style={{ height: 64, fontSize: 21, borderRadius: 18 }} onClick={newGame} disabled={creating}>
+          {creating ? 'Creating…' : 'New game'}
+        </button>
+        {error && (
+          <p role="alert" style={{ margin: 0, color: 'var(--danger)', textAlign: 'center' }}>
+            {error}
+          </p>
+        )}
+        <p className="faint" style={{ margin: 0, fontSize: 14, textAlign: 'center' }}>
+          Joining a friend? Open the link they shared.
+        </p>
+      </div>
     </div>
   );
 }

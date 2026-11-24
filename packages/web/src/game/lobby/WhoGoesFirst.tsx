@@ -15,7 +15,7 @@ export function WhoGoesFirst({ seats, colours, onCancel, onStart }: { seats: Sea
       <section className="sheet" role="dialog" aria-modal="true" aria-labelledby="who-first">
         <div className="handle" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <h2 id="who-first" className="display" style={{ margin: 0, fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em' }}>
+          <h2 id="who-first" className="display" style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: '0.02em' }}>
             Who goes first?
           </h2>
           <p className="muted" style={{ margin: 0, fontSize: 15, lineHeight: 1.45 }}>
@@ -38,7 +38,7 @@ export function WhoGoesFirst({ seats, colours, onCancel, onStart }: { seats: Sea
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, fontSize: 15 }}>
               {order.map((s, i) => (
                 <Fragment key={s.id}>
-                  <span style={i === 0 ? { color: 'var(--accent)', fontWeight: 700 } : undefined}>{s.name}</span>
+                  <span className={i === 0 ? 'display' : undefined} style={i === 0 ? { color: 'var(--accent)', fontWeight: 800 } : undefined}>{s.name}</span>
                   {i < order.length - 1 && <Arrow />}
                 </Fragment>
               ))}

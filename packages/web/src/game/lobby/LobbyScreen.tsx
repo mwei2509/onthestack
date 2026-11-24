@@ -1,7 +1,7 @@
 import type { SeatView } from '@onthestack/server/protocol';
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { EditIcon, Grip, ShareIcon } from '../../icons.js';
-import { Avatar, gameLink, Invite, GameHeader, SeatDot } from '../parts.js';
+import { Avatar, gameLink, Invite, GameHeader, SeatDot, SeatWash } from '../parts.js';
 import { moved, seatColours } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
 import { WhoGoesFirst } from './WhoGoesFirst.js';
@@ -105,6 +105,7 @@ function SeatRow({ seat, colour, you, dragging, editing, onEdit, onDone, game, g
 
   return (
     <li className={classes} data-seat={seat.id}>
+      <SeatWash colour={colour} />
       <div className="seat-main">
         <button className="grip" aria-label={`Move ${seat.name}. Drag, or use the arrow keys`} {...grip}>
           <Grip />

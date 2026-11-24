@@ -1,5 +1,5 @@
 import { Logo } from '../../icons.js';
-import { Avatar, ConnectionPill, gameLink, SeatDot } from '../parts.js';
+import { Avatar, ConnectionPill, gameLink, SeatDot, SeatWash } from '../parts.js';
 import { seatColours } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
 import { useState } from 'react';
@@ -23,7 +23,7 @@ export function SharedLobby({ code, game, update }: ScreenProps) {
       <header className="game-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <Logo size={30} />
-          <span className="display" style={{ fontSize: 22, fontWeight: 600 }}>
+          <span className="display" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.04em' }}>
             On The Stack
           </span>
           <span className="pill" style={{ fontSize: 14 }}>
@@ -40,7 +40,7 @@ export function SharedLobby({ code, game, update }: ScreenProps) {
 
       <main className="shared-main">
         <section className="join-panel">
-          <h2 className="display" style={{ margin: 0, fontSize: 22, fontWeight: 600 }}>
+          <h2 className="display" style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>
             Join on your phone
           </h2>
           <span className="muted" style={{ fontSize: 15 }}>
@@ -79,8 +79,9 @@ function SeatRow({ seats, colours }: { seats: SeatView[]; colours: Record<string
     <div className="shared-row">
       {seats.map((s) => (
         <div key={s.id} className="shared-seat">
+          <SeatWash colour={colours[s.id]!} />
           <Avatar name={s.name} colour={colours[s.id]!} size={48} />
-          <span style={{ fontSize: 20, fontWeight: 600, flexGrow: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
+          <span className="display" style={{ fontSize: 20, fontWeight: 700, flexGrow: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
           <SeatDot seat={s} />
         </div>
       ))}

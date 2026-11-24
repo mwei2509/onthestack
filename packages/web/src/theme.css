@@ -1,23 +1,28 @@
-/* The look from the Claude Design canvas ("On The Stack — first screens"): ink ground, one amber accent kept for
-   whose turn it is, the current step and primary buttons; seat colours always come with an initial. */
+/* The Candlelight look from the Claude Design canvas (ADR 0081): plum felt, gold for whose turn it is and the main
+   buttons, Cinzel for names and numbers. Only the active turn glows. */
 :root {
-  --ink: #0d0f13;
-  --raised: #161a20;
-  --raised-2: #1e232b;
-  --raised-3: #262c36;
-  --line: #2a303a;
-  --line-2: #3a414c;
-  --line-3: #4a5260;
-  --text: #eceae4;
-  --text-2: #a3a9b3;
-  --text-3: #7c838e;
-  --accent: #f0b44c;
-  --accent-hover: #f7cb78;
-  --on-accent: #1a1408;
-  --accent-wash: #2a2416;
-  --connected: #5fd3b5;
+  --ink: #110d14;
+  --raised: #1a1420;
+  --raised-2: #261e2e;
+  --raised-3: #2e2537;
+  --field: #1c1622;
+  --line: #2e2537;
+  --line-2: #3a2f44;
+  --line-3: #4a3b52;
+  --gold-line: #8a6a2e;
+  --text: #f2ebdd;
+  --text-2: #b9aebf;
+  --text-3: #8e8396;
+  --italic: #e6d9c8;
+  --accent: #e9b949;
+  --accent-hover: #f5d27f;
+  --on-accent: #2a1c05;
+  --accent-wash: #3a2c1a;
+  --gold: linear-gradient(180deg, #f2c960 0%, #d9a23a 100%);
+  --connected: #6fd3a8;
   --danger: #ff9b6a;
-  --display: 'Space Grotesk', Inter, system-ui, sans-serif;
+  --display: Cinzel, Georgia, serif;
+  --felt: radial-gradient(120% 70% at 50% 0%, #2a1f33 0%, #16111b 55%, #0e0b11 100%);
   color-scheme: dark;
 }
 
@@ -27,7 +32,8 @@
 
 body {
   margin: 0;
-  background: var(--ink);
+  min-height: 100dvh;
+  background: var(--felt) fixed, var(--ink);
   color: var(--text);
   font-family: Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -67,7 +73,7 @@ a {
 
 .num {
   font-family: var(--display);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .phone {
@@ -92,15 +98,16 @@ h1.title {
   margin: 0;
   font-family: var(--display);
   font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .section-label {
   margin: 0;
+  font-family: var(--display);
   font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -109,8 +116,9 @@ h1.title {
 .btn {
   height: 48px;
   border-radius: 14px;
-  border: 1px solid var(--line);
-  background: transparent;
+  border: 0;
+  box-shadow: inset 0 0 0 1.5px var(--gold-line);
+  background: rgba(28, 22, 34, 0.85);
   padding: 0 16px;
   font-size: 15px;
   font-weight: 600;
@@ -122,32 +130,36 @@ h1.title {
 
 .btn-primary {
   height: 56px;
-  border: 0;
   border-radius: 16px;
-  background: var(--accent);
+  background: var(--gold);
   color: var(--on-accent);
-  font-size: 17px;
-  font-weight: 700;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  box-shadow:
+    0 6px 16px rgba(233, 185, 73, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
+  filter: brightness(1.06);
 }
 
 .btn-raised {
-  background: var(--raised);
-  border-color: var(--line-2);
+  background: rgba(28, 22, 34, 0.85);
 }
 
 .btn-light {
-  border: 0;
-  background: var(--text);
-  color: var(--ink);
-  font-weight: 700;
+  background: var(--gold);
+  color: var(--on-accent);
+  font-family: var(--display);
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-text {
-  border: 0;
+  box-shadow: none;
   background: transparent;
   padding: 0 4px;
 }
@@ -177,8 +189,8 @@ h1.title {
 .field input {
   height: 52px;
   border-radius: 12px;
-  border: 1.5px solid var(--line);
-  background: var(--raised);
+  border: 1.5px solid var(--line-2);
+  background: var(--field);
   padding: 0 14px;
   font-size: 18px;
   color: var(--text);
@@ -201,13 +213,13 @@ h1.title {
 .game-header .code {
   font-family: var(--display);
   font-size: 17px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
 .pill {
   font-size: 13px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: 999px;
   padding: 6px 10px;
   color: var(--text-2);
@@ -217,17 +229,40 @@ h1.title {
 }
 
 /* Seats */
+/* A seat's coin: a ring in the seat's colours around a dark disc with the player's initial (ADR 0081). */
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  color: var(--ink);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-family: var(--display);
+  font-weight: 800;
   font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   flex-shrink: 0;
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 50%, var(--coin-inner, var(--field)) 52%, transparent 54%),
+    var(--coin-ring);
+}
+
+.avatar.active {
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 0 0 3.5px var(--accent),
+    0 0 14px rgba(233, 185, 73, 0.5);
+}
+
+/* The painted glow behind a seat, in its colours. */
+.wash {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--wash);
 }
 
 .dot {
@@ -247,13 +282,13 @@ h1.title {
 }
 
 .you-tag {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--ink);
+  letter-spacing: 0.1em;
+  color: var(--on-accent);
   background: var(--text);
-  border-radius: 5px;
-  padding: 2px 6px;
+  border-radius: 4px;
+  padding: 2px 5px;
 }
 
 .seat-list {
@@ -266,27 +301,45 @@ h1.title {
 }
 
 .seat-row {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line);
   padding: 4px 6px 4px 2px;
   touch-action: pan-y;
+}
+
+.seat-row > * {
+  position: relative;
+}
+
+.seat-row > .wash {
+  position: absolute;
 }
 
 .seat-row.you,
 .seat-row.editing {
   background: var(--raised-2);
-  box-shadow: inset 0 0 0 1px var(--line-2);
+  box-shadow: inset 0 0 0 1px var(--line-3);
+}
+
+.seat-row.waiting {
+  background: var(--raised-2);
+  box-shadow: inset 0 0 0 1.5px var(--gold-line);
 }
 
 .seat-row.dragging {
   background: var(--raised-3);
   box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.55),
-    inset 0 0 0 1px var(--line-3);
-  position: relative;
+    0 12px 28px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1.5px var(--accent);
   z-index: 1;
+}
+
+.seat-row.dragging .grip {
+  color: var(--accent);
 }
 
 .seat-main {
@@ -305,8 +358,9 @@ h1.title {
 }
 
 .seat-name {
+  font-family: var(--display);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -314,7 +368,8 @@ h1.title {
 
 .seat-sub {
   font-size: 13px;
-  color: var(--text-2);
+  font-style: italic;
+  color: var(--italic);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -342,7 +397,7 @@ h1.title {
 }
 
 .empty-seats {
-  border: 1.5px dashed var(--line);
+  border: 1.5px dashed var(--line-2);
   border-radius: 14px;
   padding: 18px 16px;
   display: flex;
@@ -359,7 +414,8 @@ h1.title {
 
 /* Cards and panels */
 .panel {
-  background: var(--raised);
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--line-2);
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -398,7 +454,7 @@ h1.title {
 .scrim {
   position: fixed;
   inset: 0;
-  background: rgba(5, 6, 8, 0.6);
+  background: rgba(8, 6, 10, 0.62);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -408,20 +464,22 @@ h1.title {
 .sheet {
   width: 100%;
   max-width: 480px;
-  background: var(--raised);
+  background: linear-gradient(180deg, var(--raised-2) 0%, var(--field) 40%);
   border-radius: 24px 24px 0 0;
   padding: 10px 16px calc(24px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 18px;
-  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 -12px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 var(--line-3);
 }
 
 .sheet .handle {
   width: 40px;
   height: 4px;
   border-radius: 2px;
-  background: var(--line-2);
+  background: var(--line-3);
   align-self: center;
 }
 
@@ -440,14 +498,20 @@ h1.title {
   padding: 0 14px;
   text-align: left;
   background: var(--raised-2);
-  border: 2px solid transparent;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  font-family: var(--display);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
+  --coin-inner: var(--raised-2);
 }
 
 .pick[aria-pressed='true'] {
   background: var(--accent-wash);
-  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 2px var(--accent),
+    0 0 18px rgba(233, 185, 73, 0.3);
+  --coin-inner: var(--accent-wash);
 }
 
 .toast {
@@ -494,7 +558,8 @@ h1.title {
 .join-panel {
   width: 300px;
   flex-shrink: 0;
-  background: var(--raised);
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--line-2);
   border-radius: 28px;
   padding: 28px;
   display: flex;
@@ -508,7 +573,7 @@ h1.title {
 .join-panel .big-code {
   font-family: var(--display);
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--accent);
   overflow-wrap: anywhere;
@@ -529,7 +594,9 @@ h1.title {
 }
 
 .shared-seat {
+  position: relative;
   background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line);
   border-radius: 20px;
   padding: 18px 20px;
   display: flex;
@@ -547,8 +614,8 @@ h1.title {
 .table-oval {
   min-height: 200px;
   border-radius: 120px;
-  background: #12151a;
-  box-shadow: inset 0 0 0 2px var(--raised-2);
+  background: rgba(17, 13, 20, 0.6);
+  box-shadow: inset 0 0 0 2px var(--gold-line);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -977,4 +1044,82 @@ h1.title {
   .strip-step span {
     display: none;
   }
+}
+
+/* Home */
+.home-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  text-align: center;
+}
+
+.home-cards {
+  position: relative;
+  width: 220px;
+  height: 200px;
+}
+
+.home-card {
+  position: absolute;
+  top: 30px;
+  width: 104px;
+  height: 146px;
+  border-radius: 10px;
+  box-shadow:
+    inset 0 0 0 2px #c9973a,
+    0 10px 24px rgba(0, 0, 0, 0.6);
+}
+
+.home-card.left {
+  left: 30px;
+  transform: rotate(-14deg);
+  background: linear-gradient(160deg, #3d6e9c, #1b2c44);
+}
+
+.home-card.right {
+  left: 86px;
+  transform: rotate(13deg);
+  background: linear-gradient(160deg, #3f8a57, #18301f);
+}
+
+.home-card.front {
+  left: 58px;
+  top: 18px;
+  background: linear-gradient(160deg, #d2643f, #4a1a10);
+  box-shadow:
+    inset 0 0 0 2px var(--accent),
+    0 0 40px rgba(233, 140, 60, 0.35),
+    0 14px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-crest {
+  width: 64px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0, 100% 14%, 100% 55%, 50% 100%, 0 55%, 0 14%);
+  background: rgba(17, 13, 20, 0.65);
+  font-weight: 800;
+  font-size: 30px;
+  color: var(--accent-hover);
+}
+
+.home-title {
+  margin: 0;
+  font-size: 40px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #fce7b0 0%, #e9b949 55%, #b07e25 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

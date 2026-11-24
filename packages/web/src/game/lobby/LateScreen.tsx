@@ -1,5 +1,5 @@
 import { ScreenIcon } from '../../icons.js';
-import { Avatar, GameHeader } from '../parts.js';
+import { Avatar, GameHeader, SeatWash } from '../parts.js';
 import { seatColours } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
 import { ThatsMe } from './JoinScreen.js';
@@ -13,7 +13,7 @@ export function LateScreen({ code, game, update }: ScreenProps) {
       <GameHeader
         code={code}
         right={
-          <span className="pill" style={{ color: 'var(--accent)', borderColor: '#5A4A26', fontWeight: 600 }}>
+          <span className="pill display" style={{ color: 'var(--accent)', borderColor: 'var(--gold-line)', fontWeight: 700 }}>
             In progress{turn ? ` · Turn ${turn}` : ''}
           </span>
         }
@@ -26,7 +26,8 @@ export function LateScreen({ code, game, update }: ScreenProps) {
       </section>
       <ol className="seat-list" style={{ gap: 6 }}>
         {update.seats.map((seat) => (
-          <li key={seat.id} className={`seat-row${seat.connected ? '' : ' editing'}`} style={{ padding: '8px 8px 8px 12px' }}>
+          <li key={seat.id} className={`seat-row${seat.connected ? '' : ' waiting'}`} style={{ padding: '8px 8px 8px 12px' }}>
+            <SeatWash colour={colours[seat.id]!} />
             <div className="seat-main" style={{ gap: 12 }}>
               <Avatar name={seat.name} colour={colours[seat.id]!} size={36} />
               <div className="seat-text">
@@ -50,7 +51,7 @@ export function LateScreen({ code, game, update }: ScreenProps) {
         <button className="btn btn-raised" style={{ height: 60, justifyContent: 'flex-start', gap: 14, textAlign: 'left' }} onClick={game.watch}>
           <ScreenIcon size={24} />
           <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <span style={{ fontSize: 17 }}>Just watching</span>
+            <span className="display" style={{ fontSize: 17 }}>Just watching</span>
             <span className="muted" style={{ fontSize: 13, fontWeight: 400 }}>Show the whole board, e.g. on a shared screen</span>
           </span>
         </button>
