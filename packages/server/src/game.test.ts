@@ -142,6 +142,14 @@ describe('Lobby', () => {
     expect((await late.update()).you).toBe('p2');
   });
 
+  it('takes at most six seats', async () => {
+    const { code } = await lobby('Ana', 'Theo', 'Jun', 'Priya', 'Sam', 'Rafa');
+    const seventh = await connect(code);
+    await seventh.update();
+    seventh.send({ type: 'join', name: 'Kim' });
+    expect(await seventh.next()).toEqual({ type: 'error', message: 'A game has at most 6 seats' });
+  });
+
   it('rejects malformed and invalid messages without changing anything', async () => {
     const { devices } = await lobby('Theo');
     const [theo] = devices;

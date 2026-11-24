@@ -23,6 +23,8 @@ interface Attachment {
   seatId: string | null;
 }
 
+export const MAX_SEATS = 6;
+
 class Rejected extends Error {}
 
 export class Game extends DurableObject<Env> {
@@ -96,6 +98,7 @@ export class Game extends DurableObject<Env> {
       case 'join': {
         this.inLobby('Joining');
         if (attachment(ws).seatId) throw new Rejected('This device already has a seat');
+        if (setup.seats.length >= MAX_SEATS) throw new Rejected(`A game has at most ${MAX_SEATS} seats`);
         const seat: Seat = { id: `p${setup.nextSeat}`, name: message.name };
         if (message.deckId) seat.deckId = await this.savedDeck(message.deckId);
         setup.nextSeat++;
