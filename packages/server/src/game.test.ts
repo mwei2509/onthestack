@@ -1,6 +1,7 @@
 import { LlmRequestError, parseOutput, type LlmProvider } from '@onthestack/interpreter';
 import { env, runInDurableObject } from 'cloudflare:test';
 import { exports } from 'cloudflare:workers';
+import { refuseDump } from './index.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { fakeScryfall } from './cards/fake-scryfall.js';
 import { createCardStore } from './cards/store.js';
@@ -430,6 +431,57 @@ async function interpreting() {
   };
   return { ...game, ...fake, stored, say };
 }
+
+describe('Debug dump (ADR 0117)', () => {
+  it('returns the whole game: setup, sealed turns, the current turn with its board, and interpretations', async () => {
+    const { code, devices, call, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    (await call(0)).answer(reading('s1'));
+    await everyone(devices);
+    devices[1]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'endTurn' });
+    await everyone(devices);
+    await say(1, 'I gain 2 life');
+
+    const res = await exports.default.fetch(`http://localhost/api/games/${code}/debug`);
+    expect(res.status).toBe(200);
+    const dump = (await res.json()) as {
+      code: string;
+      setup: { seats: { name: string }[] };
+      sealedTurns: { statements: { text: string }[] }[];
+      currentTurn: { number: number; statements: { text: string }[]; board: { summary: { life: Record<string, number> } } };
+      interpretations: unknown[];
+    };
+    expect(dump.code).toBe(code);
+    expect(dump.setup.seats.map((s) => s.name)).toEqual(['Theo', 'Elena', 'Michael']);
+    expect(dump.sealedTurns).toHaveLength(1);
+    expect(dump.sealedTurns[0]!.statements).toMatchObject([{ text: 'Elena loses 3 life' }]);
+    expect(dump.currentTurn.number).toBe(2);
+    expect(dump.currentTurn.statements).toMatchObject([{ text: 'I gain 2 life' }]);
+    expect(dump.currentTurn.board.summary.life).toMatchObject({ p2: 37 });
+    expect(dump.interpretations).toHaveLength(1);
+  });
+
+  it('is a 404 for a code that is no game', async () => {
+    expect((await exports.default.fetch('http://localhost/api/games/KITE-MOSS-00/debug')).status).toBe(404);
+  });
+});
+
+describe('Who may read a dump', () => {
+  const env = (DEBUG_TOKEN?: string) => ({ DEBUG_TOKEN }) as Env;
+  const get = (url: string, token?: string) => new Request(url, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+
+  it('without the secret, serves only local development and Previews', () => {
+    expect(refuseDump(get('http://localhost:8790/api/games/X/debug'), env())).toBeNull();
+    expect(refuseDump(get('https://pr-12-onthestack.onthestack.workers.dev/api/games/X/debug'), env())).toBeNull();
+    expect(refuseDump(get('https://onthestack.gg/api/games/X/debug'), env())?.status).toBe(403);
+  });
+
+  it('with the secret, needs the token everywhere', () => {
+    expect(refuseDump(get('https://onthestack.gg/api/games/X/debug', 's3cret'), env('s3cret'))).toBeNull();
+    expect(refuseDump(get('https://onthestack.gg/api/games/X/debug', 'guess'), env('s3cret'))?.status).toBe(401);
+    expect(refuseDump(get('http://localhost:8790/api/games/X/debug'), env('s3cret'))?.status).toBe(401);
+  });
+});
 
 describe('Statements', () => {
   it("stores a seated device's statement as its seat's, and the reading of it (ADR 0069)", async () => {

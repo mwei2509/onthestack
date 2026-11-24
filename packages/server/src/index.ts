@@ -9,7 +9,7 @@ import { createDeckStore } from './decks/store.js';
 
 export { Game } from './game.js';
 
-const GAME = /^\/api\/games\/([A-Za-z0-9-]{1,32})(\/ws)?$/;
+const GAME = /^\/api\/games\/([A-Za-z0-9-]{1,32})(\/ws|\/debug)?$/;
 const JOIN_PATH = /^\/api\/join\/(\d{1,12})$/;
 
 export default {
@@ -68,6 +68,13 @@ export default {
       const code = match[1].toUpperCase();
       if (!GAME_CODE.test(code)) return new Response('No game with that code', { status: 404 });
       const game = env.GAME.getByName(code);
+      if (match[2] === '/debug') {
+        if (request.method !== 'GET') return new Response('Not found', { status: 404 });
+        const refused = refuseDump(request, env);
+        if (refused) return refused;
+        const dump = await game.debugDump();
+        return dump ? Response.json(Object.assign({ code }, dump)) : Response.json({ error: 'No game with that code' }, { status: 404 });
+      }
       if (match[2]) return game.fetch(request);
       if (request.method === 'GET') {
         const summary = await game.summary();
@@ -78,3 +85,25 @@ export default {
     return new Response('Not found', { status: 404 });
   },
 } satisfies ExportedHandler<Env>;
+
+/**
+ * A game's dump shows everything said in it, so production needs the DEBUG_TOKEN secret (ADR 0117). Without the
+ * secret set, only local development and Previews (workers.dev) serve it.
+ */
+export function refuseDump(request: Request, env: Env): Response | null {
+  const { hostname } = new URL(request.url);
+  if (!env.DEBUG_TOKEN) {
+    const devHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.workers.dev');
+    return devHost ? null : new Response('Set the DEBUG_TOKEN secret to read game dumps here', { status: 403 });
+  }
+  const given = request.headers.get('Authorization')?.replace(/^Bearer /, '') ?? '';
+  return sameSecret(given, env.DEBUG_TOKEN) ? null : new Response('Wrong or missing DEBUG_TOKEN', { status: 401 });
+}
+
+/** Compares in constant time, so the response time doesn't leak how much of the token matched. */
+function sameSecret(a: string, b: string): boolean {
+  const x = new TextEncoder().encode(a);
+  const y = new TextEncoder().encode(b);
+  if (x.length !== y.length) return false;
+  return crypto.subtle.timingSafeEqual(x, y);
+}
