@@ -31,6 +31,10 @@ _Avoid_: slot, player slot
 The readable code that names a game and its link, such as KITE-MOSS-42. Anyone with it can join.
 _Avoid_: room ID, game ID, invite code
 
+**Join code**:
+A six-digit code, such as 482 913, typed into Join game to reach a game without its link. It sits beside the Game code and is retired when the game ends or goes idle, then reused.
+_Avoid_: PIN, room number
+
 ## What players say
 
 **PlayerStatement**:
