@@ -44,7 +44,27 @@ export interface DeckStore {
   importList(name: string, list: string): Promise<DeckDetail>;
   list(): Promise<DeckSummary[]>;
   get(id: string): Promise<DeckDetail | null>;
+  rename(id: string, name: string): Promise<DeckDetail | null>;
+  /** Anyone can delete a Deck (ADR 0079); games that already started keep their copy (ADR 0050). */
+  remove(id: string): Promise<boolean>;
+  /** Marks one card, or two for partners, as the commander, replacing any marked before (ADR 0077). */
+  markCommanders(id: string, oracleIds: string[]): Promise<DeckDetail | null>;
+  /** Replaces an unmatched line's text and matches it again; it joins the Deck's cards if it now matches. */
+  fixLine(id: string, line: LineRef, text: string): Promise<DeckDetail | null>;
+  skipLine(id: string, line: LineRef): Promise<DeckDetail | null>;
 }
+
+/**
+ * Names an unmatched line by its position and the text the player saw. If the text no longer matches,
+ * someone else changed the Deck in between, and the change is refused rather than applied to another line.
+ */
+export interface LineRef {
+  index: number;
+  was: string;
+}
+
+export class DeckChanged extends Error {}
+export class NotOnDeck extends Error {}
 
 interface DeckRow {
   id: string;
@@ -85,6 +105,10 @@ const INSERT_CARDS = `
   SELECT ?1, key, value ->> 'oracleId', value ->> 'scryfallId', value ->> 'quantity', value ->> 'commander'
   FROM json_each(?2)`;
 
+const APPEND_CARD = `
+  INSERT INTO deck_cards (deck_id, position, oracle_id, scryfall_id, quantity, commander)
+  SELECT ?1, coalesce(max(position) + 1, 0), ?2, ?3, ?4, ?5 FROM deck_cards WHERE deck_id = ?1`;
+
 const SELECT_SUMMARIES = `
   SELECT d.id, d.name, d.unmatched,
     (SELECT json_group_array(c.name) FROM deck_cards dc JOIN cards c ON c.oracle_id = dc.oracle_id
@@ -121,6 +145,19 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
       importedAt: deck.imported_at,
     };
   }
+
+  async function unmatchedOf(id: string): Promise<UnmatchedLine[] | null> {
+    const row = await db.prepare('SELECT unmatched FROM decks WHERE id = ?').bind(id).first<{ unmatched: string }>();
+    return row ? (JSON.parse(row.unmatched) as UnmatchedLine[]) : null;
+  }
+
+  function withoutLine(unmatched: UnmatchedLine[], line: LineRef): UnmatchedLine[] {
+    if (unmatched[line.index]?.text !== line.was) throw new DeckChanged();
+    return unmatched.filter((_, i) => i !== line.index);
+  }
+
+  const setUnmatched = (id: string, unmatched: UnmatchedLine[]) =>
+    db.prepare('UPDATE decks SET unmatched = ? WHERE id = ?').bind(JSON.stringify(unmatched), id);
 
   return {
     async importList(name, list) {
@@ -166,5 +203,54 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
     },
 
     get,
+
+    async rename(id, name) {
+      const { meta } = await db.prepare('UPDATE decks SET name = ? WHERE id = ?').bind(name, id).run();
+      return meta.changes > 0 ? get(id) : null;
+    },
+
+    async remove(id) {
+      const { meta } = await db.prepare('DELETE FROM decks WHERE id = ?').bind(id).run();
+      return meta.changes > 0;
+    },
+
+    async markCommanders(id, oracleIds) {
+      const deck = await get(id);
+      if (!deck) return null;
+      if (!oracleIds.every((o) => deck.cards.some((c) => c.oracleId === o))) throw new NotOnDeck();
+      await db
+        .prepare('UPDATE deck_cards SET commander = oracle_id IN (SELECT value FROM json_each(?2)) WHERE deck_id = ?1')
+        .bind(id, JSON.stringify(oracleIds))
+        .run();
+      return get(id);
+    },
+
+    async fixLine(id, line, text) {
+      const unmatched = await unmatchedOf(id);
+      if (!unmatched) return null;
+      const rest = withoutLine(unmatched, line);
+
+      const parsed = parseDeckList(text);
+      const cardLine = parsed.lines.length === 1 && parsed.unreadable.length === 0 ? parsed.lines[0]! : null;
+      const card = cardLine ? (await cards.resolve([requestFor(cardLine)]))[0] : null;
+
+      if (!cardLine || !card) {
+        const still: UnmatchedLine = { text: text.trim(), reason: cardLine ? 'not-found' : 'unreadable' };
+        await setUnmatched(id, unmatched.map((u, i) => (i === line.index ? still : u))).run();
+      } else {
+        await db.batch([
+          setUnmatched(id, rest),
+          db.prepare(APPEND_CARD).bind(id, card.oracleId, card.scryfallId, cardLine.quantity, cardLine.commander ? 1 : 0),
+        ]);
+      }
+      return get(id);
+    },
+
+    async skipLine(id, line) {
+      const unmatched = await unmatchedOf(id);
+      if (!unmatched) return null;
+      await setUnmatched(id, withoutLine(unmatched, line)).run();
+      return get(id);
+    },
   };
 }

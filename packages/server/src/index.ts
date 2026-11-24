@@ -35,7 +35,9 @@ export default {
     if (decks) {
       const now = () => new Date();
       const cards = createCardStore({ db: env.DB, fetch, sleep: (ms) => new Promise((r) => setTimeout(r, ms)), now });
-      return handleDecks(request, decks[1], createDeckStore({ db: env.DB, cards, now, newId: () => crypto.randomUUID() }));
+      const store = createDeckStore({ db: env.DB, cards, now, newId: () => crypto.randomUUID() });
+      const lineIndex = decks[2] === undefined ? undefined : Number(decks[2]);
+      return handleDecks(request, decks[1], lineIndex, store);
     }
 
     const match = GAME.exec(url.pathname);
