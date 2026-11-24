@@ -1,6 +1,7 @@
-import { Link, useParams } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 import { Logo } from '../icons.js';
 import { BoardScreen } from './BoardScreen.js';
+import { DebugPanel } from './DebugPanel.js';
 import { JoinScreen } from './lobby/JoinScreen.js';
 import { LateScreen } from './lobby/LateScreen.js';
 import { LobbyScreen } from './lobby/LobbyScreen.js';
@@ -16,9 +17,11 @@ export function GamePage() {
 /** Keyed by the code, so moving straight to another game starts its connection and seat memory afresh. */
 function GameSession({ code }: { code: string }) {
   const game = useGame(code);
+  const debug = new URLSearchParams(useLocation().search).has('debug');
   return (
     <>
       <Screen code={code} game={game} />
+      {debug && <DebugPanel game={game} />}
       <Toast message={game.error} />
     </>
   );
