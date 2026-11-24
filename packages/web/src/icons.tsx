@@ -67,6 +67,18 @@ export const Back = () => (
   </svg>
 );
 
+export const Forward = () => (
+  <svg width="22" height="22" viewBox="0 0 22 22" {...icon({ strokeWidth: 2 })}>
+    <path d="M8 5l6 6-6 6" />
+  </svg>
+);
+
+export const Close = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" {...icon({ strokeWidth: 2 })}>
+    <path d="M5 5l10 10M15 5L5 15" />
+  </svg>
+);
+
 export const SearchIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" {...icon({ stroke: 'var(--text-3)' })}>
     <circle cx="8" cy="8" r="5.5" />

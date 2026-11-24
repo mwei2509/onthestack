@@ -47,3 +47,29 @@ export function IdentityWash({ identity, strength = 0.16 }: { identity: string[]
     .join(', ');
   return <span className="wash" style={{ '--wash': wash } as CSSProperties} aria-hidden />;
 }
+
+/**
+ * A mana cost as the canvas draws it: a coloured gem per coloured symbol (original shapes, not the mana symbols,
+ * ADR 0081) and a numbered disc for everything else, `{2}`, `{X}` or a hybrid like `{W/U}`.
+ */
+export function ManaCost({ cost, size = 14 }: { cost: string; size?: number }) {
+  const symbols = (cost.match(/\{[^}]+\}/g) ?? []).map((s) => s.slice(1, -1));
+  if (symbols.length === 0) return null;
+  return (
+    <span className="mana-cost" role="img" aria-label={`Costs ${symbols.join(' ')}`}>
+      {symbols.map((s, i) =>
+        s in HUE ? (
+          <span
+            key={i}
+            className="pip"
+            style={{ width: size, height: size, background: `radial-gradient(circle at 35% 30%, ${HUE[s as Colour][0]}, ${HUE[s as Colour][1]} 55%, ${HUE[s as Colour][2]})` }}
+          />
+        ) : (
+          <span key={i} className="pip generic" style={{ minWidth: size, height: size, fontSize: Math.round(size * 0.62) }}>
+            {s}
+          </span>
+        ),
+      )}
+    </span>
+  );
+}
