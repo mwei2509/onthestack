@@ -2,6 +2,7 @@ import type { SeatView } from '@onthestack/server/protocol';
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { CopyIcon, Logo, ShareIcon } from '../icons.js';
 import { IdentityWash } from '../decks/identity.js';
+import { formatJoinCode } from './joinCode.js';
 import { initial } from './seats.js';
 import type { Connection } from './useGame.js';
 
@@ -55,7 +56,7 @@ export function SeatDot({ seat }: { seat: SeatView }) {
 
 export const gameLink = (code: string) => `${location.origin}/g/${code}`;
 
-export function Invite({ code, note }: { code: string; note?: string }) {
+export function Invite({ code, joinCode, note }: { code: string; joinCode: string | null; note?: string }) {
   const link = gameLink(code);
   const [copied, setCopied] = useState(false);
   const copy = async () => {
@@ -76,6 +77,19 @@ export function Invite({ code, note }: { code: string; note?: string }) {
         </h2>
         {note && <span className="faint" style={{ fontSize: 13 }}>{note}</span>}
       </div>
+      {joinCode && (
+        <div className="join-code-box">
+          <span className="faint" style={{ fontSize: 13 }}>
+            Join code
+          </span>
+          <span className="join-code" aria-label={`Join code ${joinCode.split('').join(' ')}`}>
+            {formatJoinCode(joinCode)}
+          </span>
+          <span className="faint" style={{ fontSize: 13 }}>
+            On Home, tap Join game
+          </span>
+        </div>
+      )}
       <div className="link-box">
         <span>{link.replace(/^https?:\/\//, '')}</span>
         <button aria-label={copied ? 'Link copied' : 'Copy link'} onClick={copy}>

@@ -1,5 +1,6 @@
 import { Logo } from '../../icons.js';
 import { Avatar, ConnectionPill, gameLink, SeatDot, SeatWash } from '../parts.js';
+import { formatJoinCode } from '../joinCode.js';
 import { seatLooks, type SeatLook } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
 import { useState } from 'react';
@@ -43,12 +44,26 @@ export function SharedLobby({ code, game, update }: ScreenProps) {
           <h2 className="display" style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>
             Join on your phone
           </h2>
-          <span className="muted" style={{ fontSize: 15 }}>
-            {link.slice(0, link.length - code.length)}
-          </span>
-          <span className="big-code">{code}</span>
+          {update.joinCode ? (
+            <>
+              <span className="muted" style={{ fontSize: 15 }}>
+                Tap Join game and type
+              </span>
+              <span className="big-code join-digits">{formatJoinCode(update.joinCode)}</span>
+              <span className="faint" style={{ fontSize: 14 }}>
+                or open {link}
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="muted" style={{ fontSize: 15 }}>
+                {link.slice(0, link.length - code.length)}
+              </span>
+              <span className="big-code">{code}</span>
+            </>
+          )}
           <p className="faint" style={{ margin: 0, fontSize: 14, lineHeight: 1.4 }}>
-            Phone died? Open the link again and tap “That's me”.
+            Phone died? Join again and tap “That's me”.
           </p>
         </section>
 

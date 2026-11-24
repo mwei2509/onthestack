@@ -119,7 +119,7 @@ export function JoinScreen({ code, game, update }: ScreenProps) {
       </section>
 
       <div style={{ marginTop: 'auto' }}>
-        <Invite code={code} />
+        <Invite code={code} joinCode={update.joinCode} />
       </div>
     </div>
   );
