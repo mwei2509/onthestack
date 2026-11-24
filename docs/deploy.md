@@ -23,6 +23,10 @@ Do these before the first deploy. Until the secrets exist, the `deploy` job fail
 - To redeploy `main` without a new commit: Actions → CI → Run workflow.
 - To roll back: `pnpm --filter @onthestack/server exec wrangler rollback` (after `wrangler login`), or revert the merge.
 
+## Pull request Previews
+
+Each pull request from a branch in this repo gets a Cloudflare Preview named `pr-<number>` from `.github/workflows/preview.yml` (ADR 0062). A comment on the PR links it, and it is updated on every push and deleted when the PR closes. A Preview has its own Durable Objects, so its games are separate from production. Forks and a repo without the secrets above get no Preview, and the job passes. Previews only get a URL once `main` has been deployed, since `preview_urls` in `wrangler.jsonc` is applied by `wrangler deploy`; before that the job fails with "This Preview deployment has no active URLs". To delete one by hand: `pnpm --filter @onthestack/server exec wrangler preview delete --name pr-<number>`.
+
 ## Checking a deploy
 
 ```sh
