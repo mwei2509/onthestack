@@ -85,6 +85,7 @@ export function useGame(code: string): GameConnection {
           }
           return setError(message.message);
         }
+        if (message.type === 'debugLog') return;
         if (message.version < version) return;
         version = message.version;
         if (message.you) claiming = false;

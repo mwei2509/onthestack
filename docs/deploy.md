@@ -45,3 +45,11 @@ The web app has no game-socket UI yet. To check that a socket connects over mobi
 ```sh
 npx wscat -c wss://onthestack.gg/api/games/smoke-test/ws   # < {"type":"state","state":null}
 ```
+
+## Interpretation logs
+
+Every interpretation logs one line with `message: "interpretation"` (ADR 0108): the game, turn, the user message sent, the raw answer or error, tokens and latency. The system prompt is logged only as `promptVersion`, a hash of the text in `packages/interpreter/src/prompt.ts` at that deploy.
+
+- **History:** Cloudflare dashboard → Workers & Pages → `onthestack` → Logs, filtered on `message = interpretation` and, for one game, `game = <code>`. Kept for 3 days on the free plan (7 from 2026-12-01).
+- **Live:** `pnpm --filter @onthestack/server exec wrangler tail --format pretty` (needs `wrangler login`).
+- **At the table:** open the game with `?debug` for its last 10 interpretations (ADR 0109).

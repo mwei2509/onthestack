@@ -48,5 +48,7 @@
       { "name": "AUTH_LIMITER", "namespace_id": "1002", "simple": { "limit": 10, "period": 60 } }
     ]
   },
+  // Workers Logs: each interpretation's log line (ADR 0108). Free within the Workers Free plan's daily allowance.
+  "observability": { "enabled": true },
   "dev": { "port": 8790 }
 }
