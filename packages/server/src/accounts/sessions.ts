@@ -31,7 +31,7 @@ export async function startSession(db: D1Database, accountId: string, now: Date)
   return token;
 }
 
-/** The session a token belongs to, renewed if it was last renewed over a day ago (ADR 0101); null once expired. */
+/** The session a token belongs to, renewed if it was last renewed over a day ago (ADR 0104); null once expired. */
 export async function findSession(db: D1Database, token: string, now: Date): Promise<Session | null> {
   const tokenHash = await hash(token);
   const row = await db
