@@ -40,6 +40,24 @@ export const questions: EvalCase[] = [
     },
   },
   {
+    id: 'answer-settles-a-question',
+    checks: 'a short answer to an open question settles it: the target is read and the question is dropped (ADR 0068)',
+    turnStart: table('theo', [before('michael', { type: 'cast', card: 'Grizzly Bears' }), before('melissa', { type: 'cast', card: 'Grizzly Bears' })]),
+    openQuestions: [{ kind: 'chooseObjects', askPlayer: 'theo', text: 'Which Grizzly Bears, Michael’s or Melissa’s?', about: ['s1'] }],
+    statements: conversation(['theo', 'Murder the Bears.'], ['theo', "Michael's."]),
+    currentStep: 'main1',
+    expected: {
+      entries: [
+        entry('main1', 'theo', {
+          type: 'cast',
+          card: 'Murder',
+          targets: [{ card: 'Grizzly Bears', controller: 'michael' }],
+          effects: [{ type: 'move', object: { card: 'Grizzly Bears', controller: 'michael' }, to: 'graveyard', how: 'destroy' }],
+        }, ['s1', 's2']),
+      ],
+    },
+  },
+  {
     id: 'no-question-when-clear',
     checks: 'a slightly misspoken name with only one match is read, not asked about',
     turnStart: table('theo'),

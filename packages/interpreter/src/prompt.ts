@@ -1,6 +1,6 @@
 import { stats, STEPS, type CardName, type GameState, type PlayerStatement, type Step } from '@onthestack/engine';
 import type { PinnedEntry } from './resolve.js';
-import { QUESTION_KINDS } from './schema.js';
+import { QUESTION_KINDS, type InterpretedQuestion } from './schema.js';
 
 export interface PromptInput {
   /** The board when the turn began; the interpreter re-reads the whole turn from here (ADR 0015). */
@@ -13,6 +13,8 @@ export interface PromptInput {
   oracleText?: (card: CardName) => string | undefined;
   /** What players recorded by tapping on the board this turn; already in the record (ADR 0065). */
   pinned?: PinnedEntry[];
+  /** Questions from the last reading that players can see and may be answering now (ADR 0043, 0068). */
+  openQuestions?: InterpretedQuestion[];
 }
 
 export interface Prompt {
@@ -61,7 +63,7 @@ Never guess. If you can't tell what a player meant, leave out only that part, ke
 
 Return JSON only, matching the schema.`;
 
-function userMessage({ turnStart, statements, currentStep, oracleText, pinned }: PromptInput): string {
+function userMessage({ turnStart, statements, currentStep, oracleText, pinned, openQuestions }: PromptInput): string {
   const sections = [
     `Turn ${turnStart.turn.number}. Active player: ${turnStart.turn.activePlayerId}. The table is now in: ${currentStep}.`,
     `Seats, in turn order:\n${turnStart.turnOrder.map((id) => seat(turnStart, id)).join('\n')}`,
@@ -69,6 +71,7 @@ function userMessage({ turnStart, statements, currentStep, oracleText, pinned }:
     `Cards in this game:\n${cardList(turnStart, oracleText)}`,
     `What players said this turn, in order:\n${transcript(turnStart, statements)}`,
   ];
+  if (openQuestions?.length) sections.push(`Questions you asked last time, still open (a later statement may answer one):\n${asked(turnStart, openQuestions)}`);
   if (pinned?.length) sections.push(`Already recorded by a tap on the board (never add these):\n${tapped(turnStart, statements, pinned)}`);
   return sections.join('\n\n');
 }
@@ -140,6 +143,15 @@ function tapped(state: GameState, statements: PlayerStatement[], pinned: PinnedE
       const a = entry.gameAction;
       const what = a.type === 'life' ? `${a.playerId} ${a.delta > 0 ? 'gained' : 'lost'} ${Math.abs(a.delta)} life` : JSON.stringify(a);
       return `- ${what} (tapped by ${who}, ${when}, in ${entry.step})`;
+    })
+    .join('\n');
+}
+
+function asked(state: GameState, questions: InterpretedQuestion[]): string {
+  return questions
+    .map((q) => {
+      const options = q.options?.length ? ` Options: ${q.options.join(' / ')}.` : '';
+      return `- To ${state.players[q.askPlayer]?.name ?? q.askPlayer} (${q.askPlayer}), about [${q.about.join(', ')}], ${q.kind}: "${q.text}"${options}`;
     })
     .join('\n');
 }

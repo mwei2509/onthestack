@@ -74,4 +74,17 @@ describe('buildPrompt', () => {
     expect(prompt.system).toContain('never add an entry for them');
     expect(prompt.user).not.toContain('Already recorded');
   });
+
+  it('lists the questions players were shown, so a short answer can settle one (ADR 0068)', () => {
+    const withQuestion = buildPrompt({
+      turnStart,
+      statements,
+      currentStep: 'declareBlockers',
+      openQuestions: [{ kind: 'chooseOption', askPlayer: 'melissa', text: 'Did you say Serra Angel or Savannah Lions?', about: ['s2'], options: ['Serra Angel', 'Savannah Lions'] }],
+    });
+    expect(withQuestion.user).toContain(
+      'Questions you asked last time, still open (a later statement may answer one):\n- To Melissa (melissa), about [s2], chooseOption: "Did you say Serra Angel or Savannah Lions?" Options: Serra Angel / Savannah Lions.',
+    );
+    expect(prompt.user).not.toContain('Questions you asked');
+  });
 });

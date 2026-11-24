@@ -12,6 +12,8 @@ export interface EvalCase {
   currentStep: Step;
   /** Actions tapped on the board this turn, already in the record (ADR 0065). */
   pinned?: PinnedEntry[];
+  /** Questions players were shown after the last reading (ADR 0068). */
+  openQuestions?: InterpretedQuestion[];
   expected: {
     entries: TimelineEntry[];
     /** Questions the interpreter should ask instead of guessing (ADR 0043). Matched on kind, player and statements. */

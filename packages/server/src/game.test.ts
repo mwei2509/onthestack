@@ -708,3 +708,24 @@ describe("The turn's log (ADR 0106)", () => {
     expect(await game.devices[0]!.next()).toEqual({ type: 'error', message: 'Nothing has been said yet' });
   });
 });
+
+describe("The reading's questions (ADR 0068)", () => {
+  it('shows a question on every screen and tells the interpreter about it next time, until an answer settles it', async () => {
+    const game = await interpreting();
+    const question = { kind: 'yesNo', askPlayer: 'p2', text: 'Elena, did you lose 3 life?', about: ['s1'] };
+    await game.say(0, 'Elena loses 3 life, I think');
+    (await game.call(0)).answer({ entries: [], questions: [question] });
+    const updates = [];
+    for (const d of game.devices) updates.push(await d.update());
+    for (const u of updates) expect(u.log!.questions).toEqual([question]);
+
+    await game.say(1, 'Yes');
+    const next = await game.call(1);
+    expect(next.user).toContain('Questions you asked last time, still open (a later statement may answer one):\n- To Elena (p2), about [s1], yesNo: "Elena, did you lose 3 life?"');
+    next.answer(reading('s1', 's2'));
+    const after = [];
+    for (const d of game.devices) after.push(await d.update());
+    expect(after[0]!.log!.questions).toEqual([]);
+    expect(after[0]!.view!.players.p2!.life).toBe(37);
+  });
+});
