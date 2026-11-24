@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { claimJoinCode, findGameByJoinCode, IDLE_MS, touchJoinCode } from './joinCodes.js';
+import { claimJoinCode, findGameByJoinCode, IDLE_MS, retireJoinCode, touchJoinCode } from './joinCodes.js';
 
 const t0 = new Date('2026-11-24T12:00:00Z');
 const later = (ms: number) => new Date(t0.getTime() + ms);
@@ -39,5 +39,15 @@ describe('join codes', () => {
     expect(await touchJoinCode(env.DB, '000001', 'KITE-MOSS-42', later(IDLE_MS - 1000))).toBe(true);
     expect(await findGameByJoinCode(env.DB, '000001', later(IDLE_MS + 1000))).toBe('KITE-MOSS-42');
     expect(await claimJoinCode(env.DB, 'WOLF-REED-07', later(IDLE_MS + 1000), always(1))).toBeNull();
+  });
+
+  it('retires a code at once when its game ends, so a new game can have it (ADR 0101)', async () => {
+    await claimJoinCode(env.DB, 'KITE-MOSS-42', t0, always(1));
+    await retireJoinCode(env.DB, '000001', 'WOLF-REED-07');
+    expect(await findGameByJoinCode(env.DB, '000001', t0)).toBe('KITE-MOSS-42');
+    await retireJoinCode(env.DB, '000001', 'KITE-MOSS-42');
+    expect(await findGameByJoinCode(env.DB, '000001', t0)).toBeNull();
+    expect(await touchJoinCode(env.DB, '000001', 'KITE-MOSS-42', t0)).toBe(false);
+    expect(await claimJoinCode(env.DB, 'WOLF-REED-07', t0, always(1))).toBe('000001');
   });
 });

@@ -24,6 +24,8 @@ export const DeviceMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('jumpToStep'), from: step, to: z.union([step, z.literal('endTurn')]) }),
   /** A PlayerStatement typed on a seated device; "I" is that seat's player (ADR 0069). */
   z.object({ type: z.literal('statement'), text: z.string().trim().min(1, 'Say what happened first').max(500, 'Statements are at most 500 characters') }),
+  /** Ends the game for everyone, after the device's confirm (ADR 0092, 0101). */
+  z.object({ type: z.literal('end') }),
 ]);
 export type DeviceMessage = z.infer<typeof DeviceMessage>;
 
@@ -35,6 +37,13 @@ export interface SeatView {
   connected: boolean;
 }
 
+/** When a game ended, in which turn, and the seat that ended it; null for the shared screen (ADR 0101). */
+export interface Ended {
+  at: string;
+  turn: number;
+  by: string | null;
+}
+
 export type ServerMessage =
   | {
       type: 'update';
@@ -44,6 +53,7 @@ export type ServerMessage =
       you: string | null;
       seats: SeatView[];
       started: boolean;
+      ended: Ended | null;
       /** The six-digit code for Join game, until it's retired (ADR 0095). */
       joinCode: string | null;
       /** What every screen shows, once the game has started. */
