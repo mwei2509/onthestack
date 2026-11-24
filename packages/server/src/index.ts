@@ -1,3 +1,4 @@
+import { AUTOCOMPLETE_PATH, handleAutocomplete } from './cards/autocomplete.js';
 import { IMAGE_PATH, serveImage } from './cards/images.js';
 import { createCardStore } from './cards/store.js';
 import { GAME_CODE, newGameCode } from './codes.js';
@@ -30,6 +31,8 @@ export default {
     if (image?.[1] && request.method === 'GET') {
       return serveImage(image[1], image[2] !== undefined, { db: env.DB, bucket: env.IMAGES, fetch });
     }
+
+    if (url.pathname === AUTOCOMPLETE_PATH && request.method === 'GET') return handleAutocomplete(request, fetch);
 
     const decks = DECKS_PATH.exec(url.pathname);
     if (decks) {

@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #72)
 
+Amended by ADR 0082 (fixing a line suggests names from Scryfall) and ADR 0083 (how the commander is picked).
+
 Refines ADR 0049. Importing a Deck saves it straight away with every card that matched. Nothing waits on a review step, so a Deck is never half imported.
 
 - **Unmatched lines** (a line that can't be read, or that names a card or printing the card store can't find) are kept on the Deck, in the order they appeared. On the Deck's page each one can be edited and matched again, or skipped, which drops it.
