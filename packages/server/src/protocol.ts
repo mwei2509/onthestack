@@ -22,6 +22,8 @@ export const DeviceMessage = z.discriminatedUnion('type', [
   /** `from` is the Step the device saw, so two screens pressing at once move one Step, not two. */
   z.object({ type: z.literal('nextStep'), from: step }),
   z.object({ type: z.literal('jumpToStep'), from: step, to: z.union([step, z.literal('endTurn')]) }),
+  /** A PlayerStatement typed on a seated device; "I" is that seat's player (ADR 0069). */
+  z.object({ type: z.literal('statement'), text: z.string().trim().min(1, 'Say what happened first').max(500, 'Statements are at most 500 characters') }),
 ]);
 export type DeviceMessage = z.infer<typeof DeviceMessage>;
 
