@@ -1,0 +1,202 @@
+[
+  {
+    "object": "card",
+    "id": "fc817e07-c1f3-469f-9cf7-0945dea7400f",
+    "oracle_id": "6ad8011d-3471-4369-9d68-b264cc027487",
+    "name": "Sol Ring",
+    "lang": "en",
+    "layout": "normal",
+    "set": "trc",
+    "collector_number": "499",
+    "mana_cost": "{1}",
+    "cmc": 1.0,
+    "type_line": "Artifact",
+    "oracle_text": "{T}: Add {C}{C}.",
+    "keywords": [],
+    "colors": [],
+    "color_identity": [],
+    "image_uris": {
+      "normal": "https://cards.scryfall.io/normal/front/f/c/fc817e07-c1f3-469f-9cf7-0945dea7400f.jpg?1793021181",
+      "grid": "https://cards.scryfall.io/grid/front/f/c/fc817e07-c1f3-469f-9cf7-0945dea7400f.webp?1793021181"
+    },
+    "image_status": "highres_scan",
+    "artist": "Hector Ortiz",
+    "rarity": "uncommon",
+    "prices": {
+      "usd": "1.16",
+      "usd_foil": null,
+      "usd_etched": null,
+      "eur": "0.83",
+      "eur_foil": null,
+      "tix": "0.04"
+    }
+  },
+  {
+    "object": "card",
+    "id": "27beed9c-a42e-46de-8fbc-885da337ae75",
+    "oracle_id": "b1c56e23-eae6-47a1-a1cd-3a2d01621768",
+    "name": "Vona, Butcher of Magan",
+    "lang": "en",
+    "layout": "normal",
+    "set": "lcc",
+    "collector_number": "293",
+    "mana_cost": "{3}{W}{B}",
+    "cmc": 5.0,
+    "type_line": "Legendary Creature — Vampire Knight",
+    "oracle_text": "Vigilance, lifelink\n{T}, Pay 7 life: Destroy target nonland permanent. Activate only during your turn.",
+    "power": "4",
+    "toughness": "4",
+    "keywords": [
+      "Lifelink",
+      "Vigilance"
+    ],
+    "colors": [
+      "B",
+      "W"
+    ],
+    "color_identity": [
+      "B",
+      "W"
+    ],
+    "image_uris": {
+      "normal": "https://cards.scryfall.io/normal/front/2/7/27beed9c-a42e-46de-8fbc-885da337ae75.jpg?1783913842",
+      "grid": "https://cards.scryfall.io/grid/front/2/7/27beed9c-a42e-46de-8fbc-885da337ae75.webp?1783913842"
+    },
+    "image_status": "highres_scan",
+    "artist": "Volkan Baǵa",
+    "rarity": "mythic",
+    "prices": {
+      "usd": "0.35",
+      "usd_foil": null,
+      "usd_etched": null,
+      "eur": "0.36",
+      "eur_foil": null,
+      "tix": "0.06"
+    }
+  },
+  {
+    "object": "card",
+    "id": "d24c3d51-795d-4c01-a34a-3280fccd2d78",
+    "oracle_id": "1c633e02-95ef-445e-b4e0-fbfbc5ed9cc9",
+    "name": "Brightclimb Pathway // Grimclimb Pathway",
+    "lang": "en",
+    "layout": "modal_dfc",
+    "set": "znr",
+    "collector_number": "259",
+    "cmc": 0.0,
+    "type_line": "Land // Land",
+    "keywords": [],
+    "color_identity": [
+      "B",
+      "W"
+    ],
+    "card_faces": [
+      {
+        "object": "card_face",
+        "name": "Brightclimb Pathway",
+        "mana_cost": "",
+        "type_line": "Land",
+        "oracle_text": "{T}: Add {W}.",
+        "colors": [],
+        "artist": "Johannes Voss",
+        "image_uris": {
+          "normal": "https://cards.scryfall.io/normal/front/d/2/d24c3d51-795d-4c01-a34a-3280fccd2d78.jpg?1783929313",
+          "grid": "https://cards.scryfall.io/grid/front/d/2/d24c3d51-795d-4c01-a34a-3280fccd2d78.webp?1783929313"
+        },
+        "flavor_text": "\"Why risk life and limb exploring the wilds? For this.\"\n—Yavotz, Sea Gate Expeditionary House"
+      },
+      {
+        "object": "card_face",
+        "name": "Grimclimb Pathway",
+        "mana_cost": "",
+        "type_line": "Land",
+        "oracle_text": "{T}: Add {B}.",
+        "colors": [],
+        "artist": "Johannes Voss",
+        "image_uris": {
+          "normal": "https://cards.scryfall.io/normal/back/d/2/d24c3d51-795d-4c01-a34a-3280fccd2d78.jpg?1783929313",
+          "grid": "https://cards.scryfall.io/grid/back/d/2/d24c3d51-795d-4c01-a34a-3280fccd2d78.webp?1783929313"
+        },
+        "flavor_text": "\"My mother wanted me to take over the family dry goods business, but no. I had to come here.\"\n—Yavotz, Sea Gate Expeditionary House"
+      }
+    ],
+    "image_status": "highres_scan",
+    "artist": "Johannes Voss",
+    "rarity": "rare",
+    "prices": {
+      "usd": "4.74",
+      "usd_foil": "4.26",
+      "usd_etched": null,
+      "eur": "4.45",
+      "eur_foil": "4.77",
+      "tix": "0.03"
+    }
+  },
+  {
+    "object": "card",
+    "id": "6904ea20-e504-47da-95a0-08739fdde260",
+    "oracle_id": "edd531b9-f615-4399-8c8c-1c5e18c4acbf",
+    "name": "Delver of Secrets // Insectile Aberration",
+    "lang": "en",
+    "layout": "transform",
+    "set": "inr",
+    "collector_number": "60",
+    "cmc": 1.0,
+    "type_line": "Creature — Human Wizard // Creature — Human Insect",
+    "keywords": [
+      "Flying",
+      "Transform"
+    ],
+    "color_identity": [
+      "U"
+    ],
+    "card_faces": [
+      {
+        "object": "card_face",
+        "name": "Delver of Secrets",
+        "mana_cost": "{U}",
+        "type_line": "Creature — Human Wizard",
+        "oracle_text": "At the beginning of your upkeep, look at the top card of your library. You may reveal that card. If an instant or sorcery card is revealed this way, transform this creature.",
+        "power": "1",
+        "toughness": "1",
+        "colors": [
+          "U"
+        ],
+        "artist": "Nils Hamm",
+        "image_uris": {
+          "normal": "https://cards.scryfall.io/normal/front/6/9/6904ea20-e504-47da-95a0-08739fdde260.jpg?1783908173",
+          "grid": "https://cards.scryfall.io/grid/front/6/9/6904ea20-e504-47da-95a0-08739fdde260.webp?1783908173"
+        }
+      },
+      {
+        "object": "card_face",
+        "name": "Insectile Aberration",
+        "mana_cost": "",
+        "type_line": "Creature — Human Insect",
+        "oracle_text": "Flying",
+        "power": "3",
+        "toughness": "2",
+        "colors": [
+          "U"
+        ],
+        "artist": "Nils Hamm",
+        "image_uris": {
+          "normal": "https://cards.scryfall.io/normal/back/6/9/6904ea20-e504-47da-95a0-08739fdde260.jpg?1783908173",
+          "grid": "https://cards.scryfall.io/grid/back/6/9/6904ea20-e504-47da-95a0-08739fdde260.webp?1783908173"
+        },
+        "flavor_text": "\"Unfortunately, all my test animals have died or escaped, so I shall be the final subject. I feel no fear. This is a momentous night.\"\n—Laboratory notes, final entry"
+      }
+    ],
+    "image_status": "highres_scan",
+    "artist": "Nils Hamm",
+    "rarity": "common",
+    "prices": {
+      "usd": "0.29",
+      "usd_foil": "0.33",
+      "usd_etched": null,
+      "eur": "0.49",
+      "eur_foil": "0.56",
+      "tix": "0.04"
+    }
+  }
+]
