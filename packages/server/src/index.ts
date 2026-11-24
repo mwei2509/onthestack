@@ -1,3 +1,4 @@
+import { ACCOUNT_PATH, handleAccount } from './accounts/routes.js';
 import { AUTOCOMPLETE_PATH, handleAutocomplete } from './cards/autocomplete.js';
 import { IMAGE_PATH, serveImage } from './cards/images.js';
 import { createCardStore } from './cards/store.js';
@@ -42,6 +43,9 @@ export default {
     }
 
     if (url.pathname === AUTOCOMPLETE_PATH && request.method === 'GET') return handleAutocomplete(request, fetch);
+
+    const account = ACCOUNT_PATH.exec(url.pathname);
+    if (account) return handleAccount(request, account[1], { db: env.DB, now: () => new Date() });
 
     const decks = DECKS_PATH.exec(url.pathname);
     if (decks) {
