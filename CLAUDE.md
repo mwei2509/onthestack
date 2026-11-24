@@ -12,6 +12,7 @@ On the maintainer's machine `stx` is a shell function from a personal CLI kept o
 | ------- | ----------- |
 | `stx claude [-o \| -e] [args…]` | Launch Claude Code in the current worktree, or the main clone from anywhere else (`-o` skip permissions, `-e` accept edits). Other args pass through. |
 | `stx wt <branch>` | Create the worktree if missing, otherwise enter it. Worktrees live in `../onthestack-worktrees/`. |
+| `stx wt create <branch> --print-path` | What agents run: creates the worktree (from `origin/main`, or checks out an existing branch), installs, and prints its path instead of entering it. |
 | `stx wt go \| rm \| list \| prune <…>` | Enter, remove, list, or prune worktrees whose branches have merged. |
 | `stx stack sync [-n]` | After a PR in a stack merges, rebase every branch above it and force-push them. See `.claude/rules/pull-requests.md`. |
 | `stx start [--no-open]` | (`packages/cli`) Run the local Worker (:8790) and Vite (:5190) in a new iTerm2 tab split into two panes (inline with prefixed output elsewhere), then open the browser. Offers to stop whatever already holds those ports. |
@@ -40,6 +41,7 @@ These come from the proposal as amended by `docs/adr/`, and override reasoning f
 
 ## Engineering expectations
 
+- Every piece of work, however small, starts in its own worktree made with `stx wt create <branch> --print-path`, and every edit, build and commit happens under the path it prints. The main clone stays on `main` and is never edited. See `.claude/rules/worktrees.md`.
 - Engine code stays pure and side-effect free, so it can be property-tested with fast-check. Lint enforces this in `packages/engine` (`eslint.config.mjs`); pass time, ids and randomness in as inputs.
 - Tests sit next to the code they cover as `*.test.ts` in `src/`, in every package.
 - Interpreter changes come with eval cases (conversation + board → expected timeline). Card Translation changes come with eval cases (Oracle text → expected Translation).
