@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     "./protocol": "./src/protocol.ts",
-    "./decks": "./src/decks/store.ts",
+    "./decks": "./src/decks/api.ts",
     "./decks/parse": "./src/decks/parse.ts"
   },
   "scripts": {
