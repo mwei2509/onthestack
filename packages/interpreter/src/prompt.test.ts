@@ -88,3 +88,13 @@ describe('buildPrompt', () => {
     expect(prompt.user).not.toContain('Questions you asked');
   });
 });
+
+describe('the prompt version', () => {
+  it('names the system prompt, not the turn', () => {
+    const a = buildPrompt({ turnStart: createGame([{ id: 'p1', name: 'Theo' }]), statements: [], currentStep: 'upkeep' });
+    const b = buildPrompt({ turnStart: createGame([{ id: 'p2', name: 'Elena' }]), statements: [], currentStep: 'main1' });
+    expect(a.version).toMatch(/^[0-9a-f]{8}$/);
+    expect(b.version).toBe(a.version);
+    expect(b.user).not.toBe(a.user);
+  });
+});
