@@ -1,6 +1,6 @@
 import type { DeviceMessage, ServerMessage } from '@onthestack/server/protocol';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { afterClaimRefused, afterUpdate, loadMemory, onOpen, saveMemory, type SeatMemory } from './seatMemory.js';
+import { afterClaimRefused, afterUpdate, loadMemory, onOpen, sameMemory, saveMemory, type SeatMemory } from './seatMemory.js';
 
 export type Update = Extract<ServerMessage, { type: 'update' }>;
 export type Connection = 'connecting' | 'open' | 'reconnecting' | 'missing';
@@ -35,6 +35,7 @@ export function useGame(code: string): GameConnection {
 
   const setMemory = useCallback(
     (next: SeatMemory) => {
+      if (sameMemory(memoryRef.current, next)) return;
       memoryRef.current = next;
       saveMemory(code, next);
       setMemoryState(next);
@@ -48,12 +49,20 @@ export function useGame(code: string): GameConnection {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let version = 0;
 
-    const connect = async () => {
-      if (attempt === 0) {
-        const res = await fetch(`/api/games/${encodeURIComponent(code)}`).catch(() => null);
-        if (closed) return;
-        if (res?.status === 404) return setConnection('missing');
-      }
+    // A browser can't read why a WebSocket upgrade failed, so a missing game is detected by a plain request, sent
+    // alongside the first socket rather than before it.
+    void fetch(`/api/games/${encodeURIComponent(code)}`)
+      .then((res) => {
+        if (res.status !== 404 || closed) return;
+        closed = true;
+        clearTimeout(timer);
+        socket.current?.close();
+        setConnection('missing');
+      })
+      .catch(() => undefined);
+
+    const connect = () => {
+      if (closed) return;
       const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/games/${encodeURIComponent(code)}/ws`);
       socket.current = ws;
       let heldBefore: string | null = null;
@@ -95,9 +104,9 @@ export function useGame(code: string): GameConnection {
     retryNow.current = () => {
       if (socket.current || closed) return;
       clearTimeout(timer);
-      void connect();
+      connect();
     };
-    void connect();
+    connect();
     return () => {
       closed = true;
       clearTimeout(timer);

@@ -1,5 +1,5 @@
 import type { SeatView } from '@onthestack/server/protocol';
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { EditIcon, Grip, ShareIcon } from '../../icons.js';
 import { Avatar, gameLink, Invite, GameHeader, SeatDot, SeatWash } from '../parts.js';
 import { moved, seatColours } from '../seats.js';
@@ -160,13 +160,13 @@ function SeatRow({ seat, colour, you, dragging, editing, onEdit, onDone, game, g
 /** Drag a seat by its grip (pointer events, so it works with touch), or move it with the arrow keys. */
 function useSeatDrag(seats: SeatView[], commit: (seatIds: string[]) => void) {
   const listRef = useRef<HTMLOListElement>(null);
-  const [dragOrder, setDragOrder] = useState<string[] | null>(null);
+  /** A local order, kept only while the server's order is still the one it started from. */
+  const [local, setLocal] = useState<{ from: string; order: string[] } | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const ids = seats.map((s) => s.id);
-  const order = dragOrder && dragOrder.length === ids.length && ids.every((id) => dragOrder.includes(id)) ? dragOrder : ids;
   const serverOrder = ids.join();
-
-  useEffect(() => setDragOrder(null), [serverOrder]);
+  const order = local && local.from === serverOrder ? local.order : ids;
+  const setDragOrder = (next: string[] | null) => setLocal(next && { from: serverOrder, order: next });
 
   const indexAt = (y: number, id: string) => {
     const rows = [...(listRef.current?.querySelectorAll<HTMLElement>('[data-seat]') ?? [])].filter((r) => r.dataset.seat !== id);

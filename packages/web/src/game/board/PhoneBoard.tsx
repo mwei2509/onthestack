@@ -1,5 +1,5 @@
 import type { TableView } from '@onthestack/engine';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Avatar, SeatWash } from '../parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { createTapCombiner } from './lifeTaps.js';
@@ -94,9 +94,8 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
 
 function YourSeat({ me, players, game, disabled, large }: { me: BoardPlayer; players: Record<string, BoardPlayer>; game: ScreenProps['game']; disabled: boolean; large: boolean }) {
   const [pending, setPending] = useState(0);
-  const sendRef = useRef(game.send);
-  sendRef.current = game.send;
-  const taps = useMemo(() => createTapCombiner((delta) => sendRef.current({ type: 'adjustLife', delta }), setPending), []);
+  const { send } = game;
+  const [taps] = useState(() => createTapCombiner((delta) => send({ type: 'adjustLife', delta }), setPending));
   useEffect(() => () => taps.flush(), [taps]);
   useEffect(() => {
     if (disabled) taps.cancel();
