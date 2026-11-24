@@ -16,6 +16,8 @@ export interface DeckCard {
   commander: boolean;
   group: CardGroup;
   legendary: boolean;
+  /** Its printing has a back face with its own image, at `/api/images/<scryfallId>/back`. */
+  doubleFaced: boolean;
 }
 
 export interface DeckDetail {

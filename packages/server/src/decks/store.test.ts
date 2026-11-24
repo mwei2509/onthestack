@@ -40,9 +40,9 @@ describe('importing a pasted list', () => {
 
     expect(deck).toMatchObject({ id: 'deck-1', name: 'Vona', archidektId: null, importedAt: '2026-11-23T12:00:00.000Z' });
     expect(deck.cards).toEqual([
-      { ...VONA, name: 'Vona, Butcher of Magan', quantity: 1, commander: true, group: 'Creature', legendary: true },
-      { ...SOL_RING, name: 'Sol Ring', quantity: 3, commander: false, group: 'Artifact', legendary: false },
-      expect.objectContaining({ name: 'Brightclimb Pathway // Grimclimb Pathway', group: 'Land', legendary: false }),
+      { ...VONA, name: 'Vona, Butcher of Magan', quantity: 1, commander: true, group: 'Creature', legendary: true, doubleFaced: false },
+      { ...SOL_RING, name: 'Sol Ring', quantity: 3, commander: false, group: 'Artifact', legendary: false, doubleFaced: false },
+      expect.objectContaining({ name: 'Brightclimb Pathway // Grimclimb Pathway', group: 'Land', legendary: false, doubleFaced: true }),
     ]);
     expect(deck.colorIdentity).toEqual(['W', 'B']);
     expect(deck.unmatched).toEqual([

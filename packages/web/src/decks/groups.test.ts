@@ -10,6 +10,7 @@ const card = (name: string, group: DeckCard['group'], quantity = 1): DeckCard =>
   scryfallId: name,
   commander: false,
   legendary: false,
+  doubleFaced: false,
 });
 
 describe('groupCards', () => {
