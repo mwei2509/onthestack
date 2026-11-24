@@ -1,3 +1,4 @@
+import { env, runInDurableObject } from 'cloudflare:test';
 import { exports } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 import type { DeviceMessage, ServerMessage } from './protocol.js';
@@ -77,7 +78,7 @@ describe('Lobby', () => {
   it('sends an empty lobby on connect', async () => {
     const code = await createGame();
     const device = await connect(code);
-    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false });
+    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false, view: null });
   });
 
   it('adds a seat per device that joins, in order, and tells each device which seat is theirs', async () => {
@@ -167,5 +168,117 @@ describe('Lobby', () => {
     expect(await theo!.next()).toEqual({ type: 'error', message: "That Deck isn't saved" });
     theo!.send({ type: 'start', firstSeatId: 'p9' });
     expect(await theo!.next()).toEqual({ type: 'error', message: 'No such seat' });
+  });
+});
+
+/** A started game: Theo, Elena and Michael seated clockwise, Elena won the dice. */
+async function started() {
+  const { code, devices } = await lobby('Theo', 'Elena', 'Michael');
+  devices[0]!.send({ type: 'start', firstSeatId: 'p2' });
+  const updates = [];
+  for (const d of devices) updates.push(await d.update());
+  return { code, devices, view: updates[0]!.view! };
+}
+
+/** Every device's next update, all checked to be the same TableView. */
+async function everyone(devices: Awaited<ReturnType<typeof connect>>[]) {
+  const updates = [];
+  for (const d of devices) updates.push(await d.update());
+  for (const u of updates) expect(u.view).toEqual(updates[0]!.view);
+  return updates[0]!.view!;
+}
+
+describe('Game', () => {
+  it('starts from the seats, clockwise from whoever won the dice, in their upkeep', async () => {
+    const { view } = await started();
+    expect(view.turn).toEqual({ number: 1, activePlayerId: 'p2', step: 'upkeep' });
+    expect(Object.values(view.players).map((p) => [p.name, p.life])).toEqual([
+      ['Elena', 40],
+      ['Michael', 40],
+      ['Theo', 40],
+    ]);
+    expect(view.commandZone).toEqual({ p1: null, p2: null, p3: null });
+  });
+
+  it('changes a seated device\'s own life, on every screen', async () => {
+    const { code, devices } = await started();
+    devices[0]!.send({ type: 'adjustLife', delta: -3 });
+    expect((await everyone(devices)).players.p1!.life).toBe(37);
+
+    const screen = await connect(code);
+    expect((await screen.update()).view!.players.p1!.life).toBe(37);
+    screen.send({ type: 'watch' });
+    await screen.update();
+    for (const d of devices) await d.update();
+    screen.send({ type: 'adjustLife', delta: 1 });
+    expect(await screen.next()).toEqual({ type: 'error', message: 'Only a seated device can change its life' });
+  });
+
+  it('moves to the next Step that happens, once even when two screens press together', async () => {
+    const { devices } = await started();
+    devices[0]!.send({ type: 'nextStep', from: 'upkeep' });
+    devices[1]!.send({ type: 'nextStep', from: 'upkeep' });
+    expect((await everyone(devices)).turn.step).toBe('draw');
+    expect(await devices[1]!.next()).toEqual({ type: 'error', message: 'The Step has already moved on' });
+
+    devices[1]!.send({ type: 'jumpToStep', from: 'draw', to: 'declareAttackers' });
+    expect((await everyone(devices)).turn.step).toBe('declareAttackers');
+    devices[1]!.send({ type: 'nextStep', from: 'declareAttackers' });
+    expect((await everyone(devices)).turn.step).toBe('endOfCombat');
+  });
+
+  it('only jumps forward, to Steps that happen this turn', async () => {
+    const { devices } = await started();
+    devices[0]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'main2' });
+    await everyone(devices);
+    for (const to of ['main1', 'combatDamage'] as const) {
+      devices[0]!.send({ type: 'jumpToStep', from: 'main2', to });
+      expect(await devices[0]!.next()).toEqual({ type: 'error', message: 'The step menu only jumps forward, to a Step that happens this turn' });
+    }
+  });
+
+  it('seals the turn after cleanup and starts the next player\'s turn in their upkeep', async () => {
+    const { code, devices } = await started();
+    devices[1]!.send({ type: 'adjustLife', delta: 2 });
+    await everyone(devices);
+    devices[1]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'cleanup' });
+    await everyone(devices);
+    devices[1]!.send({ type: 'nextStep', from: 'cleanup' });
+    const view = await everyone(devices);
+    expect(view.turn).toEqual({ number: 2, activePlayerId: 'p3', step: 'upkeep' });
+    expect(view.players.p2!.life).toBe(42);
+
+    devices[2]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'endTurn' });
+    expect((await everyone(devices)).turn).toEqual({ number: 3, activePlayerId: 'p1', step: 'upkeep' });
+
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      const sealed = await state.storage.list({ prefix: 'sealed:' });
+      expect([...sealed.keys()]).toEqual(['sealed:1', 'sealed:2']);
+      expect(await state.storage.get('board')).toBeUndefined();
+    });
+  });
+
+  it('gives a reconnecting device the current board and its seat back', async () => {
+    const { code, devices } = await started();
+    devices[2]!.send({ type: 'adjustLife', delta: -5 });
+    await everyone(devices);
+    devices[2]!.ws.close();
+    await devices[0]!.update();
+    await devices[1]!.update();
+
+    const reloaded = await connect(code);
+    const first = await reloaded.update();
+    expect(first.view!.players.p3!.life).toBe(35);
+    expect(first.seats[2]).toEqual({ id: 'p3', name: 'Michael', connected: false });
+    reloaded.send({ type: 'claim', seatId: 'p3' });
+    expect((await reloaded.update()).you).toBe('p3');
+  });
+
+  it('rejects game messages before Start', async () => {
+    const { devices } = await lobby('Theo');
+    devices[0]!.send({ type: 'adjustLife', delta: -1 });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: "The game hasn't started yet" });
+    devices[0]!.send({ type: 'adjustLife', delta: 0 });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: "A life change can't be 0" });
   });
 });
