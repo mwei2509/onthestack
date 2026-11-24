@@ -1,5 +1,6 @@
 import type { CardRequest, CardStore, ResolvedCard } from '../cards/store.js';
 import { entriesOf, type ArchidektDeck } from './archidekt.js';
+import { colorIdentityOf, groupOf, isLegendary, type CardGroup } from './groups.js';
 import { parseDeckList, type DeckLine } from './parse.js';
 
 /** A line kept on a Deck because it couldn't be read, or names a card the card store can't find (ADR 0077). */
@@ -14,7 +15,12 @@ export interface DeckCard {
   name: string;
   quantity: number;
   commander: boolean;
+  group: CardGroup;
+  legendary: boolean;
 }
+
+/** What a Deck stores per card; the rest of `DeckCard` is read from the card store. */
+type SavedCard = Pick<DeckCard, 'oracleId' | 'scryfallId' | 'quantity' | 'commander'>;
 
 export interface DeckDetail {
   id: string;
@@ -23,15 +29,20 @@ export interface DeckDetail {
   cards: DeckCard[];
   unmatched: UnmatchedLine[];
   importedAt: string;
+  /** The commanders' colours together, in WUBRG order; empty with no commander (ADR 0081). */
+  colorIdentity: string[];
 }
 
 export interface DeckSummary {
   id: string;
   name: string;
   commanders: string[];
+  colorIdentity: string[];
   cardCount: number;
   /** Unmatched lines, plus one if no commander is marked. */
   problems: number;
+  source: 'archidekt' | 'pasted';
+  importedAt: string;
 }
 
 export interface DeckStoreDeps {
@@ -88,13 +99,18 @@ interface CardRow {
   name: string;
   quantity: number;
   commander: number;
+  type_line: string | null;
+  color_identity: string | null;
 }
 
 interface SummaryRow {
   id: string;
   name: string;
   unmatched: string;
+  archidekt_id: string | null;
+  imported_at: string;
   commanders: string | null;
+  identities: string | null;
   card_count: number | null;
 }
 
@@ -117,10 +133,15 @@ const APPEND_CARD = `
   INSERT INTO deck_cards (deck_id, position, oracle_id, scryfall_id, quantity, commander)
   SELECT ?1, coalesce(max(position) + 1, 0), ?2, ?3, ?4, ?5 FROM deck_cards WHERE deck_id = ?1`;
 
+// A double-faced card's type is its front face's (ADR 0084).
+const TYPE_LINE = "coalesce(c.data ->> '$.card_faces[0].type_line', c.data ->> '$.type_line')";
+
 const SELECT_SUMMARIES = `
-  SELECT d.id, d.name, d.unmatched,
+  SELECT d.id, d.name, d.unmatched, d.archidekt_id, d.imported_at,
     (SELECT json_group_array(c.name) FROM deck_cards dc JOIN cards c ON c.oracle_id = dc.oracle_id
       WHERE dc.deck_id = d.id AND dc.commander) AS commanders,
+    (SELECT json_group_array(json(coalesce(c.data -> '$.color_identity', '[]'))) FROM deck_cards dc
+      JOIN cards c ON c.oracle_id = dc.oracle_id WHERE dc.deck_id = d.id AND dc.commander) AS identities,
     (SELECT sum(quantity) FROM deck_cards WHERE deck_id = d.id) AS card_count
   FROM decks d ORDER BY d.name COLLATE NOCASE`;
 
@@ -130,7 +151,8 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
       db.prepare('SELECT id, name, archidekt_id, unmatched, imported_at FROM decks WHERE id = ?').bind(id),
       db
         .prepare(
-          `SELECT dc.oracle_id, dc.scryfall_id, c.name, dc.quantity, dc.commander
+          `SELECT dc.oracle_id, dc.scryfall_id, c.name, dc.quantity, dc.commander,
+             ${TYPE_LINE} AS type_line, c.data -> '$.color_identity' AS color_identity
            FROM deck_cards dc JOIN cards c ON c.oracle_id = dc.oracle_id
            WHERE dc.deck_id = ? ORDER BY dc.position`,
         )
@@ -138,19 +160,25 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
     ]);
     const deck = (decks!.results as DeckRow[])[0];
     if (!deck) return null;
+    const cardRows = rows!.results as CardRow[];
     return {
       id: deck.id,
       name: deck.name,
       archidektId: deck.archidekt_id,
-      cards: (rows!.results as CardRow[]).map((r) => ({
+      cards: cardRows.map((r) => ({
         oracleId: r.oracle_id,
         scryfallId: r.scryfall_id,
         name: r.name,
         quantity: r.quantity,
         commander: r.commander === 1,
+        group: groupOf(r.type_line ?? ''),
+        legendary: isLegendary(r.type_line ?? ''),
       })),
       unmatched: JSON.parse(deck.unmatched) as UnmatchedLine[],
       importedAt: deck.imported_at,
+      colorIdentity: colorIdentityOf(
+        cardRows.filter((r) => r.commander === 1).map((r) => JSON.parse(r.color_identity ?? '[]') as string[]),
+      ),
     };
   }
 
@@ -168,7 +196,7 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
     const wanted = entries.filter((e) => 'request' in e);
     const resolved = await cards.resolve(wanted.map((e) => e.request));
     const found = new Map<Entry, ResolvedCard | null | undefined>(wanted.map((e, i) => [e, resolved[i]]));
-    const deckCards: Omit<DeckCard, 'name'>[] = [];
+    const deckCards: SavedCard[] = [];
     const unmatched: UnmatchedLine[] = [];
     for (const e of entries) {
       const card = found.get(e);
@@ -179,7 +207,7 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
     return { deckCards, unmatched };
   }
 
-  const insertCards = (id: string, deckCards: Omit<DeckCard, 'name'>[]) =>
+  const insertCards = (id: string, deckCards: SavedCard[]) =>
     db.prepare(INSERT_CARDS).bind(id, JSON.stringify(deckCards.map((c) => ({ ...c, commander: c.commander ? 1 : 0 }))));
 
   const setUnmatched = (id: string, unmatched: UnmatchedLine[]) =>
@@ -238,8 +266,11 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
           id: r.id,
           name: r.name,
           commanders,
+          colorIdentity: colorIdentityOf(JSON.parse(r.identities ?? '[]') as string[][]),
           cardCount: r.card_count ?? 0,
           problems: unmatched.length + (commanders.length === 0 ? 1 : 0),
+          source: r.archidekt_id ? 'archidekt' : 'pasted',
+          importedAt: r.imported_at,
         };
       });
     },

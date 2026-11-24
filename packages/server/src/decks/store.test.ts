@@ -40,10 +40,11 @@ describe('importing a pasted list', () => {
 
     expect(deck).toMatchObject({ id: 'deck-1', name: 'Vona', archidektId: null, importedAt: '2026-11-23T12:00:00.000Z' });
     expect(deck.cards).toEqual([
-      { ...VONA, name: 'Vona, Butcher of Magan', quantity: 1, commander: true },
-      { ...SOL_RING, name: 'Sol Ring', quantity: 3, commander: false },
-      expect.objectContaining({ name: 'Brightclimb Pathway // Grimclimb Pathway', quantity: 1, commander: false }),
+      { ...VONA, name: 'Vona, Butcher of Magan', quantity: 1, commander: true, group: 'Creature', legendary: true },
+      { ...SOL_RING, name: 'Sol Ring', quantity: 3, commander: false, group: 'Artifact', legendary: false },
+      expect.objectContaining({ name: 'Brightclimb Pathway // Grimclimb Pathway', group: 'Land', legendary: false }),
     ]);
+    expect(deck.colorIdentity).toEqual(['W', 'B']);
     expect(deck.unmatched).toEqual([
       { text: '1x Sol Rnig (trc) 499 [Ramp]', reason: 'not-found' },
       { text: 'what is this', reason: 'unreadable' },
@@ -65,9 +66,18 @@ describe('the library', () => {
     await store.importList('vona', '1x Vona, Butcher of Magan (lcc) 293 [Commander]\n10 Sol Ring');
     await store.importList('Artifacts', '1 Sol Ring\n1 Sol Rnig');
 
+    const imported = { source: 'pasted', importedAt: '2026-11-23T12:00:00.000Z' };
     expect(await store.list()).toEqual([
-      { id: 'deck-2', name: 'Artifacts', commanders: [], cardCount: 1, problems: 2 },
-      { id: 'deck-1', name: 'vona', commanders: ['Vona, Butcher of Magan'], cardCount: 11, problems: 0 },
+      { id: 'deck-2', name: 'Artifacts', commanders: [], colorIdentity: [], cardCount: 1, problems: 2, ...imported },
+      {
+        id: 'deck-1',
+        name: 'vona',
+        commanders: ['Vona, Butcher of Magan'],
+        colorIdentity: ['W', 'B'],
+        cardCount: 11,
+        problems: 0,
+        ...imported,
+      },
     ]);
   });
 
@@ -185,6 +195,6 @@ describe('importing from Archidekt', () => {
     expect(again.deck.name).toBe('Vona v2');
     expect(again.deck.cards.map((c) => [c.name, c.commander])).toEqual([['Sol Ring', true]]);
     expect(again.deck.unmatched).toEqual([{ text: '1x Gone Card (xyz) 1', reason: 'not-found' }]);
-    expect(await store.list()).toHaveLength(1);
+    expect((await store.list()).map((d) => d.source)).toEqual(['archidekt']);
   });
 });

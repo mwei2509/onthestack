@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./protocol": "./src/protocol.ts"
+    "./protocol": "./src/protocol.ts",
+    "./decks": "./src/decks/store.ts",
+    "./decks/parse": "./src/decks/parse.ts"
   },
   "scripts": {
     "dev": "wrangler d1 migrations apply DB --local -y && wrangler dev",
