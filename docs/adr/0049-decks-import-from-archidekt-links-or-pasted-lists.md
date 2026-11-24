@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42).
 
+Amended by ADR 0077 (an import saves at once; unmatched lines and a missing commander are fixed on the Deck).
+
 A Deck is imported either from an Archidekt deck link, through the Worker proxy of ADR 0006, or from a pasted list. The parser accepts two shapes of pasted list:
 
 - **Archidekt's text export:** `1x Vona, Butcher of Magan (lcc) 293 [Commander{top}]`. The set code and collector number pin the printing, the category in brackets names the commander, and the Maybeboard and Sideboard categories are left out.

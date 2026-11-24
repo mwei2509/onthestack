@@ -20,7 +20,7 @@ _Avoid_: push-to-talk, tap to speak, wake word
 A player in a game who has no account, joined with only a name and a Deck from the shared library (or one imported while joining).
 
 **Lobby**:
-A game before it starts, where each device joins with a name and (once the Deck library exists) a Deck, adding a Seat. Seats are put in the order people sit, and Start asks who goes first.
+A game before it starts, where each device joins with a name and a Deck from the library, adding a Seat. Seats are put in the order people sit, and Start asks who goes first.
 _Avoid_: waiting room, setup
 
 **Seat**:
@@ -138,6 +138,10 @@ _Avoid_: player screen, profile
 **Deck**:
 A list of cards, imported from an Archidekt link or a pasted list, that exists on its own, independent of any player or account, so it can be shared and reused. Saved Decks form one shared library until accounts arrive. Each player picks one when joining a game, and the game copies it at Start. It may be incomplete; cards not on it can still come up in a game.
 _Avoid_: decklist, list
+
+**Unmatched line**:
+A line of an imported Deck list that couldn't be read, or names a card or printing the card store can't find. It stays on the Deck, to be fixed or skipped on the Deck's page, and is never guessed at.
+_Avoid_: error, invalid card, missing card
 
 **Card store**:
 The app's own copy of every card players have imported, with each printing's image, fetched from Scryfall when a Deck containing it is imported, so a game never waits on Scryfall.
