@@ -56,6 +56,13 @@ export interface Ended {
   by: string | null;
 }
 
+/** What `GET /api/games/<code>` says about a game besides its code (ADR 0111). */
+export interface GameSummary {
+  status: 'lobby' | 'playing' | 'ended';
+  /** The current turn while playing; the turn it ended in once ended. */
+  turn: number | null;
+}
+
 export type ServerMessage =
   | {
       type: 'update';

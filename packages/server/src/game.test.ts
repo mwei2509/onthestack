@@ -110,7 +110,7 @@ describe('Worker', () => {
     const code = await createGame();
     expect(code).toMatch(/^[A-Z]+-[A-Z]+-\d{2}$/);
     const res = await exports.default.fetch(`http://test/api/games/${code.toLowerCase()}`);
-    expect(await res.json()).toEqual({ code });
+    expect(await res.json()).toEqual({ code, status: 'lobby', turn: null });
   });
 
   it('reports codes that are not games', async () => {
@@ -278,6 +278,12 @@ async function everyone(devices: Awaited<ReturnType<typeof connect>>[]) {
 }
 
 describe('Game', () => {
+  it('says a started game is playing, and in which turn (ADR 0111)', async () => {
+    const { code } = await started();
+    const res = await exports.default.fetch(`http://test/api/games/${code}`);
+    expect(await res.json()).toEqual({ code, status: 'playing', turn: 1 });
+  });
+
   it('starts from the seats, clockwise from whoever won the dice, in their upkeep', async () => {
     const { view } = await started();
     expect(view.turn).toEqual({ number: 1, activePlayerId: 'p2', step: 'upkeep' });

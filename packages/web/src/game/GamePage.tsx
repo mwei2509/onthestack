@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { Link, useLocation, useParams } from 'react-router';
 import { Logo } from '../icons.js';
 import { BoardScreen } from './BoardScreen.js';
 import { DebugPanel } from './DebugPanel.js';
+import { forgetGame, rememberGame } from './lastGame.js';
 import { JoinScreen } from './lobby/JoinScreen.js';
 import { LateScreen } from './lobby/LateScreen.js';
 import { LobbyScreen } from './lobby/LobbyScreen.js';
@@ -17,6 +19,13 @@ export function GamePage() {
 /** Keyed by the code, so moving straight to another game starts its connection and seat memory afresh. */
 function GameSession({ code }: { code: string }) {
   const game = useGame(code);
+  const ended = !!game.update?.ended;
+  const known = game.update !== null;
+  const missing = game.connection === 'missing';
+  useEffect(() => {
+    if (missing || ended) forgetGame(code);
+    else if (known) rememberGame(code);
+  }, [code, known, ended, missing]);
   const debug = new URLSearchParams(useLocation().search).has('debug');
   return (
     <>
