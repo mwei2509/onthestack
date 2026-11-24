@@ -1,4 +1,4 @@
-import { STEPS, type TableView } from '@onthestack/engine';
+import { STEPS, type TableView, type TimelineEntry } from '@onthestack/engine';
 import { z } from 'zod';
 
 const seatId = z.string().min(1).max(16);
@@ -26,6 +26,8 @@ export const DeviceMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('statement'), text: z.string().trim().min(1, 'Say what happened first').max(500, 'Statements are at most 500 characters') }),
   /** Ends the game for everyone, after the device's confirm (ADR 0092, 0101). */
   z.object({ type: z.literal('end') }),
+  /** Try again on statements the last reading couldn't interpret (ADR 0067, 0106). */
+  z.object({ type: z.literal('retryInterpretation') }),
 ]);
 export type DeviceMessage = z.infer<typeof DeviceMessage>;
 
@@ -58,5 +60,16 @@ export type ServerMessage =
       joinCode: string | null;
       /** What every screen shows, once the game has started. */
       view: TableView | null;
+      /** The turn's log: what was said and what the board was replayed from, once the game has started (ADR 0106). */
+      log: TurnLog | null;
     }
   | { type: 'error'; message: string };
+
+export type StatementStatus = 'read' | 'interpreting' | 'failed';
+
+export interface TurnLog {
+  /** The TurnTranscript in the order it was said, each with how far the reading has got. */
+  statements: { id: string; playerId: string; text: string; status: StatementStatus }[];
+  /** The engine timeline the board was replayed from; a tap's entry cites no statements (ADR 0065). */
+  entries: TimelineEntry[];
+}

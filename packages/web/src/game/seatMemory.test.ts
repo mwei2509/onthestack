@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { afterClaimRefused, afterUpdate, onOpen, sameMemory } from './seatMemory.js';
 
-const update = (you: string | null) => ({ type: 'update' as const, version: 2, you, seats: [], started: false, ended: null, joinCode: null, view: null });
+const update = (you: string | null) => ({ type: 'update' as const, version: 2, you, seats: [], started: false, ended: null, joinCode: null, view: null, log: null });
 
 describe('seat memory', () => {
   it('reclaims a remembered seat on connect, without taking it over', () => {

@@ -3,7 +3,7 @@ import { createGame, replayTurn, sealTurn, STEPS, stepsAhead, tableView, type Ga
 import { claudeProvider, interpretTurn, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
-import { DeviceMessage, type Ended, type ServerMessage } from './protocol.js';
+import { DeviceMessage, type Ended, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
 
 interface Seat {
   id: string;
@@ -76,6 +76,8 @@ export class Game extends DurableObject<Env> {
   private interpreter: LlmProvider | undefined;
   private interpretAfterMs = INTERPRET_AFTER_MS;
   private interpreting = false;
+  /** Between a statement and the request it leads to (ADR 0017's short wait). */
+  private interpretWaiting = false;
   private interpretTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(ctx: DurableObjectState, env: Env) {
@@ -140,8 +142,8 @@ export class Game extends DurableObject<Env> {
       if (e instanceof Rejected) return send(ws, { type: 'error', message: e.message });
       throw e;
     }
+    if (parsed.data.type === 'statement' || parsed.data.type === 'retryInterpretation') this.interpretSoon();
     await this.changed();
-    if (parsed.data.type === 'statement') this.interpretSoon();
   }
 
   async webSocketClose(ws: WebSocket): Promise<void> {
@@ -222,6 +224,11 @@ export class Game extends DurableObject<Env> {
         turn.transcriptVersion++;
         return;
       }
+      case 'retryInterpretation': {
+        const turn = this.inGame();
+        if (turn.statements.length === 0) throw new Rejected('Nothing has been said yet');
+        return;
+      }
       case 'adjustLife': {
         const turn = this.inGame();
         const playerId = attachment(ws).seatId;
@@ -278,7 +285,11 @@ export class Game extends DurableObject<Env> {
   private interpretSoon(): void {
     if (this.interpreting) return;
     clearTimeout(this.interpretTimer);
-    this.interpretTimer = setTimeout(() => void this.interpret(), this.interpretAfterMs);
+    this.interpretWaiting = true;
+    this.interpretTimer = setTimeout(() => {
+      this.interpretWaiting = false;
+      void this.interpret();
+    }, this.interpretAfterMs);
   }
 
   /** One request at a time, always with the whole turn. A failure keeps the last reading (ADR 0067). */
@@ -303,6 +314,8 @@ export class Game extends DurableObject<Env> {
       }
     } catch (e) {
       console.error('Interpretation failed', e);
+      this.interpreting = false;
+      await this.changed();
     } finally {
       this.interpreting = false;
     }
@@ -397,6 +410,19 @@ export class Game extends DurableObject<Env> {
     if (!(await touchJoinCode(this.env.DB, setup.joinCode, setup.code, now))) setup.joinCode = null;
   }
 
+  /** A statement the last reading covered is read; one past it is being read while a request is due or under way, and otherwise couldn't be (ADR 0067). */
+  private log(): TurnLog | null {
+    const turn = this.turn;
+    if (!turn) return null;
+    const readUpTo = turn.reading?.transcriptVersion ?? 0;
+    const busy = this.interpreting || this.interpretWaiting;
+    const status = (i: number): StatementStatus => (i < readUpTo ? 'read' : busy ? 'interpreting' : 'failed');
+    return {
+      statements: turn.statements.map((s, i) => ({ id: s.id, playerId: s.playerId, text: s.text, status: status(i) })),
+      entries: this.resolved.timeline,
+    };
+  }
+
   private sendUpdate(ws: WebSocket, view: TableView | null, closing?: WebSocket): void {
     const setup = this.setup!;
     send(ws, {
@@ -408,6 +434,7 @@ export class Game extends DurableObject<Env> {
       ended: setup.ended ?? null,
       joinCode: setup.joinCode ?? null,
       view,
+      log: this.log(),
     });
   }
 }
