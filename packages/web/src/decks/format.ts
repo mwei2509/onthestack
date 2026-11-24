@@ -38,3 +38,20 @@ export function nameFromList(list: string): string {
 
 /** How many lines the import will read: every non-blank line, as the button counts them. */
 export const lineCount = (list: string) => list.split(/\r?\n/).filter((l) => l.trim() !== '').length;
+
+/** What a fix starts from: a line's card name without its quantity, set or categories. */
+export function nameInLine(text: string): string {
+  return parseDeckList(text).lines[0]?.name ?? text.trim();
+}
+
+/** A picked card name back into a line, keeping the line's quantity. */
+export function lineWithName(text: string, name: string): string {
+  return `${parseDeckList(text).lines[0]?.quantity ?? 1} ${name}`;
+}
+
+/** The commander picker's order (ADR 0083): legendary creatures and planeswalkers first, each part A–Z. */
+export function commanderChoices<T extends { name: string; legendary: boolean; group: string }>(cards: T[]): T[] {
+  const likely = (c: T) => c.legendary && (c.group === 'Creature' || c.group === 'Planeswalker');
+  const byName = (a: T, b: T) => a.name.localeCompare(b.name);
+  return [...cards.filter(likely).sort(byName), ...cards.filter((c) => !likely(c)).sort(byName)];
+}

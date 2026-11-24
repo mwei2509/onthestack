@@ -25,3 +25,17 @@ export const importList = (name: string, list: string) =>
   call<DeckDetail>('/api/decks', { method: 'POST', body: JSON.stringify({ name, list }) });
 export const importArchidekt = (link: string) =>
   call<DeckDetail>('/api/decks', { method: 'POST', body: JSON.stringify({ archidekt: link }) });
+
+const send = <T>(path: string, method: string, body?: unknown) =>
+  call<T>(path, { method, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
+
+export const renameDeck = (id: string, name: string) => send<DeckDetail>(`/api/decks/${encodeURIComponent(id)}`, 'PATCH', { name });
+export const markCommanders = (id: string, commanders: string[]) =>
+  send<DeckDetail>(`/api/decks/${encodeURIComponent(id)}`, 'PATCH', { commanders });
+export const deleteDeck = (id: string) => send<null>(`/api/decks/${encodeURIComponent(id)}`, 'DELETE');
+export const fixLine = (id: string, index: number, was: string, text: string) =>
+  send<DeckDetail>(`/api/decks/${encodeURIComponent(id)}/unmatched/${index}`, 'POST', { action: 'fix', was, text });
+export const skipLine = (id: string, index: number, was: string) =>
+  send<DeckDetail>(`/api/decks/${encodeURIComponent(id)}/unmatched/${index}`, 'POST', { action: 'skip', was });
+export const suggestNames = async (q: string, signal: AbortSignal) =>
+  (await call<{ names: string[] }>(`/api/cards/autocomplete?q=${encodeURIComponent(q)}`, { signal })).names;
