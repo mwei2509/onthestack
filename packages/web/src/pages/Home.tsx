@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 export function Home() {
   const navigate = useNavigate();
@@ -44,6 +44,9 @@ export function Home() {
             {error}
           </p>
         )}
+        <Link className="btn" to="/decks" style={{ height: 52, textDecoration: 'none', color: 'var(--text)' }}>
+          Decks
+        </Link>
         <p className="faint" style={{ margin: 0, fontSize: 14, textAlign: 'center' }}>
           Joining a friend? Open the link they shared.
         </p>

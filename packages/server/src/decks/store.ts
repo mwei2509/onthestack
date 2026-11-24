@@ -1,49 +1,11 @@
 import type { CardRequest, CardStore, ResolvedCard } from '../cards/store.js';
 import { entriesOf, type ArchidektDeck } from './archidekt.js';
-import { colorIdentityOf, groupOf, isLegendary, type CardGroup } from './groups.js';
+import type { DeckCard, DeckDetail, DeckSummary, UnmatchedLine } from './api.js';
+import { colorIdentityOf, groupOf, isLegendary } from './groups.js';
 import { parseDeckList, type DeckLine } from './parse.js';
-
-/** A line kept on a Deck because it couldn't be read, or names a card the card store can't find (ADR 0077). */
-export interface UnmatchedLine {
-  text: string;
-  reason: 'unreadable' | 'not-found';
-}
-
-export interface DeckCard {
-  oracleId: string;
-  scryfallId: string;
-  name: string;
-  quantity: number;
-  commander: boolean;
-  group: CardGroup;
-  legendary: boolean;
-}
 
 /** What a Deck stores per card; the rest of `DeckCard` is read from the card store. */
 type SavedCard = Pick<DeckCard, 'oracleId' | 'scryfallId' | 'quantity' | 'commander'>;
-
-export interface DeckDetail {
-  id: string;
-  name: string;
-  archidektId: string | null;
-  cards: DeckCard[];
-  unmatched: UnmatchedLine[];
-  importedAt: string;
-  /** The commanders' colours together, in WUBRG order; empty with no commander (ADR 0081). */
-  colorIdentity: string[];
-}
-
-export interface DeckSummary {
-  id: string;
-  name: string;
-  commanders: string[];
-  colorIdentity: string[];
-  cardCount: number;
-  /** Unmatched lines, plus one if no commander is marked. */
-  problems: number;
-  source: 'archidekt' | 'pasted';
-  importedAt: string;
-}
 
 export interface DeckStoreDeps {
   db: D1Database;

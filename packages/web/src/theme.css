@@ -1196,3 +1196,387 @@ h1.title {
   background-clip: text;
   color: transparent;
 }
+
+/* Decks (the canvas's Decks screens) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 52px;
+}
+
+.page-header h1 {
+  margin: 0;
+  flex-grow: 1;
+  min-width: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-header .back {
+  margin-left: -10px;
+}
+
+.mono {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 14px;
+  color: var(--italic);
+}
+
+.hint {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-3);
+}
+
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.import-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-grow: 1;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  background: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.tabs button {
+  height: 44px;
+  border-radius: 9px;
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.tabs button[aria-selected='true'] {
+  background: var(--raised-2);
+  box-shadow: inset 0 0 0 1.5px var(--gold-line);
+  color: var(--text);
+}
+
+.deck-list-field {
+  flex-grow: 1;
+}
+
+.deck-list-field textarea {
+  min-height: 280px;
+  flex-grow: 1;
+  border-radius: 12px;
+  border: 1.5px solid var(--line-2);
+  background: var(--ink);
+  padding: 12px 14px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--italic);
+  white-space: pre;
+  resize: vertical;
+  outline: none;
+}
+
+.deck-list-field textarea:focus {
+  border-color: var(--accent);
+}
+
+.decks-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 12px 8px;
+  text-align: center;
+}
+
+.decks-empty h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.decks-empty p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.empty-cards {
+  position: relative;
+  width: 96px;
+  height: 92px;
+}
+
+.empty-cards span {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  width: 50px;
+  height: 70px;
+  border-radius: 7px;
+  border: 1.5px dashed #6b5a74;
+  transform: rotate(-12deg);
+}
+
+.empty-cards span + span {
+  top: 8px;
+  left: 34px;
+  border-color: #c9973a;
+  background: rgba(28, 22, 34, 0.6);
+  transform: rotate(10deg);
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search svg {
+  position: absolute;
+  left: 14px;
+}
+
+.search input {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: var(--field);
+  padding: 0 14px 0 42px;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+}
+
+.search input:focus {
+  border-color: var(--accent);
+}
+
+.deck-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.deck-row {
+  position: relative;
+  overflow: hidden;
+  min-height: 72px;
+  border-radius: 14px;
+  background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.deck-row > * {
+  position: relative;
+}
+
+.deck-row > .wash {
+  position: absolute;
+}
+
+.deck-row-text {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.deck-row-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.deck-row-commander {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--italic);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warn-chip {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger);
+  border: 1px solid #6a3e2a;
+  border-radius: 999px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.gems {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.gem {
+  display: inline-block;
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+.commander-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--field);
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px var(--line-3);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.commander-frame {
+  position: relative;
+  width: 52px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: rgba(17, 13, 20, 0.7);
+  box-shadow: inset 0 0 0 1.5px #c9973a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.commander-frame .gems {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+}
+
+.problem {
+  background: var(--field);
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  padding: 10px 8px 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.problem.open {
+  box-shadow: inset 0 0 0 1.5px #a0603d;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px 14px;
+  gap: 10px;
+}
+
+.problem-text {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.problem-text .mono {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.problem-reason {
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.card-groups {
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.card-group {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 0 14px;
+  font-size: 15px;
+}
+
+.card-names {
+  list-style: none;
+  margin: 0;
+  padding: 2px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.card-names li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+/* Cinzel's 1 reads as a Roman I at small sizes, so counts in lists use Inter's figures. */
+.count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-names .count {
+  width: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.commander-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}

@@ -60,3 +60,36 @@ export const Arrow = () => (
     <path d="M3 7h8M8 4l3 3-3 3" />
   </svg>
 );
+
+export const Back = () => (
+  <svg width="22" height="22" viewBox="0 0 22 22" {...icon({ strokeWidth: 2 })}>
+    <path d="M14 5l-6 6 6 6" />
+  </svg>
+);
+
+export const SearchIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" {...icon({ stroke: 'var(--text-3)' })}>
+    <circle cx="8" cy="8" r="5.5" />
+    <path d="M12.2 12.2L16 16" />
+  </svg>
+);
+
+export const Chevron = ({ open }: { open?: boolean }) => (
+  <svg width="18" height="18" viewBox="0 0 18 18" {...icon({ stroke: 'var(--text-3)', strokeWidth: 2 })} style={{ transform: open ? 'rotate(90deg)' : undefined }}>
+    <path d="M7 4l5 5-5 5" />
+  </svg>
+);
+
+export const More = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="var(--text-2)" aria-hidden>
+    <circle cx="4" cy="10" r="1.8" />
+    <circle cx="10" cy="10" r="1.8" />
+    <circle cx="16" cy="10" r="1.8" />
+  </svg>
+);
+
+export const Check = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" {...icon({ stroke: 'var(--accent)', strokeWidth: 2.2 })}>
+    <path d="M3.5 9.5l3.5 3.5 7.5-8" />
+  </svg>
+);
