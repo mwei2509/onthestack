@@ -237,3 +237,30 @@ describe('resolveTimeline with tapped entries (ADR 0065)', () => {
     expect(replayTurn(start, r.timeline, { currentStep: 'main1' }).state.players.melissa!.life).toBe(32);
   });
 });
+
+describe('players named instead of by id', () => {
+  const seated = (...names: string[]) => createGame(names.map((name, i) => ({ id: `p${i + 1}`, name })), cards);
+
+  it("reads a player's name as that player when only one player has it", () => {
+    const { timeline: resolved, questions } = resolveTimeline(
+      seated('Melissa', 'Theo'),
+      timeline(
+        said('main1', 'p1', { type: 'playLand', card: 'Plains' }),
+        said('main1', 'p1', { type: 'tap', object: { card: 'Plains', controller: 'melissa' } }),
+        said('main1', 'Melissa', { type: 'life', player: 'theo', delta: -3 }),
+      ),
+    );
+    expect(questions).toEqual([]);
+    expect(resolved.map((e) => [e.playerId, e.gameAction.type])).toEqual([
+      ['p1', 'playLand'],
+      ['p1', 'tap'],
+      ['p1', 'life'],
+    ]);
+    expect(resolved[2]!.gameAction).toMatchObject({ playerId: 'p2', delta: -3 });
+  });
+
+  it('still asks when two players share the name', () => {
+    const { questions } = resolveTimeline(seated('Sam', 'Sam'), timeline(said('main1', 'p1', { type: 'life', player: 'sam', delta: -3 })));
+    expect(questions).toMatchObject([{ kind: 'choosePlayers', text: 'Who is "sam"?' }]);
+  });
+});

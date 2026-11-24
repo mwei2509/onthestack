@@ -53,7 +53,8 @@ class Unresolved extends Error {
  * names something missing or genuinely ambiguous is left out and becomes a PlayerQuestion to its player.
  * Tapped entries are placed among them (`mergePinned`) and kept as they are.
  */
-export function resolveTimeline(turnStart: GameState, interpreted: InterpretedTimeline, options: ResolveOptions = {}): ResolvedTimeline {
+export function resolveTimeline(turnStart: GameState, read: InterpretedTimeline, options: ResolveOptions = {}): ResolvedTimeline {
+  const interpreted = withPlayerIds(turnStart, read);
   const timeline: EngineTimelineEntry[] = [];
   const questions = [...interpreted.questions];
 
@@ -73,6 +74,28 @@ export function resolveTimeline(turnStart: GameState, interpreted: InterpretedTi
     }
   }
   return { timeline, questions };
+}
+
+const PLAYER_FIELDS = new Set(['player', 'controller', 'target', 'askPlayer']);
+
+/**
+ * The interpreter is asked for player ids but sometimes writes a player's name ("melissa" for p1). A name that
+ * belongs to exactly one player means that player; any other unknown value is left for `player()` to ask about.
+ */
+function withPlayerIds<T>(state: GameState, value: T): T {
+  const byName = (name: string): PlayerId | undefined => {
+    if (state.players[name]) return undefined;
+    const matches = Object.values(state.players).filter((p) => sameName(p.name, name));
+    return matches.length === 1 ? matches[0]!.id : undefined;
+  };
+  const walk = (v: unknown): unknown => {
+    if (Array.isArray(v)) return v.map(walk);
+    if (!v || typeof v !== 'object') return v;
+    return Object.fromEntries(
+      Object.entries(v).map(([k, x]) => [k, PLAYER_FIELDS.has(k) && typeof x === 'string' ? (byName(x) ?? x) : walk(x)]),
+    );
+  };
+  return walk(value) as T;
 }
 
 /**
