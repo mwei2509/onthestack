@@ -489,6 +489,59 @@ describe('Statements', () => {
     expect((await stored()).reading?.transcriptVersion).toBe(3);
   });
 
+  it('keeps the last interpretations, newest first, for any device that asks (ADR 0109)', async () => {
+    const { code, devices, call, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    (await call(0)).answer(reading('s1'));
+    await everyone(devices);
+    await say(1, 'I gain 1 life');
+    (await call(1)).fail();
+    await everyone(devices);
+
+    const screen = await connect(code);
+    await screen.update();
+    screen.send({ type: 'debugLog' });
+    const log = await screen.next();
+    if (log.type !== 'debugLog') throw new Error(`Expected the debug log, got ${log.type}`);
+    expect(log.interpretations).toHaveLength(2);
+    const [failed, read] = log.interpretations;
+    expect(failed).toMatchObject({ turn: 1, transcriptVersion: 2, provider: 'fake', error: expect.stringContaining('overloaded') });
+    expect(failed!.user).toContain('[s2] Elena (p2): "I gain 1 life"');
+    expect(read).toMatchObject({ turn: 1, transcriptVersion: 1, model: 'fake', answer: JSON.stringify(reading('s1')), promptVersion: expect.stringMatching(/^[0-9a-f]{8}$/) });
+  });
+
+  it('records an interpretation that never reached a provider, such as a missing API key', async () => {
+    const { code, devices } = await started();
+    const stub = env.GAME.getByName(code);
+    await runInDurableObject(stub, (instance) => {
+      Object.assign(instance, { interpretAfterMs: 0 });
+    });
+    devices[0]!.send({ type: 'statement', text: 'Elena loses 3 life' });
+    await everyone(devices);
+    await everyone(devices);
+    const screen = await connect(code);
+    await screen.update();
+    screen.send({ type: 'debugLog' });
+    const log = await screen.next();
+    if (log.type !== 'debugLog') throw new Error(`Expected the debug log, got ${log.type}`);
+    expect(log.interpretations).toMatchObject([{ provider: 'none', error: expect.stringContaining('ANTHROPIC_API_KEY') }]);
+  });
+
+  it('keeps no more than the last 10 interpretations', async () => {
+    const { code, devices, call, say } = await interpreting();
+    for (let i = 0; i < 12; i++) {
+      await say(0, `Elena loses ${i + 1} life`);
+      (await call(i)).answer(reading('s1'));
+      await everyone(devices);
+    }
+    const screen = await connect(code);
+    await screen.update();
+    screen.send({ type: 'debugLog' });
+    const log = await screen.next();
+    if (log.type !== 'debugLog') throw new Error(`Expected the debug log, got ${log.type}`);
+    expect(log.interpretations.map((r) => r.transcriptVersion)).toEqual([12, 11, 10, 9, 8, 7, 6, 5, 4, 3]);
+  });
+
   it('drops a reading that comes back after its turn was Sealed, then reads the new turn', async () => {
     const { devices, call, stored, say } = await interpreting();
     await say(0, 'Elena loses 3 life');

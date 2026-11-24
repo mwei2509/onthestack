@@ -36,6 +36,8 @@ export const DeviceMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('end') }),
   /** Try again on statements the last reading couldn't interpret (ADR 0067, 0106). */
   z.object({ type: z.literal('retryInterpretation') }),
+  /** The `?debug` panel asking for the game's last interpretations (ADR 0109). Any device can ask. */
+  z.object({ type: z.literal('debugLog') }),
 ]);
 export type DeviceMessage = z.infer<typeof DeviceMessage>;
 
@@ -71,7 +73,27 @@ export type ServerMessage =
       /** The turn's log: what was said and what the board was replayed from, once the game has started (ADR 0106). */
       log: TurnLog | null;
     }
-  | { type: 'error'; message: string };
+  | { type: 'error'; message: string }
+  | { type: 'debugLog'; interpretations: InterpretationRecord[] };
+
+/** One interpretation as ADR 0108 logs it and ADR 0109's panel shows it. */
+export interface InterpretationRecord {
+  at: string;
+  turn: number;
+  transcriptVersion: number;
+  provider: string;
+  model: string;
+  /** Which system prompt was sent; its text is in the code that version was built from. */
+  promptVersion: string;
+  /** The user message sent: the board, the card list and what was said this turn. */
+  user: string;
+  /** The answer as the provider returned it, when there was one; a malformed answer is kept too. */
+  answer?: string;
+  error?: string;
+  inputTokens?: number;
+  outputTokens?: number;
+  latencyMs: number;
+}
 
 export type StatementStatus = 'read' | 'interpreting' | 'failed';
 

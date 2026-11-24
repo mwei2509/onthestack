@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [
     cloudflareTest(async () => ({
       wrangler: { configPath: './wrangler.jsonc' },
-      miniflare: { bindings: { TEST_MIGRATIONS: await readD1Migrations('./migrations') } },
+      // A blank key, so no test can reach Anthropic with the real one `.env` gives `wrangler dev`.
+      miniflare: { bindings: { TEST_MIGRATIONS: await readD1Migrations('./migrations'), ANTHROPIC_API_KEY: '' } },
     })),
   ],
   test: { setupFiles: ['./src/test/apply-migrations.ts'] },

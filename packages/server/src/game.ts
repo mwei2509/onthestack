@@ -1,9 +1,9 @@
 import { DurableObject } from 'cloudflare:workers';
 import { createGame, replayTurn, sealTurn, STEPS, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type RulesWarning, type SealedTurn, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
-import { claudeProvider, interpretTurn, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
+import { buildPrompt, claudeProvider, interpretPrompt, LlmOutputError, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
-import { DeviceMessage, type Ended, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
+import { DeviceMessage, type Ended, type InterpretationRecord, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
 
 interface Seat {
   id: string;
@@ -54,6 +54,10 @@ const INTERPRET_AFTER_MS = 300;
 interface Attachment {
   seatId: string | null;
 }
+
+/** The debug panel's interpretations, kept apart from the turn so they never reach a Sealed turn (ADR 0109). */
+const INTERPRETATIONS = 'interpretations';
+const KEPT_INTERPRETATIONS = 10;
 
 export const MAX_SEATS = 6;
 
@@ -142,6 +146,7 @@ export class Game extends DurableObject<Env> {
       if (e instanceof Rejected) return send(ws, { type: 'error', message: e.message });
       throw e;
     }
+    if (parsed.data.type === 'debugLog') return;
     if (parsed.data.type === 'statement' || parsed.data.type === 'retryInterpretation') this.interpretSoon();
     await this.changed();
   }
@@ -153,6 +158,10 @@ export class Game extends DurableObject<Env> {
   private async handle(ws: WebSocket, message: DeviceMessage): Promise<void> {
     const setup = this.setup!;
     switch (message.type) {
+      case 'debugLog': {
+        const interpretations = (await this.ctx.storage.get<InterpretationRecord[]>(INTERPRETATIONS)) ?? [];
+        return send(ws, { type: 'debugLog', interpretations: [...interpretations].reverse() });
+      }
       case 'join': {
         this.inLobby('Joining');
         if (attachment(ws).seatId) throw new Rejected('This device already has a seat');
@@ -301,13 +310,35 @@ export class Game extends DurableObject<Env> {
     if (!turn || this.interpreting) return;
     const asked = { turn: turn.turnStart.turn.number, transcriptVersion: turn.transcriptVersion };
     this.interpreting = true;
+    const prompt = buildPrompt({
+      turnStart: turn.turnStart,
+      statements: [...turn.statements],
+      currentStep: turn.currentStep,
+      pinned: [...turn.pinned],
+      openQuestions: [...this.resolved.questions],
+    });
+    const record = { at: new Date().toISOString(), turn: asked.turn, transcriptVersion: asked.transcriptVersion, promptVersion: prompt.version, user: prompt.user };
+    const started = Date.now();
     try {
-      const { output } = await interpretTurn(this.provider(), {
-        turnStart: turn.turnStart,
-        statements: [...turn.statements],
-        currentStep: turn.currentStep,
-        pinned: [...turn.pinned],
-        openQuestions: [...this.resolved.questions],
+      let provider: LlmProvider | undefined;
+      let result;
+      try {
+        provider = this.provider();
+        result = await interpretPrompt(provider, prompt);
+      } catch (e) {
+        const id = provider?.id ?? 'none';
+        await this.record({ ...record, provider: id, model: id, error: String(e), ...(e instanceof LlmOutputError ? { answer: e.raw } : {}), latencyMs: Date.now() - started });
+        throw e;
+      }
+      const { output } = result;
+      await this.record({
+        ...record,
+        provider: provider.id,
+        model: result.model,
+        answer: result.raw,
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+        latencyMs: result.latencyMs,
       });
       const current = this.turn;
       const stale = !current || current.turnStart.turn.number !== asked.turn || (current.reading?.transcriptVersion ?? 0) >= asked.transcriptVersion;
@@ -327,6 +358,13 @@ export class Game extends DurableObject<Env> {
     if (now && (now.turnStart.turn.number !== asked.turn || now.transcriptVersion !== asked.transcriptVersion) && now.statements.length > 0) {
       await this.interpret();
     }
+  }
+
+  /** Logs one interpretation to Workers Logs (ADR 0108) and keeps the last few for the debug panel (ADR 0109). */
+  private async record(interpretation: InterpretationRecord): Promise<void> {
+    console.log({ message: 'interpretation', game: this.setup?.code, ...interpretation });
+    const kept = (await this.ctx.storage.get<InterpretationRecord[]>(INTERPRETATIONS)) ?? [];
+    await this.ctx.storage.put(INTERPRETATIONS, [...kept, interpretation].slice(-KEPT_INTERPRETATIONS));
   }
 
   private provider(): LlmProvider {

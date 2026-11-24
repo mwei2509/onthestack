@@ -21,10 +21,12 @@ export interface Prompt {
   /** Identical for every request, so providers can cache it. */
   system: string;
   user: string;
+  /** Names the system prompt's text, so a log line can say which one was sent without carrying it (ADR 0108). */
+  version: string;
 }
 
 export function buildPrompt(input: PromptInput): Prompt {
-  return { system: SYSTEM, user: userMessage(input) };
+  return { system: SYSTEM, user: userMessage(input), version: SYSTEM_VERSION };
 }
 
 const SYSTEM = `You keep the record for an in-person game of Magic: The Gathering Commander. Players hold a button and say what they do at the table. You read everything said this turn and return what happened, as an ordered list of literal GameActions, each placed in the Step where it happened.
@@ -62,6 +64,18 @@ Never guess. If you can't tell what a player meant, leave out only that part, ke
 - Don't ask when the board or the conversation makes the meaning clear, and don't ask why a player did something: record life payments, sacrifices and other stated actions as said. Return only the questions still open: once a later statement answers one, drop it.
 
 Return JSON only, matching the schema.`;
+
+/** FNV-1a over the system prompt, in hex: short, stable across deploys while the text is unchanged. */
+function fnv1a(text: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+const SYSTEM_VERSION = fnv1a(SYSTEM);
 
 function userMessage({ turnStart, statements, currentStep, oracleText, pinned, openQuestions }: PromptInput): string {
   const sections = [
