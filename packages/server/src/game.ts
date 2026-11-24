@@ -304,6 +304,7 @@ export class Game extends DurableObject<Env> {
         statements: [...turn.statements],
         currentStep: turn.currentStep,
         pinned: [...turn.pinned],
+        openQuestions: [...this.resolved.questions],
       });
       const current = this.turn;
       const stale = !current || current.turnStart.turn.number !== asked.turn || (current.reading?.transcriptVersion ?? 0) >= asked.transcriptVersion;
@@ -420,6 +421,7 @@ export class Game extends DurableObject<Env> {
     return {
       statements: turn.statements.map((s, i) => ({ id: s.id, playerId: s.playerId, text: s.text, status: status(i) })),
       entries: this.resolved.timeline,
+      questions: this.resolved.questions,
     };
   }
 

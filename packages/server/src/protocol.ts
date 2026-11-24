@@ -1,4 +1,5 @@
 import { STEPS, type TableView, type TimelineEntry } from '@onthestack/engine';
+import type { InterpretedQuestion } from '@onthestack/interpreter';
 import { z } from 'zod';
 
 const seatId = z.string().min(1).max(16);
@@ -72,4 +73,6 @@ export interface TurnLog {
   statements: { id: string; playerId: string; text: string; status: StatementStatus }[];
   /** The engine timeline the board was replayed from; a tap's entry cites no statements (ADR 0065). */
   entries: TimelineEntry[];
+  /** What the reading couldn't settle, asked of a player instead of guessed (ADR 0043, 0068). */
+  questions: InterpretedQuestion[];
 }
