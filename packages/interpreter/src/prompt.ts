@@ -1,4 +1,5 @@
 import { stats, STEPS, type CardName, type GameState, type PlayerStatement, type Step } from '@onthestack/engine';
+import type { PinnedEntry } from './resolve.js';
 import { QUESTION_KINDS } from './schema.js';
 
 export interface PromptInput {
@@ -10,6 +11,8 @@ export interface PromptInput {
   currentStep: Step;
   /** Oracle text by card name, where the app has it. */
   oracleText?: (card: CardName) => string | undefined;
+  /** What players recorded by tapping on the board this turn; already in the record (ADR 0065). */
+  pinned?: PinnedEntry[];
 }
 
 export interface Prompt {
@@ -30,6 +33,7 @@ Re-read the whole turn every time. Later statements can change earlier ones:
 - Take-backs ("oops", "wait, no", "I didn't mean that", "actually it attacked Michael") change or remove what they refer to.
 - Late statements ("back in my main phase I played a land", "I forgot my upkeep trigger") go in the Step they describe, unless the player says they do it now.
 - Each statement has an id. List every statement an entry came from in its "from".
+- Some actions were recorded by a tap on the board and are listed separately. They're already in the record: never add an entry for them, even when someone also says them ("that's the 3 I tapped off").
 
 Steps, in order: ${STEPS.join(', ')}.
 Timing words:
@@ -57,7 +61,7 @@ Never guess. If you can't tell what a player meant, leave out only that part, ke
 
 Return JSON only, matching the schema.`;
 
-function userMessage({ turnStart, statements, currentStep, oracleText }: PromptInput): string {
+function userMessage({ turnStart, statements, currentStep, oracleText, pinned }: PromptInput): string {
   const sections = [
     `Turn ${turnStart.turn.number}. Active player: ${turnStart.turn.activePlayerId}. The table is now in: ${currentStep}.`,
     `Seats, in turn order:\n${turnStart.turnOrder.map((id) => seat(turnStart, id)).join('\n')}`,
@@ -65,6 +69,7 @@ function userMessage({ turnStart, statements, currentStep, oracleText }: PromptI
     `Cards in this game:\n${cardList(turnStart, oracleText)}`,
     `What players said this turn, in order:\n${transcript(turnStart, statements)}`,
   ];
+  if (pinned?.length) sections.push(`Already recorded by a tap on the board (never add these):\n${tapped(turnStart, statements, pinned)}`);
   return sections.join('\n\n');
 }
 
@@ -123,5 +128,18 @@ function transcript(state: GameState, statements: PlayerStatement[]): string {
   return [...statements]
     .sort((a, b) => a.pressedAt.localeCompare(b.pressedAt))
     .map((s) => `[${s.id}] ${state.players[s.playerId]?.name ?? s.playerId} (${s.playerId}): "${s.text}"`)
+    .join('\n');
+}
+
+function tapped(state: GameState, statements: PlayerStatement[], pinned: PinnedEntry[]): string {
+  const said = [...statements].sort((a, b) => a.pressedAt.localeCompare(b.pressedAt));
+  return pinned
+    .map(({ entry, afterStatements }) => {
+      const when = afterStatements === 0 ? 'before anything was said' : `after [${said[afterStatements - 1]?.id ?? `s${afterStatements}`}]`;
+      const who = state.players[entry.playerId]?.name ?? entry.playerId;
+      const a = entry.gameAction;
+      const what = a.type === 'life' ? `${a.playerId} ${a.delta > 0 ? 'gained' : 'lost'} ${Math.abs(a.delta)} life` : JSON.stringify(a);
+      return `- ${what} (tapped by ${who}, ${when}, in ${entry.step})`;
+    })
     .join('\n');
 }

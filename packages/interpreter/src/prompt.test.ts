@@ -61,4 +61,17 @@ describe('buildPrompt', () => {
   it('says where the table is now', () => {
     expect(prompt.user).toContain('The table is now in: declareBlockers.');
   });
+
+  it('lists tapped actions as already recorded, and tells the model never to add them (ADR 0065)', () => {
+    const withTap = buildPrompt({
+      turnStart,
+      statements,
+      currentStep: 'declareBlockers',
+      pinned: [{ entry: { step: 'declareBlockers', playerId: 'melissa', gameAction: { type: 'life', playerId: 'melissa', delta: -4 }, from: [] }, afterStatements: 1 }],
+    });
+    expect(withTap.user).toContain('Already recorded by a tap on the board (never add these):\n- melissa lost 4 life (tapped by Melissa, after [s1], in declareBlockers)');
+    expect(withTap.system).toBe(prompt.system);
+    expect(prompt.system).toContain('never add an entry for them');
+    expect(prompt.user).not.toContain('Already recorded');
+  });
 });

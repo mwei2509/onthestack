@@ -31,7 +31,7 @@ describe.each(providers.map((p) => [p.id, p] as const))('%s', (providerId, live)
   const provider = retryInvalidOutput(recorded);
 
   it.each(CASES.map((c) => [c.id, c] as const))('%s', async (_id, c) => {
-    const prompt = buildPrompt({ turnStart: c.turnStart, statements: c.statements, currentStep: c.currentStep });
+    const prompt = buildPrompt({ turnStart: c.turnStart, statements: c.statements, currentStep: c.currentStep, pinned: c.pinned });
     const started = Date.now();
     let result;
     try {
