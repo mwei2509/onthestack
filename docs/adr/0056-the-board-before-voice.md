@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42).
 
+Refined by ADR 0066 (the step menu only jumps forward) and ADR 0067 (quick taps combine).
+
 Until players can speak or type their actions (#43, #44), the board needs controls of its own, or nothing would ever change on it.
 
 - **Life:** each phone has − and + on its own seat's life. A tap is a GameAction, the same as saying "I lose 1 life", so it can trigger abilities.

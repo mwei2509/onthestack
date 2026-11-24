@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42).
 
+Extended by ADR 0065 (the current Step is stored too).
+
 Applies ADR 0014 to the server. The Game Durable Object stores:
 
 - the game's setup: its code, the seats and their copied Decks, and when it was created

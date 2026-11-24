@@ -190,6 +190,7 @@ interface Game {
   seats: { playerId: PlayerId; name: string; deckId?: DeckId }[];
   cards: Record<CardName, CardDefinition>;   // the catalog, section 7
   turnStart: GameState;                      // snapshot the engine replays from
+  currentStep: Step;                         // replayed to, ADR 0065
   turnTranscript: PlayerStatement[];
   interpretedTimeline: { readsUpTo: PlayerStatementId; entries: TimelineEntry[] };
   timelineCorrections: TimelineCorrection[];
