@@ -1,3 +1,4 @@
+import { IMAGE_PATH, serveImage } from './cards/images.js';
 import { GAME_CODE, newGameCode } from './codes.js';
 
 export { Game } from './game.js';
@@ -20,6 +21,11 @@ export default {
         }
       }
       return Response.json({ error: 'Could not find a free game code' }, { status: 503 });
+    }
+
+    const image = IMAGE_PATH.exec(url.pathname);
+    if (image?.[1] && request.method === 'GET') {
+      return serveImage(image[1], image[2] !== undefined, { db: env.DB, bucket: env.IMAGES, fetch });
     }
 
     const match = GAME.exec(url.pathname);
