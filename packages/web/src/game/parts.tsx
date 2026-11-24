@@ -1,5 +1,5 @@
 import type { SeatView } from '@onthestack/server/protocol';
-import { useState, type ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { CopyIcon, Logo, ShareIcon } from '../icons.js';
 import { initial } from './seats.js';
 import type { Connection } from './useGame.js';
@@ -31,12 +31,20 @@ export function ConnectionPill({ connection }: { connection: Connection }) {
   );
 }
 
-export function Avatar({ name, colour, size }: { name: string; colour: string; size?: number }) {
+/** A seat's coin: its colour as a ring around the player's initial (ADR 0081). `active` adds the gold ring of whose turn it is. */
+export function Avatar({ name, colour, size, active }: { name: string; colour: string; size?: number; active?: boolean }) {
+  const style = { '--coin-ring': colour, ...(size ? { width: size, height: size, fontSize: Math.round(size * 0.45) } : {}) } as CSSProperties;
   return (
-    <span className="avatar" style={{ background: colour, ...(size ? { width: size, height: size, fontSize: size * 0.42 } : {}) }} aria-hidden>
+    <span className={`avatar${active ? ' active' : ''}`} style={style} aria-hidden>
       {initial(name)}
     </span>
   );
+}
+
+/** The painted glow behind a seat, in its colour. Its parent must be positioned. */
+export function SeatWash({ colour, strength = 24 }: { colour: string; strength?: number }) {
+  const wash = `radial-gradient(60% 140% at 70% 0%, color-mix(in srgb, ${colour} ${strength}%, transparent), transparent 70%)`;
+  return <span className="wash" style={{ '--wash': wash } as CSSProperties} aria-hidden />;
 }
 
 export function SeatDot({ seat }: { seat: SeatView }) {

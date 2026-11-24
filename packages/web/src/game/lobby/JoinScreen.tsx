@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ScreenIcon } from '../../icons.js';
-import { Avatar, ConnectionPill, GameHeader, Invite, SeatDot } from '../parts.js';
+import { Avatar, ConnectionPill, GameHeader, Invite, SeatDot, SeatWash } from '../parts.js';
 import { seatColours } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
 
@@ -55,6 +55,7 @@ export function JoinScreen({ code, game, update }: ScreenProps) {
           <ol className="seat-list">
             {update.seats.map((seat) => (
               <li key={seat.id} className="seat-row" style={{ padding: '6px 8px 6px 12px' }}>
+                <SeatWash colour={colours[seat.id]!} />
                 <div className="seat-main">
                   <Avatar name={seat.name} colour={colours[seat.id]!} size={36} />
                   <div className="seat-text">
