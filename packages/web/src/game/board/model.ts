@@ -4,7 +4,6 @@ import { seatColours } from '../seats.js';
 
 /** A commander-damage status cue: 15 or more from one commander is shown in the warning colour (ADR 0056). */
 export const CUE_AT = 15;
-export const LETHAL = 21;
 
 export interface CommanderHit {
   fromId: string;
