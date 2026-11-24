@@ -12,7 +12,8 @@ CREATE TABLE printings (
   oracle_id TEXT NOT NULL REFERENCES cards (oracle_id),
   set_code TEXT NOT NULL COLLATE NOCASE,
   collector_number TEXT NOT NULL,
-  has_back_image INTEGER NOT NULL DEFAULT 0
+  image_url TEXT NOT NULL,
+  back_image_url TEXT
 );
 
 CREATE INDEX printings_set_number ON printings (set_code, collector_number);

@@ -11,9 +11,9 @@ async function insertSolRing() {
     .bind(solRing.oracle_id, solRing.name, '{}', '2026-11-23T00:00:00Z')
     .run();
   await env.DB.prepare(
-    'INSERT INTO printings (scryfall_id, oracle_id, set_code, collector_number) VALUES (?, ?, ?, ?)',
+    'INSERT INTO printings (scryfall_id, oracle_id, set_code, collector_number, image_url) VALUES (?, ?, ?, ?, ?)',
   )
-    .bind('4cbc6901-6a4a-4d0a-83ea-7eefa3b35021', solRing.oracle_id, 'C21', '263')
+    .bind('4cbc6901-6a4a-4d0a-83ea-7eefa3b35021', solRing.oracle_id, 'C21', '263', 'https://cards.scryfall.io/grid/front/sol-ring.webp')
     .run();
 }
 
