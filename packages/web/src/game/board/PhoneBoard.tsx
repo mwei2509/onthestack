@@ -6,7 +6,7 @@ import type { ScreenProps } from '../useGame.js';
 import { createTapCombiner } from './lifeTaps.js';
 import { GameMenuButton } from './GameMenu.js';
 import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
-import { LogStatus, SayBar, ThisTurn } from '../log/TurnLog.js';
+import { LogStatus, QuestionTray, SayBar, ThisTurn } from '../log/TurnLog.js';
 import { clockTime, Crest, EndedPill, HitChips, NextStepCompact, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
 
@@ -65,6 +65,7 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
         {update.log && <ThisTurn log={update.log} view={view} game={game} />}
       </div>
 
+      {online && !ended && <QuestionTray log={update.log} view={view} you={you} game={game} />}
       {online && !ended && <LogStatus log={update.log} game={game} />}
       <footer className="board-dock">
         {ended ? (
