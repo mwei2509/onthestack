@@ -80,6 +80,16 @@ export function StepMenuButton({ onOpen, disabled }: { onOpen: () => void; disab
   );
 }
 
+export const clockTime = (at: Date) => at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+export function EndedPill() {
+  return (
+    <span className="pill" role="status" style={{ border: 0 }}>
+      Ended
+    </span>
+  );
+}
+
 export const cue = (damage: number) => (damage >= CUE_AT ? 'var(--danger)' : 'var(--text)');
 
 /** Commander damage one player has taken: whose commander, and how much. 15 or more is shown in the warning colour. */

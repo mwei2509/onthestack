@@ -1,18 +1,20 @@
 import type { TableView } from '@onthestack/engine';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import { Avatar, SeatWash } from '../parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { createTapCombiner } from './lifeTaps.js';
-import { boardPlayers, type BoardPlayer } from './model.js';
-import { Crest, HitChips, NextStepButton, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
+import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
+import { clockTime, Crest, EndedPill, HitChips, NextStepButton, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
 
 export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { you: string; view: TableView }) {
-  const players = boardPlayers(view, update.seats);
+  const { ended } = update;
+  const players = boardPlayers(view, update.seats, ended !== null);
   const byId = Object.fromEntries(players.map((p) => [p.id, p]));
   const me = byId[you];
   const active = byId[view.turn.activePlayerId]!;
-  const online = game.connection === 'open';
+  const online = game.connection === 'open' || ended !== null;
   const myTurn = active.id === you;
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -20,17 +22,19 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
     <div className="phone board">
       <header className="game-header" style={{ minHeight: 48 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: online ? 1 : 0.6 }}>
-          <Avatar name={active.name} colour={active.ring} size={32} active />
+          <Avatar name={active.name} colour={active.ring} size={32} active={!ended} />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span className="display" style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.02em' }}>
-              {myTurn ? 'Your turn' : `${active.name}'s turn`}
+              {ended ? 'Game ended' : myTurn ? 'Your turn' : `${active.name}'s turn`}
             </span>
             <span className="muted" style={{ fontSize: 12 }}>
               Turn {view.turn.number} · {code}
             </span>
           </div>
         </div>
-        {online ? (
+        {ended ? (
+          <EndedPill />
+        ) : online ? (
           <span className="pill" role="status" style={{ border: 0 }}>
             <span className="dot on" style={{ width: 8, height: 8 }} />
             Online
@@ -44,8 +48,8 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
       </header>
 
       <div className="board-body" style={{ opacity: online ? 1 : 0.6 }}>
-        <StepCard view={view} />
-        {me && <YourSeat me={me} players={byId} game={game} disabled={!online} large={players.length <= 2} />}
+        {!ended && <StepCard view={view} />}
+        {me && <YourSeat me={me} players={byId} game={game} disabled={!online} readOnly={ended !== null} large={players.length <= 2} />}
         <ul aria-label="Other players" className="others">
           {players
             .filter((p) => p.id !== you)
@@ -56,7 +60,14 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
       </div>
 
       <footer className="board-dock">
-        {online ? (
+        {ended ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignSelf: 'center' }}>
+            <span className="muted" style={{ fontSize: 14 }}>
+              {endedLine(ended, view, clockTime)}
+            </span>
+            <Link to="/">Back to start</Link>
+          </div>
+        ) : online ? (
           <>
             <StepMenuButton onOpen={() => setMenuOpen(true)} />
             {myTurn && <NextStepButton view={view} onNext={() => game.send({ type: 'nextStep', from: view.turn.step })} />}
@@ -87,19 +98,20 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
         )}
       </footer>
 
-      {menuOpen && <StepMenu view={view} game={game} confirmFirst={!myTurn} onClose={() => setMenuOpen(false)} />}
+      {menuOpen && !ended && <StepMenu view={view} game={game} confirmFirst={!myTurn} onClose={() => setMenuOpen(false)} />}
     </div>
   );
 }
 
-function YourSeat({ me, players, game, disabled, large }: { me: BoardPlayer; players: Record<string, BoardPlayer>; game: ScreenProps['game']; disabled: boolean; large: boolean }) {
+function YourSeat({ me, players, game, disabled, readOnly, large }: { me: BoardPlayer; players: Record<string, BoardPlayer>; game: ScreenProps['game']; disabled: boolean; readOnly: boolean; large: boolean }) {
   const [pending, setPending] = useState(0);
   const { send } = game;
   const [taps] = useState(() => createTapCombiner((delta) => send({ type: 'adjustLife', delta }), setPending));
   useEffect(() => () => taps.flush(), [taps]);
   useEffect(() => {
-    if (disabled) taps.cancel();
-  }, [disabled, taps]);
+    // Taps not yet sent when the game ends are dropped, not sent into a refusal (ADR 0100).
+    if (disabled || readOnly) taps.cancel();
+  }, [disabled, readOnly, taps]);
 
   const life = me.life + pending;
   return (
@@ -116,12 +128,14 @@ function YourSeat({ me, players, game, disabled, large }: { me: BoardPlayer; pla
           </div>
           {me.commander && <span className="seat-sub" style={{ fontSize: 14 }}>{me.commander}</span>}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 4px' }}>
-          <button className="life-btn" aria-label="Lose 1 life" disabled={disabled} onClick={() => taps.tap(-1)}>
-            <svg width="24" height="24" viewBox="0 0 22 22" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
-              <path d="M5 11h12" />
-            </svg>
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: readOnly ? 'center' : 'space-between', padding: '2px 4px' }}>
+          {!readOnly && (
+            <button className="life-btn" aria-label="Lose 1 life" disabled={disabled} onClick={() => taps.tap(-1)}>
+              <svg width="24" height="24" viewBox="0 0 22 22" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
+                <path d="M5 11h12" />
+              </svg>
+            </button>
+          )}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Crest life={life} size={large ? 156 : 128} out={me.out} />
             {pending !== 0 && (
@@ -130,11 +144,13 @@ function YourSeat({ me, players, game, disabled, large }: { me: BoardPlayer; pla
               </span>
             )}
           </div>
-          <button className="life-btn" aria-label="Gain 1 life" disabled={disabled} onClick={() => taps.tap(1)}>
-            <svg width="24" height="24" viewBox="0 0 22 22" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
-              <path d="M5 11h12M11 5v12" />
-            </svg>
-          </button>
+          {!readOnly && (
+            <button className="life-btn" aria-label="Gain 1 life" disabled={disabled} onClick={() => taps.tap(1)}>
+              <svg width="24" height="24" viewBox="0 0 22 22" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
+                <path d="M5 11h12M11 5v12" />
+              </svg>
+            </button>
+          )}
         </div>
         {me.hits.some((h) => h.damage > 0) && (
           <div className="hits">
