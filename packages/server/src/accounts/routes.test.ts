@@ -14,7 +14,7 @@ const call = (rest: string | undefined, method: string, token?: string, origin =
       headers: token ? { Cookie: `theme=dark; session=${token}` } : {},
     }),
     rest,
-    { db: env.DB, now: () => now },
+    { db: env.DB, now: () => now, newId: () => crypto.randomUUID(), limit: async () => true },
   );
 
 beforeEach(async () => {

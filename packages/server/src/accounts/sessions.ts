@@ -1,3 +1,5 @@
+import { readCookie, setCookie } from './cookies.js';
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const SESSION_MS = 30 * DAY_MS;
 export const RENEW_AFTER_MS = DAY_MS;
@@ -31,7 +33,7 @@ export async function startSession(db: D1Database, accountId: string, now: Date)
   return token;
 }
 
-/** The session a token belongs to, renewed if it was last renewed over a day ago (ADR 0101); null once expired. */
+/** The session a token belongs to, renewed if it was last renewed over a day ago (ADR 0104); null once expired. */
 export async function findSession(db: D1Database, token: string, now: Date): Promise<Session | null> {
   const tokenHash = await hash(token);
   const row = await db
@@ -57,21 +59,9 @@ export async function endAllSessions(db: D1Database, accountId: string): Promise
   await db.prepare('DELETE FROM sessions WHERE account_id = ?').bind(accountId).run();
 }
 
-export function sessionToken(request: Request): string | null {
-  for (const part of (request.headers.get('Cookie') ?? '').split(';')) {
-    const [name, ...value] = part.trim().split('=');
-    if (name === COOKIE) return value.join('=') || null;
-  }
-  return null;
-}
+export const sessionToken = (request: Request) => readCookie(request, COOKIE);
 
-// Safari refuses `Secure` cookies over http://localhost, so local dev leaves it off; every deployed site is https.
-const secure = (request: Request) => (new URL(request.url).protocol === 'https:' ? '; Secure' : '');
+export const sessionCookie = (request: Request, token: string) =>
+  setCookie(request, COOKIE, token, { maxAgeSeconds: SESSION_MS / 1000 });
 
-export function sessionCookie(request: Request, token: string): string {
-  return `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_MS / 1000}${secure(request)}`;
-}
-
-export function clearedSessionCookie(request: Request): string {
-  return `${COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure(request)}`;
-}
+export const clearedSessionCookie = (request: Request) => setCookie(request, COOKIE, '', { maxAgeSeconds: 0 });

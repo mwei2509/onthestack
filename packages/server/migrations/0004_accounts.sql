@@ -33,7 +33,7 @@ CREATE TABLE sessions (
 
 CREATE INDEX sessions_account ON sessions (account_id);
 
--- A passkey prompt's one-time challenge, good for 5 minutes (ADR 0100).
+-- A passkey prompt's one-time challenge, good for 5 minutes (ADR 0103).
 CREATE TABLE auth_challenges (
   id TEXT PRIMARY KEY,
   challenge TEXT NOT NULL,
