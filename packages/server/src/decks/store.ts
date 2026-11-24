@@ -64,6 +64,10 @@ interface CardRow {
   type_line: string | null;
   color_identity: string | null;
   double_faced: number;
+  mana_cost: string | null;
+  mana_value: number | null;
+  oracle_text: string | null;
+  face_texts: string | null;
 }
 
 interface SummaryRow {
@@ -96,8 +100,10 @@ const APPEND_CARD = `
   INSERT INTO deck_cards (deck_id, position, oracle_id, scryfall_id, quantity, commander)
   SELECT ?1, coalesce(max(position) + 1, 0), ?2, ?3, ?4, ?5 FROM deck_cards WHERE deck_id = ?1`;
 
-// A double-faced card's type is its front face's (ADR 0084).
+// A double-faced card's type and cost are its front face's (ADR 0084, 0096).
 const TYPE_LINE = "coalesce(c.data ->> '$.card_faces[0].type_line', c.data ->> '$.type_line')";
+const MANA_COST = "coalesce(c.data ->> '$.mana_cost', c.data ->> '$.card_faces[0].mana_cost')";
+const FACE_TEXTS = "(SELECT json_group_array(f.value ->> '$.oracle_text') FROM json_each(c.data, '$.card_faces') f)";
 
 const SELECT_SUMMARIES = `
   SELECT d.id, d.name, d.unmatched, d.archidekt_id, d.imported_at,
@@ -116,7 +122,9 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
         .prepare(
           `SELECT dc.oracle_id, dc.scryfall_id, c.name, dc.quantity, dc.commander,
              ${TYPE_LINE} AS type_line, c.data -> '$.color_identity' AS color_identity,
-             coalesce(p.back_image_url, '') != '' AS double_faced
+             coalesce(p.back_image_url, '') != '' AS double_faced,
+             ${MANA_COST} AS mana_cost, c.data ->> '$.cmc' AS mana_value,
+             c.data ->> '$.oracle_text' AS oracle_text, ${FACE_TEXTS} AS face_texts
            FROM deck_cards dc JOIN cards c ON c.oracle_id = dc.oracle_id
            LEFT JOIN printings p ON p.scryfall_id = dc.scryfall_id
            WHERE dc.deck_id = ? ORDER BY dc.position`,
@@ -139,6 +147,11 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
         group: groupOf(r.type_line ?? ''),
         legendary: isLegendary(r.type_line ?? ''),
         doubleFaced: r.double_faced === 1,
+        typeLine: r.type_line ?? '',
+        manaCost: r.mana_cost ?? '',
+        manaValue: r.mana_value ?? 0,
+        oracleText: r.oracle_text ?? (JSON.parse(r.face_texts ?? '[]') as (string | null)[]).filter(Boolean).join('\n\n'),
+        known: false,
       })),
       unmatched: JSON.parse(deck.unmatched) as UnmatchedLine[],
       importedAt: deck.imported_at,

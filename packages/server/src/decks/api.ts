@@ -18,6 +18,14 @@ export interface DeckCard {
   legendary: boolean;
   /** Its printing has a back face with its own image, at `/api/images/<scryfallId>/back`. */
   doubleFaced: boolean;
+  /** The front face's, as Scryfall writes them: `Legendary Creature — Vampire Knight`, `{3}{W}{B}` (empty for lands). */
+  typeLine: string;
+  manaCost: string;
+  manaValue: number;
+  /** Every face's Oracle text, front first, separated by a blank line. */
+  oracleText: string;
+  /** Whether the app has a Translation for it (ADR 0098). None does until card knowledge reaches games. */
+  known: boolean;
 }
 
 export interface DeckDetail {

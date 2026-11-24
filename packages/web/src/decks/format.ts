@@ -50,8 +50,8 @@ export function lineWithName(text: string, name: string): string {
 }
 
 /** The commander picker's order (ADR 0083): legendary creatures and planeswalkers first, each part A–Z. */
-export function commanderChoices<T extends { name: string; legendary: boolean; group: string }>(cards: T[]): T[] {
-  const likely = (c: T) => c.legendary && (c.group === 'Creature' || c.group === 'Planeswalker');
+export function commanderChoices<T extends { name: string; legendary: boolean; typeLine: string }>(cards: T[]): T[] {
+  const likely = (c: T) => c.legendary && /\b(Creature|Planeswalker)\b/.test(c.typeLine);
   const byName = (a: T, b: T) => a.name.localeCompare(b.name);
   return [...cards.filter(likely).sort(byName), ...cards.filter((c) => !likely(c)).sort(byName)];
 }
