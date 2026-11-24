@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in a Claude Code session)
 
+Amended by ADR 0073 (image URLs are stored, and name-only lines reuse a stored printing).
+
 Amends ADR 0044, which stores card images in R2 without saying which printing they show. A Deck can name a specific printing: an Archidekt import gives each card's Scryfall ID, and an Archidekt text export gives set code and collector number (ADR 0049). Players should see the art on the physical card in front of them, so images are per printing, not per card.
 
 A D1 `printings` table maps each printing we have seen to its card: `scryfall_id` (primary key), `oracle_id`, `set_code`, `collector_number` (indexed together), and whether it has a back face image. An import resolves a Scryfall ID or a set and collector number from this table first, and only asks Scryfall's `/cards/collection` for the ones it doesn't know. A line that names only a card (`1 Sol Ring`) gets Scryfall's newest printing, which is what the collection endpoint returns for a name.
