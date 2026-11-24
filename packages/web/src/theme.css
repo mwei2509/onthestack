@@ -2477,6 +2477,7 @@ h1.title {
 
 .say-for svg {
   color: var(--accent);
+}
 
 /* The ?debug panel (ADR 0109): a maintainer's view, plain on purpose. */
 .debug-toggle {
