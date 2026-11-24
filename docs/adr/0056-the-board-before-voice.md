@@ -2,7 +2,7 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42).
 
-Refined by ADR 0066 (the step menu only jumps forward) and ADR 0067 (quick taps combine).
+Refined by ADR 0075 (the step menu only jumps forward) and ADR 0076 (quick taps combine).
 
 Until players can speak or type their actions (#43, #44), the board needs controls of its own, or nothing would ever change on it.
 

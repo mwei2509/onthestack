@@ -16,7 +16,7 @@ export const DeviceMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('removeSeat'), seatId }),
   z.object({ type: z.literal('reorder'), seatIds: z.array(seatId).max(16) }),
   z.object({ type: z.literal('start'), firstSeatId: seatId }),
-  /** A tap on − or + for this device's own seat, after quick taps are combined (ADR 0067). */
+  /** A tap on − or + for this device's own seat, after quick taps are combined (ADR 0076). */
   z.object({ type: z.literal('adjustLife'), delta: z.number().int().min(-999).max(999).refine((n) => n !== 0, 'A life change can\'t be 0') }),
   /** `from` is the Step the device saw, so two screens pressing at once move one Step, not two. */
   z.object({ type: z.literal('nextStep'), from: step }),
