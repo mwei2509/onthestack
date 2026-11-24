@@ -2090,3 +2090,36 @@ h1.title {
   font-family: Inter, system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
 }
+
+/* Accounts (ADR 0105) */
+.account-start,
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-top {
+  display: flex;
+  justify-content: flex-end;
+  height: 44px;
+}
+
+.home-top a {
+  display: inline-flex;
+  align-items: center;
+  max-width: 60%;
+  padding: 0 12px;
+  border-radius: 12px;
+  color: var(--text-2);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-top a:hover {
+  color: var(--text);
+}
