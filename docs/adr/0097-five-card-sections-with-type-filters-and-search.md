@@ -10,9 +10,9 @@ Both views of the Deck page group cards as the canvas does:
 2. **Creatures:** any other card that's a creature.
 3. **Other permanents:** artifacts, enchantments, planeswalkers and battles that aren't creatures.
 4. **Spells:** instants and sorceries.
-5. **Lands:** lands that aren't creatures.
+5. **Lands:** lands that aren't creatures, artifact lands included.
 
-Each section shows how many cards it holds, counting quantities. A double-faced card still goes by its front face, and the first section in this order that fits wins, so an artifact creature is a Creature and Dryad Arbor is a Creature.
+Each section shows how many cards it holds, counting quantities. A double-faced card still goes by its front face. A card with several types is a Creature if it's a creature, otherwise a Land if it's a land, so an artifact creature and Dryad Arbor are Creatures and an artifact land is a Land.
 
 Above the cards, chips filter by type (All, Creatures, Spells, Lands, Other; Creatures includes the commander when it's a creature), and a search box matches card names and Oracle text, ignoring case. Filter and search apply to both views.
 
