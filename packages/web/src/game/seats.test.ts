@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clockwiseFrom, initial, moved, seatColours } from './seats.js';
+import { clockwiseFrom, deckLine, initial, moved, seatColours, seatLooks } from './seats.js';
 
 describe('seats', () => {
   it('keeps each seat\'s colour when the seats are reordered', () => {
@@ -23,5 +23,27 @@ describe('seats', () => {
   it('takes the first letter for the avatar', () => {
     expect(initial(' ana')).toBe('A');
     expect(initial('')).toBe('?');
+  });
+});
+
+describe('seatLooks', () => {
+  it("draws a seat in its Deck's colour identity, or its seat colour without one (ADR 0086)", () => {
+    const deck = (colorIdentity: string[]) => ({ id: 'd', name: 'D', commanders: [], colorIdentity });
+    const looks = seatLooks([
+      { id: 'p1', deck: deck(['W', 'B']) },
+      { id: 'p2', deck: deck([]) },
+      { id: 'p3' },
+    ]);
+    expect(looks.p1!.identity).toEqual(['W', 'B']);
+    expect(looks.p1!.ring).toMatch(/^conic-gradient/);
+    expect(looks.p2!.ring).toBe(looks.p2!.colour);
+    expect(looks.p3!.ring).toBe(looks.p3!.colour);
+  });
+});
+
+describe('deckLine', () => {
+  it("names a seat's Deck and its commanders", () => {
+    expect(deckLine({ name: 'Vampires', commanders: ['Vona, Butcher of Magan'] })).toBe('Vampires · Vona, Butcher of Magan');
+    expect(deckLine({ name: 'Rings', commanders: [] })).toBe('Rings · no commander');
   });
 });

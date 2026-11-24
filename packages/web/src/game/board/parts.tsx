@@ -90,7 +90,7 @@ export function HitChips({ hits, players }: { hits: CommanderHit[]; players: Rec
         .filter((h) => h.damage > 0)
         .map((h) => (
           <span key={h.fromId} className="hit-chip" aria-label={`${h.damage} from ${h.commander}`}>
-            <Avatar name={players[h.fromId]!.name} colour={players[h.fromId]!.colour} size={22} />
+            <Avatar name={players[h.fromId]!.name} colour={players[h.fromId]!.ring} size={22} />
             <span style={{ fontSize: 12, color: 'var(--italic)', maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.commander}</span>
             <span className="num" style={{ fontSize: 15, fontWeight: 700, color: cue(h.damage) }}>
               {h.damage}

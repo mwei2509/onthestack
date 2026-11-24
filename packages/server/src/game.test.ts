@@ -1,7 +1,28 @@
 import { env, runInDurableObject } from 'cloudflare:test';
 import { exports } from 'cloudflare:workers';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { fakeScryfall } from './cards/fake-scryfall.js';
+import { createCardStore } from './cards/store.js';
+import { createDeckStore } from './decks/store.js';
 import type { DeviceMessage, ServerMessage } from './protocol.js';
+
+const VONA_DECK = 'vona-deck';
+const RINGS_DECK = 'rings-deck';
+
+const VAMPIRES = { id: VONA_DECK, name: 'Vampires', commanders: ['Vona, Butcher of Magan'], colorIdentity: ['W', 'B'] };
+
+const deckStore = (id: string) =>
+  createDeckStore({
+    db: env.DB,
+    cards: createCardStore({ db: env.DB, fetch: fakeScryfall().fetch, sleep: async () => {}, now: () => new Date() }),
+    now: () => new Date(),
+    newId: () => id,
+  });
+
+beforeAll(async () => {
+  await deckStore(VONA_DECK).importList('Vampires', '1x Vona, Butcher of Magan (lcc) 293 [Commander]\n1 Sol Ring');
+  await deckStore(RINGS_DECK).importList('Rings', '1 Sol Ring');
+});
 
 type Update = Extract<ServerMessage, { type: 'update' }>;
 
@@ -41,7 +62,7 @@ async function lobby(...names: string[]) {
   for (const name of names) {
     const device = await connect(code);
     await device.update();
-    device.send({ type: 'join', name });
+    device.send({ type: 'join', name, deckId: VONA_DECK });
     devices.push(device);
     for (const d of devices) await d.update();
   }
@@ -86,8 +107,8 @@ describe('Lobby', () => {
     devices[1]!.send({ type: 'watch' });
     const [theo, elena] = [await devices[0]!.update(), await devices[1]!.update()];
     expect(theo.seats).toEqual([
-      { id: 'p1', name: 'Theo', connected: true },
-      { id: 'p2', name: 'Elena', connected: false },
+      { id: 'p1', name: 'Theo', deck: VAMPIRES, connected: true },
+      { id: 'p2', name: 'Elena', deck: VAMPIRES, connected: false },
     ]);
     expect(theo.you).toBe('p1');
     expect(elena.you).toBeNull();
@@ -135,7 +156,7 @@ describe('Lobby', () => {
 
     const late = await connect(code);
     await late.update();
-    late.send({ type: 'join', name: 'Michael' });
+    late.send({ type: 'join', name: 'Michael', deckId: VONA_DECK });
     expect(await late.next()).toEqual({ type: 'error', message: "Joining can't change once the game has started" });
     late.send({ type: 'removeSeat', seatId: 'p1' });
     expect(await late.next()).toEqual({ type: 'error', message: "Seats can't change once the game has started" });
@@ -143,11 +164,48 @@ describe('Lobby', () => {
     expect((await late.update()).you).toBe('p2');
   });
 
+  it('needs a Deck from the library to take a seat (ADR 0080)', async () => {
+    const code = await createGame();
+    const device = await connect(code);
+    await device.update();
+    device.send({ type: 'join', name: 'Ana' });
+    expect((await device.next()).type).toBe('error');
+    device.send({ type: 'join', name: 'Ana', deckId: 'not-saved' });
+    expect(await device.next()).toEqual({ type: 'error', message: "That Deck isn't saved" });
+  });
+
+  it("changes a seat's Deck, keeping a summary of it (ADR 0085)", async () => {
+    const { devices } = await lobby('Theo');
+    devices[0]!.send({ type: 'editSeat', seatId: 'p1', deckId: RINGS_DECK });
+    expect((await devices[0]!.update()).seats[0]!.deck).toEqual({ id: RINGS_DECK, name: 'Rings', commanders: [], colorIdentity: [] });
+  });
+
+  it('reads every Deck afresh at Start, and refuses a Deck that was deleted', async () => {
+    const { devices } = await lobby('Theo', 'Elena');
+    devices[1]!.send({ type: 'editSeat', seatId: 'p2', deckId: RINGS_DECK });
+    for (const d of devices) await d.update();
+    await deckStore(RINGS_DECK).rename(RINGS_DECK, 'Rings, renamed');
+
+    const gone = await deckStore('gone-deck').importList('Gone', '1 Sol Ring');
+    devices[0]!.send({ type: 'editSeat', seatId: 'p1', deckId: gone.id });
+    for (const d of devices) await d.update();
+    await deckStore('gone-deck').remove(gone.id);
+    devices[0]!.send({ type: 'start', firstSeatId: 'p1' });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: "Theo's Deck isn't in the library any more. Pick another." });
+
+    devices[0]!.send({ type: 'editSeat', seatId: 'p1', deckId: VONA_DECK });
+    for (const d of devices) await d.update();
+    devices[0]!.send({ type: 'start', firstSeatId: 'p1' });
+    const update = await devices[0]!.update();
+    expect(update.seats.map((s) => s.deck?.name)).toEqual(['Vampires', 'Rings, renamed']);
+    expect(update.view!.commandZone).toEqual({ p1: { card: 'Vona, Butcher of Magan', casts: 0, inZone: true }, p2: null });
+  });
+
   it('takes at most six seats', async () => {
     const { code } = await lobby('Ana', 'Theo', 'Jun', 'Priya', 'Sam', 'Rafa');
     const seventh = await connect(code);
     await seventh.update();
-    seventh.send({ type: 'join', name: 'Kim' });
+    seventh.send({ type: 'join', name: 'Kim', deckId: VONA_DECK });
     expect(await seventh.next()).toEqual({ type: 'error', message: 'A game has at most 6 seats' });
   });
 
@@ -160,7 +218,7 @@ describe('Lobby', () => {
     expect((await theo!.next()).type).toBe('error');
     theo!.send({ type: 'join', name: '   ' });
     expect(await theo!.next()).toEqual({ type: 'error', message: 'A name is needed' });
-    theo!.send({ type: 'join', name: 'Theo again' });
+    theo!.send({ type: 'join', name: 'Theo again', deckId: VONA_DECK });
     expect(await theo!.next()).toEqual({ type: 'error', message: 'This device already has a seat' });
     theo!.send({ type: 'reorder', seatIds: ['p1', 'p1'] });
     expect(await theo!.next()).toEqual({ type: 'error', message: 'The new order must list every seat once' });
@@ -197,7 +255,8 @@ describe('Game', () => {
       ['Michael', 40],
       ['Theo', 40],
     ]);
-    expect(view.commandZone).toEqual({ p1: null, p2: null, p3: null });
+    const vona = { card: 'Vona, Butcher of Magan', casts: 0, inZone: true };
+    expect(view.commandZone).toEqual({ p1: vona, p2: vona, p3: vona });
   });
 
   it('changes a seated device\'s own life, on every screen', async () => {
@@ -269,7 +328,7 @@ describe('Game', () => {
     const reloaded = await connect(code);
     const first = await reloaded.update();
     expect(first.view!.players.p3!.life).toBe(35);
-    expect(first.seats[2]).toEqual({ id: 'p3', name: 'Michael', connected: false });
+    expect(first.seats[2]).toEqual({ id: 'p3', name: 'Michael', deck: VAMPIRES, connected: false });
     reloaded.send({ type: 'claim', seatId: 'p3' });
     expect((await reloaded.update()).you).toBe('p3');
   });

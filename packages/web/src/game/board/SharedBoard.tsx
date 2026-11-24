@@ -85,9 +85,9 @@ function SeatCard({ player, players }: { player: BoardPlayer; players: Record<st
   const hit = worstHit(player.hits);
   return (
     <section aria-label={player.name} className={`seat-card${player.active ? ' glowing' : ''}${player.out ? ' out' : ''}`}>
-      <SeatWash colour={player.colour} strength={28} />
+      <SeatWash colour={player.colour} identity={player.identity} strength={28} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Avatar name={player.name} colour={player.colour} size={40} active={player.active} />
+        <Avatar name={player.name} colour={player.ring} size={40} active={player.active} />
         <span className="display" style={{ fontSize: 24, fontWeight: 800, letterSpacing: '0.03em', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {player.name}
         </span>
@@ -111,7 +111,7 @@ function SeatCard({ player, players }: { player: BoardPlayer; players: Record<st
         <div className="hit-row">
           {player.hits.map((h) => (
             <span key={h.fromId} className="hit-box" style={h.damage === 0 ? { opacity: 0.4 } : undefined} aria-label={`${h.damage} from ${h.commander}`}>
-              <Avatar name={players[h.fromId]!.name} colour={players[h.fromId]!.colour} size={20} />
+              <Avatar name={players[h.fromId]!.name} colour={players[h.fromId]!.ring} size={20} />
               <span className="num" style={{ fontSize: 18, fontWeight: 700, color: cue(h.damage) }}>
                 {h.damage}
               </span>
