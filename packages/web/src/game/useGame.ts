@@ -1,4 +1,4 @@
-import type { DeviceMessage, ServerMessage } from '@onthestack/server/protocol';
+import type { DeviceMessage, InterpretationRecord, ServerMessage } from '@onthestack/server/protocol';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { afterClaimRefused, afterUpdate, loadMemory, onOpen, sameMemory, saveMemory, type SeatMemory } from './seatMemory.js';
 
@@ -18,6 +18,8 @@ export interface GameConnection {
   retry: () => void;
   /** When the last update arrived, to say how old the board is while offline. */
   updatedAt: Date | null;
+  /** The game's last interpretations, newest first, once the debug panel has asked (ADR 0109). */
+  debugLog: InterpretationRecord[] | null;
 }
 
 const RETRY_MS = [500, 1000, 2000, 4000, 8000];
@@ -29,6 +31,7 @@ export function useGame(code: string): GameConnection {
   const [memory, setMemoryState] = useState<SeatMemory>(() => loadMemory(code));
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const [debugLog, setDebugLog] = useState<InterpretationRecord[] | null>(null);
   const socket = useRef<WebSocket | null>(null);
   const retryNow = useRef<() => void>(() => undefined);
   const memoryRef = useRef(memory);
@@ -85,7 +88,7 @@ export function useGame(code: string): GameConnection {
           }
           return setError(message.message);
         }
-        if (message.type === 'debugLog') return;
+        if (message.type === 'debugLog') return setDebugLog(message.interpretations);
         if (message.version < version) return;
         version = message.version;
         if (message.you) claiming = false;
@@ -135,7 +138,7 @@ export function useGame(code: string): GameConnection {
 
   const retry = useCallback(() => retryNow.current(), []);
 
-  return { connection, update, memory, error, send, watch, stopWatching, retry, updatedAt };
+  return { connection, update, memory, error, send, watch, stopWatching, retry, updatedAt, debugLog };
 }
 
 export interface ScreenProps {
