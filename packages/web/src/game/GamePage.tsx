@@ -51,5 +51,6 @@ function Screen({ code, game }: { code: string; game: GameConnection }) {
   // A remembered seat counts as held until the server refuses the claim, so a reconnect doesn't flash the seat picker.
   const you = update.you ?? memory?.seatId ?? null;
   if (you) return update.started ? <BoardScreen {...props} you={you} /> : <LobbyScreen {...props} you={you} />;
+  if (update.ended) return <BoardScreen {...props} you={null} />;
   return update.started ? <LateScreen {...props} /> : <JoinScreen {...props} />;
 }

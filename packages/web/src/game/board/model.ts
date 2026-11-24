@@ -1,5 +1,5 @@
 import type { Player, TableView } from '@onthestack/engine';
-import type { SeatView } from '@onthestack/server/protocol';
+import type { Ended, SeatView } from '@onthestack/server/protocol';
 import { seatLooks } from '../seats.js';
 
 /** A commander-damage status cue: 15 or more from one commander is shown in the warning colour (ADR 0056). */
@@ -23,8 +23,17 @@ export interface BoardPlayer extends Player {
   hits: CommanderHit[];
 }
 
-/** The TableView's players in turn order, with what the board shows for each: colour, device, commander damage. */
-export function boardPlayers(view: TableView, seats: SeatView[]): BoardPlayer[] {
+/**
+ * The TableView's players in turn order, with what the board shows for each: colour, device, commander damage. Nobody
+ * is active once the game has ended (ADR 0102).
+ */
+/** "Ended on turn 7, in Theo's turn · 9:42 pm" (ADR 0102). */
+export function endedLine(ended: Ended, view: TableView, time: (at: Date) => string): string {
+  const whose = view.players[view.turn.activePlayerId]?.name;
+  return `Ended on turn ${view.turn.number}${whose ? `, in ${whose}'s turn` : ''} · ${time(new Date(ended.at))}`;
+}
+
+export function boardPlayers(view: TableView, seats: SeatView[], ended = false): BoardPlayer[] {
   const looks = seatLooks(seats);
   const connected = new Set(seats.filter((s) => s.connected).map((s) => s.id));
   const commanders = Object.entries(view.commandZone).flatMap(([id, c]) => (c ? [{ id, card: c.card }] : []));
@@ -35,7 +44,7 @@ export function boardPlayers(view: TableView, seats: SeatView[]): BoardPlayer[] 
     identity: looks[p.id]?.identity ?? [],
     connected: connected.has(p.id),
     commander: view.commandZone[p.id]?.card ?? null,
-    active: p.id === view.turn.activePlayerId,
+    active: !ended && p.id === view.turn.activePlayerId,
     hits: commanders.filter((c) => c.id !== p.id).map((c) => ({ fromId: c.id, commander: c.card, damage: p.commanderDamage[c.card] ?? 0 })),
   }));
 }
