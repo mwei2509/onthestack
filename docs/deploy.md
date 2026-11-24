@@ -23,6 +23,13 @@ Do these before the first deploy. Until the secrets exist, the `deploy` job fail
 
 Migrations run before the new code is live, so a migration must keep working with the code currently deployed: add columns and tables, don't rename or drop them in the same change that stops using them.
 
+## The interpreter's API key
+
+Typed statements are read by Claude (ADR 0047), which needs `ANTHROPIC_API_KEY`. It's optional everywhere: without it, every statement shows "Couldn't interpret" and the board keeps working by tap (ADR 0067). It's paid per statement, so use a key with a spend cap (ADR 0040).
+
+- **Locally:** put `ANTHROPIC_API_KEY=…` in `packages/server/.env`. `wrangler dev` reads it when there is no `.dev.vars`, and the root `.gitignore` covers `.env` but not `.dev.vars`, so prefer `.env`. The evals read their own copy in `packages/interpreter/.env`. `stx wt create` copies `.env` files into new worktrees.
+- **Deployed:** `pnpm --filter @onthestack/server exec wrangler secret put ANTHROPIC_API_KEY` (after `wrangler login`). It's a Worker secret, not a repository secret: CI never sees it.
+
 ## Deploying
 
 - Every push to `main` deploys once CI passes.
