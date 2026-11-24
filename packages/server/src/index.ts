@@ -88,13 +88,13 @@ export default {
 
 /**
  * A game's dump shows everything said in it, so production needs the DEBUG_TOKEN secret (ADR 0117). Without the
- * secret set, only local development and Previews (workers.dev) serve it.
+ * secret set, only local development and Previews (workers.dev) serve it. `wrangler dev` rewrites every request's
+ * host to the first route's (onthestack.gg), so local development is marked by `LOCAL_DEV` from the dev script.
  */
-export function refuseDump(request: Request, env: Env): Response | null {
-  const { hostname } = new URL(request.url);
+export function refuseDump(request: Request, env: Pick<Env, 'DEBUG_TOKEN' | 'LOCAL_DEV'>): Response | null {
   if (!env.DEBUG_TOKEN) {
-    const devHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.workers.dev');
-    return devHost ? null : new Response('Set the DEBUG_TOKEN secret to read game dumps here', { status: 403 });
+    const allowed = env.LOCAL_DEV === 'true' || new URL(request.url).hostname.endsWith('.workers.dev');
+    return allowed ? null : new Response('Set the DEBUG_TOKEN secret to read game dumps here', { status: 403 });
   }
   const given = request.headers.get('Authorization')?.replace(/^Bearer /, '') ?? '';
   return sameSecret(given, env.DEBUG_TOKEN) ? null : new Response('Wrong or missing DEBUG_TOKEN', { status: 401 });

@@ -6,7 +6,7 @@ export default defineConfig({
     cloudflareTest(async () => ({
       wrangler: { configPath: './wrangler.jsonc' },
       // A blank key, so no test can reach Anthropic with the real one `.env` gives `wrangler dev`; no event logs in test output.
-      miniflare: { bindings: { TEST_MIGRATIONS: await readD1Migrations('./migrations'), ANTHROPIC_API_KEY: '', TEST_PHASE: 'false' } },
+      miniflare: { bindings: { TEST_MIGRATIONS: await readD1Migrations('./migrations'), ANTHROPIC_API_KEY: '', TEST_PHASE: 'false', LOCAL_DEV: 'true' } },
     })),
   ],
   test: { setupFiles: ['./src/test/apply-migrations.ts'] },

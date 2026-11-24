@@ -467,11 +467,11 @@ describe('Debug dump (ADR 0117)', () => {
 });
 
 describe('Who may read a dump', () => {
-  const env = (DEBUG_TOKEN?: string) => ({ DEBUG_TOKEN }) as Env;
+  const env = (DEBUG_TOKEN?: string, LOCAL_DEV?: string) => ({ DEBUG_TOKEN, LOCAL_DEV });
   const get = (url: string, token?: string) => new Request(url, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
 
   it('without the secret, serves only local development and Previews', () => {
-    expect(refuseDump(get('http://localhost:8790/api/games/X/debug'), env())).toBeNull();
+    expect(refuseDump(get('https://onthestack.gg/api/games/X/debug'), env(undefined, 'true'))).toBeNull();
     expect(refuseDump(get('https://pr-12-onthestack.onthestack.workers.dev/api/games/X/debug'), env())).toBeNull();
     expect(refuseDump(get('https://onthestack.gg/api/games/X/debug'), env())?.status).toBe(403);
   });
@@ -479,7 +479,7 @@ describe('Who may read a dump', () => {
   it('with the secret, needs the token everywhere', () => {
     expect(refuseDump(get('https://onthestack.gg/api/games/X/debug', 's3cret'), env('s3cret'))).toBeNull();
     expect(refuseDump(get('https://onthestack.gg/api/games/X/debug', 'guess'), env('s3cret'))?.status).toBe(401);
-    expect(refuseDump(get('http://localhost:8790/api/games/X/debug'), env('s3cret'))?.status).toBe(401);
+    expect(refuseDump(get('https://onthestack.gg/api/games/X/debug'), env('s3cret', 'true'))?.status).toBe(401);
   });
 });
 

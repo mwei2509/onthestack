@@ -4,4 +4,6 @@ interface Env {
   ANTHROPIC_API_KEY?: string;
   /** Required for a game's debug dump on onthestack.gg (ADR 0117). */
   DEBUG_TOKEN?: string;
+  /** "true" under `wrangler dev`, passed by the dev script, since request hosts can't tell (ADR 0117). */
+  LOCAL_DEV?: string;
 }
