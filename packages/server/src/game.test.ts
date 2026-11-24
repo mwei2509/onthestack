@@ -510,6 +510,23 @@ describe('Statements', () => {
     expect(read).toMatchObject({ turn: 1, transcriptVersion: 1, model: 'fake', answer: JSON.stringify(reading('s1')), promptVersion: expect.stringMatching(/^[0-9a-f]{8}$/) });
   });
 
+  it('records an interpretation that never reached a provider, such as a missing API key', async () => {
+    const { code, devices } = await started();
+    const stub = env.GAME.getByName(code);
+    await runInDurableObject(stub, (instance) => {
+      Object.assign(instance, { interpretAfterMs: 0 });
+    });
+    devices[0]!.send({ type: 'statement', text: 'Elena loses 3 life' });
+    await everyone(devices);
+    await everyone(devices);
+    const screen = await connect(code);
+    await screen.update();
+    screen.send({ type: 'debugLog' });
+    const log = await screen.next();
+    if (log.type !== 'debugLog') throw new Error(`Expected the debug log, got ${log.type}`);
+    expect(log.interpretations).toMatchObject([{ provider: 'none', error: expect.stringContaining('ANTHROPIC_API_KEY') }]);
+  });
+
   it('keeps no more than the last 10 interpretations', async () => {
     const { code, devices, call, say } = await interpreting();
     for (let i = 0; i < 12; i++) {

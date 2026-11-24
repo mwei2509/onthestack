@@ -320,12 +320,14 @@ export class Game extends DurableObject<Env> {
     const record = { at: new Date().toISOString(), turn: asked.turn, transcriptVersion: asked.transcriptVersion, promptVersion: prompt.version, user: prompt.user };
     const started = Date.now();
     try {
-      const provider = this.provider();
+      let provider: LlmProvider | undefined;
       let result;
       try {
+        provider = this.provider();
         result = await interpretPrompt(provider, prompt);
       } catch (e) {
-        await this.record({ ...record, provider: provider.id, model: provider.id, error: String(e), ...(e instanceof LlmOutputError ? { answer: e.raw } : {}), latencyMs: Date.now() - started });
+        const id = provider?.id ?? 'none';
+        await this.record({ ...record, provider: id, model: id, error: String(e), ...(e instanceof LlmOutputError ? { answer: e.raw } : {}), latencyMs: Date.now() - started });
         throw e;
       }
       const { output } = result;
