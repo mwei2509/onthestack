@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { gitOut, worktreeRoot } from '../utils/git.js';
@@ -10,6 +10,23 @@ const SERVER_PORT = 8790;
 const WEB_PORT = 5190;
 
 const PACKAGES_NEEDING_DEPS = ['.', 'packages/web', 'packages/server'];
+
+const mtime = (path: string) => statSync(path).mtimeMs;
+
+/**
+ * pnpm install is per checkout, and a pull doesn't run it, so a fresh worktree or new
+ * dependencies would otherwise only fail inside the panes. pnpm rewrites
+ * node_modules/.modules.yaml on every install, even one with nothing to change.
+ */
+function installReason(root: string): string | undefined {
+  const missing = PACKAGES_NEEDING_DEPS.filter((p) => !existsSync(join(root, p, 'node_modules')));
+  if (missing.length) return `no node_modules in ${missing.join(', ')}`;
+  const marker = join(root, 'node_modules', '.modules.yaml');
+  if (!existsSync(marker) || mtime(join(root, 'pnpm-lock.yaml')) > mtime(marker)) {
+    return 'pnpm-lock.yaml changed since the last install';
+  }
+  return undefined;
+}
 
 function portPids(ports: number[]): number[] {
   const pids = new Set<number>();
@@ -169,11 +186,13 @@ export const startCommand = new Command('start')
   .action(async (opts: { open: boolean }) => {
     const root = worktreeRoot();
 
-    // pnpm install is per checkout, so a fresh worktree would otherwise only fail inside the panes.
-    const missing = PACKAGES_NEEDING_DEPS.filter((p) => !existsSync(join(root, p, 'node_modules')));
-    if (missing.length) {
-      console.error(`stx start: no node_modules in ${missing.join(', ')}; run 'pnpm install' in ${root} first.`);
-      process.exit(1);
+    const reason = installReason(root);
+    if (reason) {
+      console.log(dim(`▶ ${reason}; running pnpm install`));
+      if (spawnSync('pnpm', ['install'], { cwd: root, stdio: 'inherit' }).status !== 0) {
+        console.error('stx start: pnpm install failed; not starting.');
+        process.exit(1);
+      }
     }
 
     if (!(await freePorts([SERVER_PORT, WEB_PORT]))) process.exit(1);
