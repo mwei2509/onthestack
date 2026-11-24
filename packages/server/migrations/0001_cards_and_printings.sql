@@ -12,7 +12,7 @@ CREATE TABLE printings (
   oracle_id TEXT NOT NULL REFERENCES cards (oracle_id),
   set_code TEXT NOT NULL COLLATE NOCASE,
   collector_number TEXT NOT NULL,
-  image_url TEXT NOT NULL,
+  image_url TEXT,
   back_image_url TEXT
 );
 
