@@ -1,6 +1,19 @@
-import { before, conversation, entry, table, type EvalCase } from '../case.js';
+import { before, conversation, entry, seatedTable, table, type EvalCase } from '../case.js';
 
 export const basics: EvalCase[] = [
+  {
+    id: 'land-and-tap-with-seat-ids',
+    checks: 'a land played and tapped at a table whose ids are p1, p2, not names (from a real game)',
+    turnStart: seatedTable(),
+    statements: conversation(['p1', 'i play godless shrine and tap it']),
+    currentStep: 'main1',
+    expected: {
+      entries: [
+        entry('main1', 'p1', { type: 'playLand', card: 'Godless Shrine' }, ['s1']),
+        entry('main1', 'p1', { type: 'tap', object: { card: 'Godless Shrine' } }, ['s1']),
+      ],
+    },
+  },
   {
     id: 'land-drop',
     checks: 'a plain land drop',

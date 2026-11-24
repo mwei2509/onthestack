@@ -78,6 +78,20 @@ export function table(active: string, setup: TimelineEntry[] = []): GameState {
   return next;
 }
 
+/**
+ * A two-player table seated the way real games are, with ids `p1`, `p2` rather than names, so cases can check the
+ * interpreter refers to players by id even though the transcript shows names.
+ */
+export function seatedTable(): GameState {
+  return createGame(
+    [
+      { id: 'p1', name: 'melissa', commander: 'Amalia Benavides Aguirre' },
+      { id: 'p2', name: 'tester', commander: 'Krenko, Mob Boss' },
+    ],
+    { ...CARDS, 'Godless Shrine': card('Godless Shrine', ['Land']) },
+  );
+}
+
 let setupStatement = 0;
 /** One earlier action for `table`'s setup. */
 export const before = (player: string, action: TimelineEntry['action']): TimelineEntry => ({ step: 'main1', player, action, from: [`setup${++setupStatement}`] });
