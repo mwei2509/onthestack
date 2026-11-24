@@ -52,10 +52,7 @@ export function replayTurn(
   const settleNow = (resolveStack = true) => take(settle(state, { resolveStack }));
 
   for (const step of STEPS.slice(0, stepIndex(last) + 1)) {
-    const noAttackers = !state.combat?.attacks.length;
-    if (step === 'firstStrikeDamage' && (noAttackers || !firstStrikeStepNeeded(state))) continue;
-    if (step === 'combatDamage' && noAttackers) continue;
-    if (step === 'declareBlockers' && noAttackers && !timeline.some((e) => e.step === step)) continue;
+    if (stepSkipped(step, state, timeline.some((e) => e.step === step))) continue;
 
     const draft = clone(state);
     const started: GameEvent[] = [];
@@ -73,6 +70,23 @@ export function replayTurn(
     });
   }
   return { state, events, tableEvents: numbered(tableEvents), warnings };
+}
+
+/** Whether the rules skip a Step, given the board as it reaches it. `recorded`: the timeline has entries in that Step. */
+function stepSkipped(step: Step, state: GameState, recorded: boolean): boolean {
+  const noAttackers = !state.combat?.attacks.length;
+  if (step === 'firstStrikeDamage') return noAttackers || !firstStrikeStepNeeded(state);
+  if (step === 'combatDamage') return noAttackers;
+  if (step === 'declareBlockers') return noAttackers && !recorded;
+  return false;
+}
+
+/**
+ * The Steps still to come this turn, given the board now, leaving out the ones the rules skip (ADR 0065). Next step
+ * moves to the first; after the last, the turn ends.
+ */
+export function stepsAhead(state: GameState): Step[] {
+  return STEPS.slice(stepIndex(state.turn.step) + 1).filter((step) => !stepSkipped(step, state, false));
 }
 
 function automatic(state: GameState, step: Step): StepResult {

@@ -6,7 +6,7 @@ import { createGame } from './game.js';
 import type { GameState } from './state.js';
 import type { Step } from './steps.js';
 import type { TimelineEntry } from './timeline.js';
-import { applyBoardCorrection, replayTurn, sealTurn, tableView } from './turn.js';
+import { applyBoardCorrection, replayTurn, sealTurn, stepsAhead, tableView } from './turn.js';
 
 const card = (name: string, types: string[], power?: number, toughness?: number, keywords: string[] = []): CardDefinition => ({ name, types, power, toughness, keywords, abilities: [] });
 
@@ -248,6 +248,25 @@ const entry = fc.record({
   player: fc.constantFrom('theo', 'michael', 'melissa'),
   kind: fc.constantFrom('creature', 'life', 'shrink', 'attack', 'noBlock'),
   n: fc.integer({ min: 1, max: 5 }),
+});
+
+describe('stepsAhead', () => {
+  const at = (state: GameState, step: Step) => ({ ...state, turn: { ...state.turn, step } });
+
+  it('skips blockers and combat damage when nobody attacks, and ends with cleanup', () => {
+    expect(stepsAhead(at(newGame(), 'main1'))).toEqual(['beginningOfCombat', 'declareAttackers', 'endOfCombat', 'main2', 'end', 'cleanup']);
+    expect(stepsAhead(at(newGame(), 'cleanup'))).toEqual([]);
+  });
+
+  it('keeps combat damage once there are attackers, and first-strike damage only for first strikers', () => {
+    const timeline: TimelineEntry[] = [
+      { step: 'main1', playerId: 'theo', gameAction: { type: 'cast', card: 'Grizzly Bears' }, from: [] },
+    ];
+    const withBears = replayTurn(newGame(), timeline).state;
+    const bears = Object.values(withBears.permanents)[0]!;
+    const attacking = { ...at(withBears, 'declareAttackers'), combat: { attacks: [{ attackerId: bears.id, target: 'elena' }], blocks: [], ready: [], divisions: {} } };
+    expect(stepsAhead(attacking)).toEqual(['declareBlockers', 'combatDamage', 'endOfCombat', 'main2', 'end', 'cleanup']);
+  });
 });
 
 describe('replay properties', () => {
