@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-22, in a Claude Code session)
 
+Amended by ADR 0070 (what a row holds) and ADR 0071 (printings, and images per printing).
+
 The app looks up cards constantly (Translation, the TableView), and calling Scryfall's API for each lookup during a game is slow and leans on someone else's service. We keep our own copy, but only of cards players actually use. Card data lives in a D1 `cards` table with one row per card, keyed by Scryfall Oracle ID, which is also what Archidekt returns for an imported Deck (ADR 0006) and the natural key for storing each card's Translation (ADR 0005). Card images live in an R2 bucket, and the app only ever points at our own URL.
 
 A card is fetched when a Deck containing it is imported. The import checks which of the Deck's Oracle IDs are already in `cards`, and requests the rest from Scryfall's `POST /cards/collection` endpoint (up to 75 cards per request, so a Commander Deck is at most two requests), keeping only the fields the app uses. Pasted-text imports look cards up by name through the same endpoint. Lines Scryfall can't match (a typo, a card too new for Scryfall) are listed back to the player at import to fix or skip. Nothing is stored for them, and nothing is guessed.

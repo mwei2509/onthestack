@@ -139,6 +139,14 @@ _Avoid_: player screen, profile
 A list of cards, imported from an Archidekt link or a pasted list, that exists on its own, independent of any player or account, so it can be shared and reused. Saved Decks form one shared library until accounts arrive. Each player picks one when joining a game, and the game copies it at Start. It may be incomplete; cards not on it can still come up in a game.
 _Avoid_: decklist, list
 
+**Card store**:
+The app's own copy of every card players have imported, with each printing's image, fetched from Scryfall when a Deck containing it is imported, so a game never waits on Scryfall.
+_Avoid_: card database, cache, Scryfall
+
+**Printing**:
+One edition of a card, with its own art, set and collector number. A Deck can name the printings its owner plays, and the app shows that printing's image; rules and Translations belong to the card, not the printing.
+_Avoid_: version, edition, print
+
 **Translation**:
 The app's understanding of what a card's triggered and static abilities do, derived once per card from its Oracle text and shared by every game.
 _Avoid_: template, parse, tagging

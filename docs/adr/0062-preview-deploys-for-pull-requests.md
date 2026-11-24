@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in a Claude Code session)
 
+Amended by ADR 0072 (Previews' D1 database and R2 bucket).
+
 Every pull request from a branch in this repo gets its own Cloudflare Preview (`wrangler preview --name pr-<number>`), created or updated on each push. A bot comment on the PR links it, and the Preview is deleted when the PR closes. Pull requests from forks get none, since GitHub withholds repository secrets from them.
 
 Previews serve HTTPS on `workers.dev`, so a voice change can be tried on a real phone before it merges (browsers only allow the microphone over HTTPS). Each Preview gets its own Durable Object namespace and storage, so games on a Preview never touch production games. Previews are on Cloudflare's free plan (100 per Worker, the least recently deployed deleted first) and their requests count against the same free daily quota as production.
