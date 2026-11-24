@@ -15,11 +15,27 @@
     "bindings": [{ "name": "GAME", "class_name": "Game" }]
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Game"] }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "onthestack",
+      "database_id": "d4b62e3a-005f-46ef-98a0-1c00ac12319f",
+      // What `d1 migrations apply --preview` targets: the database every Preview binds below.
+      "preview_database_id": "0609b2d5-d479-4d7c-b67f-25df8017407d"
+    }
+  ],
   // Previews don't inherit production bindings; repeat each one here.
   "previews": {
     "durable_objects": {
       "bindings": [{ "name": "GAME", "class_name": "Game" }]
-    }
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "onthestack-preview",
+        "database_id": "0609b2d5-d479-4d7c-b67f-25df8017407d"
+      }
+    ]
   },
   "dev": { "port": 8790 }
 }
