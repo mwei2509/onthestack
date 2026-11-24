@@ -236,6 +236,18 @@ describe('replayTurn', () => {
     expect(r.state.permanents.p1).toBeUndefined();
   });
 
+  it('sealing through a Step stops there: ending mid-turn runs no cleanup (ADR 0100)', () => {
+    const timeline = [
+      e('main1', 'michael', { type: 'modify', permanentId: 'p1', power: 2, toughness: 2, until: 'endOfTurn' }),
+      e('main1', 'elena', { type: 'damage', sourceId: 'k0', recipient: { permanentId: 'p1' }, amount: 1 }),
+    ];
+    const r = sealTurn(twoBears(), timeline, { through: 'main1' });
+    expect(r.sealed.finalBoard.turn.step).toBe('main1');
+    expect(r.sealed.finalBoard.permanents.p1).toMatchObject({ damage: 1, effects: [{ until: 'endOfTurn' }] });
+    expect(r.sealed.gameEvents.some((x) => x.type === 'CleanedUp')).toBe(false);
+    expect(r.sealed.finalBoard).toEqual(replayTurn(twoBears(), timeline, { currentStep: 'main1' }).state);
+  });
+
   it('sealing passes the turn to the next player still in the game', () => {
     const s = newGame();
     s.players.michael!.out = true;

@@ -137,9 +137,16 @@ export interface SealedTurn {
   summary: Record<PlayerId, { lifeChange: number }>;
 }
 
-/** Replays the whole turn through cleanup and returns its sealed record plus the next turn's starting snapshot. */
-export function sealTurn(turnStart: GameState, timeline: TimelineEntry[]): { sealed: SealedTurn; nextTurnStart: GameState; warnings: RulesWarning[] } {
-  const { state, events, tableEvents, warnings } = replayTurn(turnStart, timeline, { currentStep: 'cleanup' });
+/**
+ * Replays the turn through cleanup, or only through `through` when the game is being ended mid-turn (ADR 0100), and
+ * returns its sealed record plus the next turn's starting snapshot.
+ */
+export function sealTurn(
+  turnStart: GameState,
+  timeline: TimelineEntry[],
+  options: { through?: Step } = {},
+): { sealed: SealedTurn; nextTurnStart: GameState; warnings: RulesWarning[] } {
+  const { state, events, tableEvents, warnings } = replayTurn(turnStart, timeline, { currentStep: options.through ?? 'cleanup' });
   const summary: SealedTurn['summary'] = {};
   for (const id of state.turnOrder) {
     summary[id] = { lifeChange: events.reduce((n, e) => n + (e.type === 'LifeChanged' && e.playerId === id ? e.delta : 0), 0) };
