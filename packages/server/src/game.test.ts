@@ -130,7 +130,7 @@ describe('Lobby', () => {
   it('sends an empty lobby on connect', async () => {
     const code = await createGame();
     const device = await connect(code);
-    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false, ended: null, joinCode: expect.stringMatching(/^\d{6}$/), view: null });
+    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false, ended: null, joinCode: expect.stringMatching(/^\d{6}$/), view: null, log: null });
   });
 
   it('adds a seat per device that joins, in order, and tells each device which seat is theirs', async () => {
@@ -479,6 +479,7 @@ describe('Statements', () => {
 
     await say(0, 'Michael loses 2 life');
     (await call(1)).fail();
+    await everyone(devices);
     await say(1, 'I gain 1 life');
     const retry = await call(2);
     expect(retry.user).toContain('[s2] Theo (p1): "Michael loses 2 life"');
@@ -660,5 +661,50 @@ describe('The reading becomes the board', () => {
       expect(sealed.timeline.map((e) => e.from)).toEqual([[], ['s1']]);
       expect(sealed.statements.map((s) => s.text)).toEqual(['Elena loses 3 life']);
     });
+  });
+});
+
+describe("The turn's log (ADR 0106)", () => {
+  const logOf = async (devices: Awaited<ReturnType<typeof connect>>[]) => {
+    const updates = [];
+    for (const d of devices) updates.push(await d.update());
+    for (const u of updates) expect(u.log).toEqual(updates[0]!.log);
+    return updates[0]!.log!;
+  };
+
+  it('shows each statement as being read, then read, with the entries it became', async () => {
+    const game = await interpreting();
+    game.devices[0]!.send({ type: 'statement', text: 'Elena loses 3 life' });
+    expect((await logOf(game.devices)).statements).toEqual([{ id: 's1', playerId: 'p1', text: 'Elena loses 3 life', status: 'interpreting' }]);
+
+    (await game.call(0)).answer(reading('s1'));
+    const log = await logOf(game.devices);
+    expect(log.statements[0]!.status).toBe('read');
+    expect(log.entries).toEqual([{ step: 'upkeep', playerId: 'p1', gameAction: { type: 'life', playerId: 'p2', delta: -3 }, from: ['s1'] }]);
+  });
+
+  it("marks statements the last reading couldn't interpret, and reads them again on Try again (ADR 0067)", async () => {
+    const game = await interpreting();
+    game.devices[0]!.send({ type: 'statement', text: 'Elena loses 3 life' });
+    await logOf(game.devices);
+    (await game.call(0)).fail();
+    expect((await logOf(game.devices)).statements[0]!.status).toBe('failed');
+
+    game.devices[2]!.send({ type: 'retryInterpretation' });
+    expect((await logOf(game.devices)).statements[0]!.status).toBe('interpreting');
+    (await game.call(1)).answer(reading('s1'));
+    expect((await logOf(game.devices)).statements[0]!.status).toBe('read');
+  });
+
+  it('lists taps in the log with no statement behind them', async () => {
+    const game = await interpreting();
+    game.devices[1]!.send({ type: 'adjustLife', delta: -2 });
+    expect((await logOf(game.devices)).entries).toEqual([{ step: 'upkeep', playerId: 'p2', gameAction: { type: 'life', playerId: 'p2', delta: -2 }, from: [] }]);
+  });
+
+  it('refuses Try again before anything was said', async () => {
+    const game = await interpreting();
+    game.devices[0]!.send({ type: 'retryInterpretation' });
+    expect(await game.devices[0]!.next()).toEqual({ type: 'error', message: 'Nothing has been said yet' });
   });
 });
