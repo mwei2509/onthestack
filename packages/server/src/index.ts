@@ -1,5 +1,8 @@
 import { IMAGE_PATH, serveImage } from './cards/images.js';
+import { createCardStore } from './cards/store.js';
 import { GAME_CODE, newGameCode } from './codes.js';
+import { DECKS_PATH, handleDecks } from './decks/routes.js';
+import { createDeckStore } from './decks/store.js';
 
 export { Game } from './game.js';
 
@@ -26,6 +29,13 @@ export default {
     const image = IMAGE_PATH.exec(url.pathname);
     if (image?.[1] && request.method === 'GET') {
       return serveImage(image[1], image[2] !== undefined, { db: env.DB, bucket: env.IMAGES, fetch });
+    }
+
+    const decks = DECKS_PATH.exec(url.pathname);
+    if (decks) {
+      const now = () => new Date();
+      const cards = createCardStore({ db: env.DB, fetch, sleep: (ms) => new Promise((r) => setTimeout(r, ms)), now });
+      return handleDecks(request, decks[1], createDeckStore({ db: env.DB, cards, now, newId: () => crypto.randomUUID() }));
     }
 
     const match = GAME.exec(url.pathname);
