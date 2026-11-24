@@ -2,6 +2,7 @@ import { DurableObject } from 'cloudflare:workers';
 import { createGame, replayTurn, sealTurn, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
 import { claudeProvider, interpretTurn, type InterpretedTimeline, type LlmProvider } from '@onthestack/interpreter';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
+import { claimJoinCode, touchJoinCode } from './joinCodes.js';
 import { DeviceMessage, type ServerMessage } from './protocol.js';
 
 interface Seat {
@@ -19,6 +20,8 @@ interface Setup {
   nextSeat: number;
   started: boolean;
   firstSeatId?: string;
+  /** The six-digit code typed into Join game; null once retired (ADR 0095). */
+  joinCode?: string | null;
   /** Each seat's Deck, copied at Start so later edits never change the game (ADR 0050). */
   decks?: Record<string, Deck>;
 }
@@ -46,11 +49,15 @@ interface Attachment {
 
 export const MAX_SEATS = 6;
 
+const JOIN_CODE_TOUCH_MS = 10 * 60 * 1000;
+
 class Rejected extends Error {}
 
 export class Game extends DurableObject<Env> {
   private setup: Setup | null = null;
   private version = 0;
+  /** When the join code's activity was last refreshed in D1; kept in memory, so a wake-up refreshes once more. */
+  private joinCodeTouchedAt = 0;
   private turn: Turn | null = null;
   private board: ReplayResult | null = null;
   private readonly decks: DeckSource;
@@ -72,13 +79,15 @@ export class Game extends DurableObject<Env> {
     });
   }
 
-  /** Called once by `POST /api/games`. False if the code is already a game, so a new game never overwrites one. */
-  async create(code: string, createdAt: string): Promise<boolean> {
-    if (this.setup) return false;
-    this.setup = { code, createdAt, seats: [], nextSeat: 1, started: false };
+  /** Called once by `POST /api/games`. Null if the code is already a game, so a new game never overwrites one. */
+  async create(code: string, createdAt: string): Promise<{ joinCode: string | null } | null> {
+    if (this.setup) return null;
+    const joinCode = await claimJoinCode(this.env.DB, code, new Date(createdAt));
+    this.setup = { code, createdAt, seats: [], nextSeat: 1, started: false, joinCode };
+    this.joinCodeTouchedAt = Date.parse(createdAt);
     this.version = 1;
     await this.save();
-    return true;
+    return { joinCode };
   }
 
   async exists(): Promise<boolean> {
@@ -296,6 +305,7 @@ export class Game extends DurableObject<Env> {
 
   /** Saves, raises the version and sends every device its update. `closing` is a socket that no longer counts as connected. */
   private async changed(closing?: WebSocket): Promise<void> {
+    await this.keepJoinCode();
     this.version++;
     this.replay();
     await this.save();
@@ -313,6 +323,15 @@ export class Game extends DurableObject<Env> {
     return this.board ? tableView(this.board) : null;
   }
 
+  /** Tells D1 the game is still being played, at most every ten minutes, and drops a code that was retired (ADR 0095). */
+  private async keepJoinCode(): Promise<void> {
+    const setup = this.setup!;
+    const now = new Date();
+    if (!setup.joinCode || now.getTime() - this.joinCodeTouchedAt < JOIN_CODE_TOUCH_MS) return;
+    this.joinCodeTouchedAt = now.getTime();
+    if (!(await touchJoinCode(this.env.DB, setup.joinCode, setup.code, now))) setup.joinCode = null;
+  }
+
   private sendUpdate(ws: WebSocket, view: TableView | null, closing?: WebSocket): void {
     const setup = this.setup!;
     send(ws, {
@@ -321,6 +340,7 @@ export class Game extends DurableObject<Env> {
       you: attachment(ws).seatId,
       seats: setup.seats.map((s) => ({ ...s, connected: this.holders(s.id, closing).length > 0 })),
       started: setup.started,
+      joinCode: setup.joinCode ?? null,
       view,
     });
   }

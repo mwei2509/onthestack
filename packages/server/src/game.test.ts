@@ -70,6 +70,35 @@ async function lobby(...names: string[]) {
   return { code, devices };
 }
 
+describe('Join codes (ADR 0095)', () => {
+  const join = (digits: string, ip = '203.0.113.1') => exports.default.fetch(`http://test/api/join/${digits}`, { headers: { 'CF-Connecting-IP': ip } });
+
+  it('gives each new game a six-digit join code that finds it, shown to every device', async () => {
+    const res = await exports.default.fetch('http://test/api/games', { method: 'POST' });
+    const { code, joinCode } = (await res.json()) as { code: string; joinCode: string };
+    expect(joinCode).toMatch(/^\d{6}$/);
+    expect(await (await join(joinCode, '203.0.113.2')).json()).toEqual({ code });
+    const device = await connect(code);
+    expect((await device.update()).joinCode).toBe(joinCode);
+  });
+
+  it('answers 404 for a code that is not a game', async () => {
+    await env.DB.prepare("DELETE FROM join_codes WHERE code = '000000'").run();
+    const res = await join('000000', '203.0.113.3');
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: 'No game with that code' });
+    expect((await join('12345', '203.0.113.3')).status).toBe(404);
+  });
+
+  it('slows down anyone trying lots of codes', async () => {
+    const statuses = [];
+    for (let i = 0; i < 12; i++) statuses.push((await join(String(100000 + i), '198.51.100.9')).status);
+    expect(statuses.slice(0, 10)).not.toContain(429);
+    expect(statuses.at(-1)).toBe(429);
+    expect((await join('100000', '198.51.100.10')).status).not.toBe(429);
+  });
+});
+
 describe('Worker', () => {
   it('answers health checks', async () => {
     const res = await exports.default.fetch('http://test/api/health');
@@ -100,7 +129,7 @@ describe('Lobby', () => {
   it('sends an empty lobby on connect', async () => {
     const code = await createGame();
     const device = await connect(code);
-    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false, view: null });
+    expect(await device.update()).toEqual({ type: 'update', version: 1, you: null, seats: [], started: false, joinCode: expect.stringMatching(/^\d{6}$/), view: null });
   });
 
   it('adds a seat per device that joins, in order, and tells each device which seat is theirs', async () => {
