@@ -16,8 +16,12 @@ _Avoid_: center board, main app, host
 Speaking while holding the button on your Phone. Only speech captured this way becomes a PlayerStatement; everything else is table talk.
 _Avoid_: push-to-talk, tap to speak, wake word
 
+**Account**:
+Optional. A player's sign-in to the app, with a passkey: a display name, a private email, the games they've played and the Decks they own. Signed in, their seat follows them to any device.
+_Avoid_: user, profile, login
+
 **Guest**:
-A player in a game who has no account, joined with only a name and a Deck from the shared library (or one imported while joining).
+A player in a game who isn't signed in, joined with only a name and a Deck from the shared library (or one imported while joining).
 
 **Lobby**:
 A game before it starts, where each device joins with a name and a Deck from the library, adding a Seat. Seats are put in the order people sit, and Start asks who goes first.
@@ -136,7 +140,7 @@ _Avoid_: player screen, profile
 ## Cards
 
 **Deck**:
-A list of cards, imported from an Archidekt link or a pasted list, that exists on its own, independent of any player or account, so it can be shared and reused. Saved Decks form one shared library until accounts arrive. Each player picks one when joining a game, and the game copies it at Start. It may be incomplete; cards not on it can still come up in a game.
+A list of cards, imported from an Archidekt link or a pasted list, that exists on its own, independent of any player or account, so it can be shared and reused. A Deck imported by someone signed in belongs to them and is public (in the shared library) or private (only theirs); Decks with no owner are open to everyone. Each player picks one when joining a game, and the game copies it at Start. It may be incomplete; cards not on it can still come up in a game.
 _Avoid_: decklist, list
 
 **Unmatched line**:
