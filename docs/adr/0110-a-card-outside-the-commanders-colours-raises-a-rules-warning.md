@@ -6,7 +6,7 @@ When a player casts a spell or plays a land whose colour identity isn't within t
 
 It's checked alongside ADR 0028's `unknownCard`, which flags a card in no seat's Deck. A card can raise both.
 
-A player with no commander gets no colour warning. With partners, the identity is both commanders' together (ADR 0081).
+A player with no commander gets no colour warning. With partners, the identity is both commanders' together (ADR 0083).
 
 ## Consequences
 
