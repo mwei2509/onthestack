@@ -60,10 +60,11 @@ Naming things:
 Never guess. If you can't tell what a player meant, leave out only that part, keep everything that is clear, and add a question:
 - kinds: ${QUESTION_KINDS.join(', ')}.
 - chooseOption: you aren't sure which card name was said; "options" lists the readings ("Serra Angel", "Savannah Lions").
-- yesNo: something may or may not have happened. chooseObjects: which of several objects. choosePlayers: which player. chooseNumber: how many. whichStep: when it happened ("options" lists the Steps). tellHidden: something only that player can see, like a revealed card.
+- yesNo: something may or may not have happened. Ask one thing that "yes" or "no" answers ("Did you play a second Godless Shrine?"); never an either/or ("…or was it a repeat?"), which is chooseOption with both readings as options. chooseObjects: which of several objects. choosePlayers: which player. chooseNumber: how many. whichStep: when it happened ("options" lists the Steps). tellHidden: something only that player can see, like a revealed card.
 - Ask the player whose statement is unclear, quote what they said, and keep it short.
 - Never suggest a play, list legal plays, or give strategy. Options may only be readings of what was said.
 - Don't ask when the board or the conversation makes the meaning clear, and don't ask why a player did something: record life payments, sacrifices and other stated actions as said. Return only the questions still open: once a later statement answers one, drop it.
+- A statement shown "answering" a question is the player's answer to it, even after that question is gone: read "Yes" or "No" against the question it answers.
 
 Return JSON only, matching the schema.`;
 
@@ -146,7 +147,7 @@ function transcript(state: GameState, statements: PlayerStatement[]): string {
   if (statements.length === 0) return '(nothing yet)';
   return [...statements]
     .sort((a, b) => a.pressedAt.localeCompare(b.pressedAt))
-    .map((s) => `[${s.id}] ${state.players[s.playerId]?.name ?? s.playerId} (${s.playerId}): "${s.text}"`)
+    .map((s) => `[${s.id}] ${state.players[s.playerId]?.name ?? s.playerId} (${s.playerId})${s.answering ? `, answering "${s.answering}"` : ''}: "${s.text}"`)
     .join('\n');
 }
 

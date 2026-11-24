@@ -31,6 +31,8 @@ export const DeviceMessage = z.discriminatedUnion('type', [
     type: z.literal('statement'),
     text: z.string().trim().min(1, 'Say what happened first').max(500, 'Statements are at most 500 characters'),
     seatId: seatId.optional(),
+    /** The question's text, when this is an answer to it (ADR 0114). */
+    answering: z.string().trim().min(1).max(500).optional(),
   }),
   /** Ends the game for everyone, after the device's confirm (ADR 0092, 0101). */
   z.object({ type: z.literal('end') }),

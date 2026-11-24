@@ -40,7 +40,7 @@ export function QuestionCard({ q, view, you, game, forAnyone }: { q: Question; v
       {answers.length > 0 && (
         <div className="question-answers">
           {answers.map((a) => (
-            <button key={a} className="btn" onClick={() => game!.send({ type: 'statement', text: a, ...(mine ? {} : { seatId: q.askPlayer }) })}>
+            <button key={a} className="btn" onClick={() => game!.send({ type: 'statement', text: a, answering: q.text, ...(mine ? {} : { seatId: q.askPlayer }) })}>
               {a}
             </button>
           ))}

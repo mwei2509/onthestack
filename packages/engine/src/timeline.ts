@@ -7,6 +7,8 @@ export interface PlayerStatement {
   playerId: PlayerId;
   pressedAt: string;
   text: string;
+  /** The question this statement answers, when it was given as an answer, so every re-read knows what "Yes" meant (ADR 0114). */
+  answering?: string;
 }
 
 /** One entry of the InterpretedTimeline: a GameAction placed in its Step, with the PlayerStatements it came from. */

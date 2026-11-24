@@ -98,3 +98,14 @@ describe('the prompt version', () => {
     expect(b.user).not.toBe(a.user);
   });
 });
+
+describe('answers', () => {
+  it('shows the question a statement answers, so a later re-read still knows what "Yes" meant (ADR 0114)', () => {
+    const prompt = buildPrompt({
+      turnStart: createGame([{ id: 'p1', name: 'melissa' }]),
+      statements: [{ id: 's1', playerId: 'p1', pressedAt: '2026-11-24T21:00:00Z', text: 'Yes', answering: 'Did you play a second Godless Shrine?' }],
+      currentStep: 'main1',
+    });
+    expect(prompt.user).toContain('[s1] melissa (p1), answering "Did you play a second Godless Shrine?": "Yes"');
+  });
+});
