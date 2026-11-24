@@ -14,6 +14,7 @@
     "wrangler": "^4.166.0"
   },
   "dependencies": {
-    "@onthestack/engine": "workspace:^"
+    "@onthestack/engine": "workspace:^",
+    "zod": "^4.6.6"
   }
 }
