@@ -22,6 +22,7 @@
   "dependencies": {
     "@onthestack/engine": "workspace:^",
     "@onthestack/interpreter": "workspace:^",
+    "@simplewebauthn/server": "14.1.0",
     "zod": "^4.6.6"
   }
 }

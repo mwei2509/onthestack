@@ -45,7 +45,14 @@ export default {
     if (url.pathname === AUTOCOMPLETE_PATH && request.method === 'GET') return handleAutocomplete(request, fetch);
 
     const account = ACCOUNT_PATH.exec(url.pathname);
-    if (account) return handleAccount(request, account[1], { db: env.DB, now: () => new Date() });
+    if (account) {
+      return handleAccount(request, account[1], {
+        db: env.DB,
+        now: () => new Date(),
+        newId: () => crypto.randomUUID(),
+        limit: async (key) => (await env.AUTH_LIMITER.limit({ key })).success,
+      });
+    }
 
     const decks = DECKS_PATH.exec(url.pathname);
     if (decks) {
