@@ -1,7 +1,7 @@
 import { replayTurn, type GameState, type ReplayResult } from '@onthestack/engine';
 import { resolveTimeline } from '../resolve.js';
 import type { InterpretedQuestion, InterpretedTimeline, TimelineEntry } from '../schema.js';
-import type { EvalCase } from './case.js';
+import { resolveOptions, type EvalCase } from './case.js';
 
 export interface EvalScore {
   pass: boolean;
@@ -19,8 +19,8 @@ type ExpectedQuestion = NonNullable<EvalCase['expected']['questions']>[number];
 
 /** ADR 0039: a case passes when both readings replay to the same game and the same questions were asked. */
 export function scoreCase(c: EvalCase, actual: InterpretedTimeline): EvalScore {
-  const expected = resolveTimeline(c.turnStart, { entries: c.expected.entries, questions: [] });
-  const got = resolveTimeline(c.turnStart, actual);
+  const expected = resolveTimeline(c.turnStart, { entries: c.expected.entries, questions: [] }, resolveOptions(c));
+  const got = resolveTimeline(c.turnStart, actual, resolveOptions(c));
   const want = summarize(replayTurn(c.turnStart, expected.timeline, { currentStep: c.currentStep }));
   const have = summarize(replayTurn(c.turnStart, got.timeline, { currentStep: c.currentStep }));
 

@@ -1,6 +1,6 @@
 import { DurableObject } from 'cloudflare:workers';
-import { createGame, replayTurn, sealTurn, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type RulesWarning, type SealedTurn, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
-import { claudeProvider, interpretTurn, type InterpretedTimeline, type LlmProvider } from '@onthestack/interpreter';
+import { createGame, replayTurn, sealTurn, STEPS, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type RulesWarning, type SealedTurn, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
+import { claudeProvider, interpretTurn, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
 import { DeviceMessage, type Ended, type ServerMessage } from './protocol.js';
@@ -30,7 +30,8 @@ interface Setup {
 /** The current turn (ADR 0054, 0069, 0074). The board is never stored: it's this, replayed. Sealed turns have keys of their own. */
 interface Turn {
   turnStart: GameState;
-  timeline: TimelineEntry[];
+  /** What was tapped on the board, kept on every re-read and placed by when it was tapped (ADR 0065). */
+  pinned: PinnedEntry[];
   currentStep: Step;
   /** The TurnTranscript, in the order statements arrived. */
   statements: PlayerStatement[];
@@ -69,6 +70,8 @@ export class Game extends DurableObject<Env> {
   private board: ReplayResult | null = null;
   /** The frozen board of an ended game: its last sealed turn, never replayed again (ADR 0100). */
   private endedBoard: ReplayResult | null = null;
+  /** The engine timeline the board was replayed from: the reading's entries resolved, with the taps among them. */
+  private resolved: ResolvedTimeline = { timeline: [], questions: [] };
   private readonly decks: DeckSource;
   private interpreter: LlmProvider | undefined;
   private interpretAfterMs = INTERPRET_AFTER_MS;
@@ -82,8 +85,7 @@ export class Game extends DurableObject<Env> {
       const stored = await ctx.storage.get<unknown>(['setup', 'version', 'turn']);
       this.setup = (stored.get('setup') as Setup | undefined) ?? null;
       this.version = (stored.get('version') as number | undefined) ?? 0;
-      const turn = stored.get('turn') as Partial<Turn> | undefined;
-      this.turn = turn ? { statements: [], transcriptVersion: 0, ...turn } as Turn : null;
+      this.turn = loadTurn(stored.get('turn') as StoredTurn | undefined);
       if (this.setup?.ended) {
         const last = await ctx.storage.get<StoredSealedTurn>(`sealed:${this.setup.ended.turn}`);
         if (last) this.endedBoard = { state: last.finalBoard, events: [], tableEvents: [], warnings: last.warnings ?? [] };
@@ -224,7 +226,8 @@ export class Game extends DurableObject<Env> {
         const turn = this.inGame();
         const playerId = attachment(ws).seatId;
         if (!playerId) throw new Rejected('Only a seated device can change its life');
-        turn.timeline.push({ step: turn.currentStep, playerId, gameAction: { type: 'life', playerId, delta: message.delta }, from: [] });
+        const entry: TimelineEntry = { step: turn.currentStep, playerId, gameAction: { type: 'life', playerId, delta: message.delta }, from: [] };
+        turn.pinned.push({ entry, afterStatements: turn.statements.length });
         return;
       }
       case 'nextStep':
@@ -245,7 +248,7 @@ export class Game extends DurableObject<Env> {
   }
 
   private async sealTurn(turn: Turn): Promise<void> {
-    const { sealed, nextTurnStart, warnings } = sealTurn(turn.turnStart, turn.timeline);
+    const { sealed, nextTurnStart, warnings } = sealTurn(turn.turnStart, this.resolved.timeline);
     await this.storeSealed(sealed, turn, warnings);
     this.turn = newTurn(nextTurnStart);
   }
@@ -253,7 +256,7 @@ export class Game extends DurableObject<Env> {
   /** Seals the turn where the table is and freezes the game (ADR 0100, 0101). */
   private async end(turn: Turn, by: string | null): Promise<void> {
     const setup = this.setup!;
-    const { sealed, warnings } = sealTurn(turn.turnStart, turn.timeline, { through: turn.currentStep });
+    const { sealed, warnings } = sealTurn(turn.turnStart, this.resolved.timeline, { through: turn.currentStep });
     await this.storeSealed(sealed, turn, warnings);
     clearTimeout(this.interpretTimer);
     this.turn = null;
@@ -285,11 +288,17 @@ export class Game extends DurableObject<Env> {
     const asked = { turn: turn.turnStart.turn.number, transcriptVersion: turn.transcriptVersion };
     this.interpreting = true;
     try {
-      const { output } = await interpretTurn(this.provider(), { turnStart: turn.turnStart, statements: [...turn.statements], currentStep: turn.currentStep });
+      const { output } = await interpretTurn(this.provider(), {
+        turnStart: turn.turnStart,
+        statements: [...turn.statements],
+        currentStep: turn.currentStep,
+        pinned: [...turn.pinned],
+      });
       const current = this.turn;
       const stale = !current || current.turnStart.turn.number !== asked.turn || (current.reading?.transcriptVersion ?? 0) >= asked.transcriptVersion;
       if (!stale) {
         current.reading = { timeline: output, transcriptVersion: asked.transcriptVersion };
+        this.advanceStep(current);
         await this.changed();
       }
     } catch (e) {
@@ -318,7 +327,22 @@ export class Game extends DurableObject<Env> {
   }
 
   private replay(): void {
-    this.board = this.turn ? replayTurn(this.turn.turnStart, this.turn.timeline, { currentStep: this.turn.currentStep }) : null;
+    const turn = this.turn;
+    if (!turn) {
+      this.board = null;
+      return;
+    }
+    this.resolved = resolveTurn(turn);
+    this.board = replayTurn(turn.turnStart, this.resolved.timeline, { currentStep: turn.currentStep });
+  }
+
+  /**
+   * A statement placing something in a later Step moves the table there; statements never move it back (ADR 0066).
+   * Until #47, the latest Step in the timeline stands in for where the table is.
+   */
+  private advanceStep(turn: Turn): void {
+    const latest = resolveTurn(turn).timeline.reduce((i, e) => Math.max(i, STEPS.indexOf(e.step)), STEPS.indexOf(turn.currentStep));
+    turn.currentStep = STEPS[latest]!;
   }
 
   private inLobby(what: string): void {
@@ -389,7 +413,33 @@ export class Game extends DurableObject<Env> {
 }
 
 function newTurn(turnStart: GameState): Turn {
-  return { turnStart, timeline: [], currentStep: 'upkeep', statements: [], transcriptVersion: 0 };
+  return { turnStart, pinned: [], currentStep: 'upkeep', statements: [], transcriptVersion: 0 };
+}
+
+/** A turn as stored before taps were pinned: its taps were the whole `timeline`, all before any statement. */
+type StoredTurn = Partial<Turn> & { timeline?: TimelineEntry[] };
+
+function loadTurn(stored: StoredTurn | undefined): Turn | null {
+  if (!stored?.turnStart) return null;
+  const { timeline, ...turn } = stored;
+  return {
+    statements: [],
+    transcriptVersion: 0,
+    currentStep: 'upkeep',
+    ...turn,
+    pinned: turn.pinned ?? (timeline ?? []).map((entry) => ({ entry, afterStatements: 0 })),
+  } as Turn;
+}
+
+/** The reading resolved, with the taps placed among its entries. A reading that won't resolve leaves just the taps. */
+function resolveTurn(turn: Turn): ResolvedTimeline {
+  const options = { pinned: turn.pinned, statementIds: turn.statements.map((s) => s.id) };
+  try {
+    return resolveTimeline(turn.turnStart, turn.reading?.timeline ?? { entries: [], questions: [] }, options);
+  } catch (e) {
+    console.error('Reading did not resolve; showing the taps alone', e);
+    return resolveTimeline(turn.turnStart, { entries: [], questions: [] }, options);
+  }
 }
 
 function attachment(ws: WebSocket): Attachment {

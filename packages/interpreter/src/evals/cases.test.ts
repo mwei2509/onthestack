@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { resolveTimeline } from '../resolve.js';
 import { InterpretedTimeline, type InterpretedQuestion } from '../schema.js';
-import type { EvalCase } from './case.js';
+import { resolveOptions, type EvalCase } from './case.js';
 import { CASES } from './cases/index.js';
 import { scoreCase } from './score.js';
 
@@ -21,7 +21,7 @@ describe('eval cases', () => {
     });
 
     it('has an expected reading that resolves without questions of its own', () => {
-      expect(resolveTimeline(c.turnStart, { entries: c.expected.entries, questions: [] }).questions).toEqual([]);
+      expect(resolveTimeline(c.turnStart, { entries: c.expected.entries, questions: [] }, resolveOptions(c)).questions).toEqual([]);
     });
 
     it('only cites statements that exist', () => {
@@ -51,6 +51,14 @@ describe('scoreCase', () => {
       e.action.type === 'attack' ? { ...e, action: { ...e.action, attacks: [{ attacker: { card: 'Grizzly Bears' }, target: 'michael' }] } } : e,
     );
     const score = scoreCase(c, { entries: wrong, questions: [] });
+    expect(score.pass).toBe(false);
+    expect(score.outcome.map((o) => o.part)).toContain('players');
+  });
+
+  it('fails a reading that records a tapped life loss a second time (ADR 0065)', () => {
+    const c = byId('statement-repeats-a-tap');
+    const twice = { entries: [{ step: 'main1' as const, player: 'melissa', action: { type: 'life' as const, player: 'melissa', delta: -3 }, from: ['s1'] }], questions: [] };
+    const score = scoreCase(c, twice);
     expect(score.pass).toBe(false);
     expect(score.outcome.map((o) => o.part)).toContain('players');
   });

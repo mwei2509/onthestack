@@ -193,6 +193,7 @@ interface Game {
   currentStep: Step;                         // replayed to, ADR 0074
   turnTranscript: PlayerStatement[];
   interpretedTimeline: { readsUpTo: PlayerStatementId; entries: TimelineEntry[] };
+  pinned: { entry: TimelineEntry; afterStatements: number }[];  // taps, placed by when they were tapped, ADR 0065
   timelineCorrections: TimelineCorrection[];
   interpreterQueue: { inFlight: PlayerStatementId | null; latestStatement: PlayerStatementId; latestApplied: PlayerStatementId };
   sealedTurns: SealedTurn[];

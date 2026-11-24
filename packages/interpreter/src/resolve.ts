@@ -17,6 +17,22 @@ export interface ResolvedTimeline {
   questions: InterpretedQuestion[];
 }
 
+/** A GameAction recorded by a tap on the board, kept on every re-read (ADR 0065). */
+export interface PinnedEntry {
+  entry: EngineTimelineEntry;
+  /** How many of the turn's statements had been made when it was tapped: where it falls in the conversation. */
+  afterStatements: number;
+}
+
+export interface ResolveOptions {
+  /** Tapped entries to place among the interpreted ones (ADR 0065). */
+  pinned?: PinnedEntry[];
+  /** The turn's statement ids in the order they were made, to tell which statements came before a tap. */
+  statementIds?: string[];
+}
+
+type Item = { interpreted: TimelineEntry } | { pinned: EngineTimelineEntry };
+
 /** What an action needs of the object it names, used to pick between copies before asking (ADR 0044). */
 interface Need {
   untapped?: boolean;
@@ -35,13 +51,18 @@ class Unresolved extends Error {
  * Turns the interpreter's name-based timeline into engine timeline entries (ADR 0038). Each entry is resolved
  * against the board as it stands just before that entry, by replaying the entries resolved so far. An entry that
  * names something missing or genuinely ambiguous is left out and becomes a PlayerQuestion to its player.
+ * Tapped entries are placed among them (`mergePinned`) and kept as they are.
  */
-export function resolveTimeline(turnStart: GameState, interpreted: InterpretedTimeline): ResolvedTimeline {
-  const ordered = [...interpreted.entries].sort((a, b) => STEPS.indexOf(a.step) - STEPS.indexOf(b.step));
+export function resolveTimeline(turnStart: GameState, interpreted: InterpretedTimeline, options: ResolveOptions = {}): ResolvedTimeline {
   const timeline: EngineTimelineEntry[] = [];
   const questions = [...interpreted.questions];
 
-  for (const entry of ordered) {
+  for (const item of mergePinned(interpreted.entries, options)) {
+    if ('pinned' in item) {
+      timeline.push(item.pinned);
+      continue;
+    }
+    const entry = item.interpreted;
     const { state } = replayTurn(turnStart, timeline, { currentStep: entry.step, responsePending: entry.response === true });
     try {
       const gameAction = new Resolver(state, entry).action(entry.action);
@@ -52,6 +73,27 @@ export function resolveTimeline(turnStart: GameState, interpreted: InterpretedTi
     }
   }
   return { timeline, questions };
+}
+
+/**
+ * Interpreted entries in Step order, keeping the interpreter's order within a Step, with each tapped entry placed
+ * in the Step it was tapped in, before the first interpreted entry that came from a later statement (ADR 0065).
+ */
+function mergePinned(entries: TimelineEntry[], { pinned = [], statementIds = [] }: ResolveOptions): Item[] {
+  const position = new Map(statementIds.map((id, i) => [id, i + 1]));
+  const madeAt = (e: TimelineEntry) => Math.max(...e.from.map((id) => position.get(id) ?? statementIds.length));
+  const step = (s: EngineTimelineEntry['step']) => STEPS.indexOf(s);
+  const ordered = [...entries].sort((a, b) => step(a.step) - step(b.step));
+  const taps = [...pinned].sort((a, b) => step(a.entry.step) - step(b.entry.step) || a.afterStatements - b.afterStatements);
+
+  const items: Item[] = [];
+  for (const e of ordered) {
+    while (taps[0] && (step(taps[0].entry.step) < step(e.step) || (taps[0].entry.step === e.step && taps[0].afterStatements < madeAt(e)))) {
+      items.push({ pinned: taps.shift()!.entry });
+    }
+    items.push({ interpreted: e });
+  }
+  return [...items, ...taps.map((t) => ({ pinned: t.entry }))];
 }
 
 const sameQuestion = (a: InterpretedQuestion, b: InterpretedQuestion) =>

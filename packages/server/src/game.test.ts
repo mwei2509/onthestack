@@ -602,3 +602,63 @@ describe('Ending a game (ADR 0100, 0101)', () => {
     });
   });
 });
+
+describe('The reading becomes the board', () => {
+  const lifeIn = (step: string, player: string, delta: number, ...from: string[]) => ({ step, player: 'p1', action: { type: 'life', player, delta }, from });
+
+  it('changes every screen when a reading comes back', async () => {
+    const { devices, call, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    (await call(0)).answer(reading('s1'));
+    expect((await everyone(devices)).players.p2!.life).toBe(37);
+  });
+
+  it('keeps a tap through every re-read, tells the interpreter about it, and never counts it twice (ADR 0065)', async () => {
+    const { devices, call, say } = await interpreting();
+    devices[1]!.send({ type: 'adjustLife', delta: -2 });
+    expect((await everyone(devices)).players.p2!.life).toBe(38);
+
+    await say(0, 'Elena loses 3 life');
+    const first = await call(0);
+    expect(first.user).toContain('Already recorded by a tap on the board (never add these):\n- p2 lost 2 life (tapped by Elena, before anything was said, in upkeep)');
+    first.answer(reading('s1'));
+    expect((await everyone(devices)).players.p2!.life).toBe(35);
+
+    await say(0, 'Wait, no, take that back');
+    (await call(1)).answer({ entries: [], questions: [] });
+    expect((await everyone(devices)).players.p2!.life).toBe(38);
+  });
+
+  it('moves the table forward to a later Step a statement describes, never back (ADR 0066)', async () => {
+    const { devices, call, say, stored } = await interpreting();
+    await say(1, 'Moving on, Theo takes 1 in combat');
+    (await call(0)).answer({ entries: [lifeIn('declareAttackers', 'p1', -1, 's1')], questions: [] });
+    const view = await everyone(devices);
+    expect(view.turn.step).toBe('declareAttackers');
+    expect(view.players.p1!.life).toBe(39);
+    expect(((await stored()) as unknown as { currentStep: string }).currentStep).toBe('declareAttackers');
+
+    await say(1, 'Back in my upkeep I lost 1');
+    (await call(1)).answer({ entries: [lifeIn('upkeep', 'p2', -1, 's2'), lifeIn('declareAttackers', 'p1', -1, 's1')], questions: [] });
+    const later = await everyone(devices);
+    expect(later.turn.step).toBe('declareAttackers');
+    expect(later.players.p2!.life).toBe(39);
+  });
+
+  it('seals what was read and said, with the taps (ADR 0019)', async () => {
+    const { code, devices, call, say } = await interpreting();
+    devices[1]!.send({ type: 'adjustLife', delta: -2 });
+    await everyone(devices);
+    await say(0, 'Elena loses 3 life');
+    (await call(0)).answer(reading('s1'));
+    await everyone(devices);
+    devices[1]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'endTurn' });
+    expect((await everyone(devices)).players.p2!.life).toBe(35);
+
+    await runInDurableObject(env.GAME.getByName(code), async (_instance, state) => {
+      const sealed = (await state.storage.get('sealed:1')) as { timeline: { from: string[] }[]; statements: { text: string }[] };
+      expect(sealed.timeline.map((e) => e.from)).toEqual([[], ['s1']]);
+      expect(sealed.statements.map((s) => s.text)).toEqual(['Elena loses 3 life']);
+    });
+  });
+});

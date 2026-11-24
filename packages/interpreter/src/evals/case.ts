@@ -1,5 +1,5 @@
 import { createGame, sealTurn, type CardDefinition, type GameState, type PlayerStatement, type Step } from '@onthestack/engine';
-import { resolveTimeline } from '../resolve.js';
+import { resolveTimeline, type PinnedEntry } from '../resolve.js';
 import type { InterpretedQuestion, InterpretedTimeline, TimelineEntry } from '../schema.js';
 
 /** An interpreter eval: a table and a turn's conversation in, the expected reading out (ADR 0015, 0039). */
@@ -10,6 +10,8 @@ export interface EvalCase {
   turnStart: GameState;
   statements: PlayerStatement[];
   currentStep: Step;
+  /** Actions tapped on the board this turn, already in the record (ADR 0065). */
+  pinned?: PinnedEntry[];
   expected: {
     entries: TimelineEntry[];
     /** Questions the interpreter should ask instead of guessing (ADR 0043). Matched on kind, player and statements. */
@@ -90,5 +92,14 @@ export const entry = (step: Step, player: string, action: TimelineEntry['action'
   from,
   ...(response ? { response } : {}),
 });
+
+/** A life change tapped on the board after the first `afterStatements` statements (ADR 0065). */
+export const tappedLife = (step: Step, player: string, delta: number, afterStatements: number): PinnedEntry => ({
+  entry: { step, playerId: player, gameAction: { type: 'life', playerId: player, delta }, from: [] },
+  afterStatements,
+});
+
+/** How a case's tapped entries are placed among its statements, for resolving and scoring. */
+export const resolveOptions = (c: Pick<EvalCase, 'pinned' | 'statements'>) => ({ pinned: c.pinned ?? [], statementIds: c.statements.map((s) => s.id) });
 
 export type { InterpretedTimeline };

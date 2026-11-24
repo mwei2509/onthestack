@@ -198,3 +198,42 @@ describe('resolveTimeline', () => {
     expect(result.questions).toEqual([own]);
   });
 });
+
+describe('resolveTimeline with tapped entries (ADR 0065)', () => {
+  const tap = (step: TimelineEntry['step'], delta: number, afterStatements: number) => ({
+    entry: { step, playerId: 'melissa', gameAction: { type: 'life' as const, playerId: 'melissa', delta }, from: [] },
+    afterStatements,
+  });
+  const at = (id: string, step: TimelineEntry['step'], action: InterpretedGameAction): TimelineEntry => ({ step, player: 'theo', action, from: [id] });
+  const ids = ['s1', 's2', 's3'];
+  const kinds = (r: ReturnType<typeof resolveTimeline>) => r.timeline.map((e) => (e.gameAction.type === 'life' ? `life ${e.gameAction.delta}` : e.gameAction.type));
+
+  it('keeps a tap that nobody mentions', () => {
+    const r = resolveTimeline(newGame(), timeline(), { pinned: [tap('main1', -3, 0)], statementIds: [] });
+    expect(kinds(r)).toEqual(['life -3']);
+  });
+
+  it('places a tap among the interpreted entries by when it was tapped, within its Step', () => {
+    const r = resolveTimeline(
+      newGame(),
+      timeline(at('s1', 'main1', { type: 'playLand', card: 'Plains' }), at('s3', 'main1', { type: 'cast', card: 'Grizzly Bears' })),
+      { pinned: [tap('main1', -2, 2)], statementIds: ids },
+    );
+    expect(kinds(r)).toEqual(['playLand', 'life -2', 'cast']);
+  });
+
+  it('keeps each entry in its Step, whatever the tap order', () => {
+    const r = resolveTimeline(
+      newGame(),
+      timeline(at('s1', 'upkeep', { type: 'life', player: 'theo', delta: -1 }), at('s2', 'main2', { type: 'playLand', card: 'Plains' })),
+      { pinned: [tap('main1', -4, 2)], statementIds: ids },
+    );
+    expect(kinds(r)).toEqual(['life -1', 'life -4', 'playLand']);
+  });
+
+  it('replays to the right board: the tap and the reading both count', () => {
+    const start = newGame();
+    const r = resolveTimeline(start, timeline(at('s1', 'main1', { type: 'life', player: 'melissa', delta: -5 })), { pinned: [tap('main1', -3, 1)], statementIds: ids });
+    expect(replayTurn(start, r.timeline, { currentStep: 'main1' }).state.players.melissa!.life).toBe(32);
+  });
+});
