@@ -4,7 +4,7 @@ import type { ScreenProps } from '../useGame.js';
 import { nextPlayerId, STEP_NAMES } from './steps.js';
 
 /**
- * Jump forward to a Step this turn, or end the turn (ADR 0066). On a phone that isn't the active player's, it first
+ * Jump forward to a Step this turn, or end the turn (ADR 0075). On a phone that isn't the active player's, it first
  * asks, so the table is never stuck when someone steps away but nobody moves another player's turn by accident (ADR 0056).
  */
 export function StepMenu({ view, game, confirmFirst, onClose }: { view: TableView; game: ScreenProps['game']; confirmFirst: boolean; onClose: () => void }) {
