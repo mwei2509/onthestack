@@ -1,15 +1,6 @@
-export interface Account {
-  id: string;
-  displayName: string;
-  email: string;
-}
+import type { Account, Passkey } from './api.js';
 
-export interface Passkey {
-  id: string;
-  label: string;
-  createdAt: string;
-  usedAt: string | null;
-}
+export type { Account, Passkey } from './api.js';
 
 export async function getAccount(db: D1Database, id: string): Promise<Account | null> {
   const row = await db

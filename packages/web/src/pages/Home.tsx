@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { fetchAccount } from '../account/api.js';
 import { JoinGame } from './JoinGame.js';
 
 export function Home() {
@@ -7,6 +8,11 @@ export function Home() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
+  const [name, setName] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchAccount().then((account) => setName(account?.displayName ?? null), () => {});
+  }, []);
 
   const newGame = async () => {
     setCreating(true);
@@ -24,6 +30,9 @@ export function Home() {
 
   return (
     <div className="phone">
+      <nav className="home-top">
+        <Link to="/account">{name ?? 'Sign in'}</Link>
+      </nav>
       <main className="home-main">
         <div className="home-cards" aria-hidden>
           <span className="home-card left" />
