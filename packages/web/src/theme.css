@@ -2566,3 +2566,24 @@ h1.title {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* Home's Continue card (ADR 0111) */
+.continue-game {
+  height: auto;
+  min-height: 60px;
+  padding: 10px 16px;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: 16px;
+}
+
+.continue-game .display {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.continue-game .muted {
+  font-size: 14px;
+}

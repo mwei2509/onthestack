@@ -70,7 +70,8 @@ export default {
       const game = env.GAME.getByName(code);
       if (match[2]) return game.fetch(request);
       if (request.method === 'GET') {
-        return (await game.exists()) ? Response.json({ code }) : Response.json({ error: 'No game with that code' }, { status: 404 });
+        const summary = await game.summary();
+        return summary ? Response.json({ code, ...summary }) : Response.json({ error: 'No game with that code' }, { status: 404 });
       }
     }
 

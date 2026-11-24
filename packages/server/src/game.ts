@@ -3,7 +3,7 @@ import { createGame, replayTurn, sealTurn, STEPS, stepsAhead, tableView, type Ga
 import { buildPrompt, claudeProvider, interpretPrompt, LlmOutputError, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
-import { DeviceMessage, type Ended, type InterpretationRecord, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
+import { DeviceMessage, type GameSummary, type Ended, type InterpretationRecord, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
 
 interface Seat {
   id: string;
@@ -111,8 +111,12 @@ export class Game extends DurableObject<Env> {
     return { joinCode };
   }
 
-  async exists(): Promise<boolean> {
-    return this.setup !== null;
+  /** Where the game is, for `GET /api/games/<code>` and Home's Continue card (ADR 0111); null if there's no game. */
+  async summary(): Promise<GameSummary | null> {
+    if (!this.setup) return null;
+    if (this.setup.ended) return { status: 'ended', turn: this.setup.ended.turn };
+    if (this.turn) return { status: 'playing', turn: this.turn.turnStart.turn.number };
+    return { status: 'lobby', turn: null };
   }
 
   async fetch(request: Request): Promise<Response> {

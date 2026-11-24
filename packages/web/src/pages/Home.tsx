@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { fetchAccount } from '../account/api.js';
+import { ContinueGame } from './ContinueGame.js';
 import { JoinGame } from './JoinGame.js';
 
 export function Home() {
@@ -52,6 +53,7 @@ export function Home() {
         </div>
       ) : (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 20 }}>
+        <ContinueGame />
         <button className="btn btn-primary" style={{ height: 64, fontSize: 21, borderRadius: 18 }} onClick={newGame} disabled={creating}>
           {creating ? 'Creating…' : 'New game'}
         </button>
