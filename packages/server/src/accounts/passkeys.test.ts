@@ -1,8 +1,9 @@
 import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CHALLENGE_MS } from './challenges.js';
-import { handleAccount, type AccountDeps } from './routes.js';
+import type { AccountDeps } from './routes.js';
 import { TestAuthenticator } from './test-authenticator.js';
+import { testBrowser, type TestBrowser } from './test-browser.js';
 import { clearAccounts } from './test-accounts.js';
 
 const SITE = 'https://onthestack.gg';
@@ -17,42 +18,16 @@ const deps: AccountDeps = {
   limit: async () => allowed,
 };
 
-/** A browser: remembers cookies between requests, like the real one does for the challenge and session. */
-function browser(origin = SITE, userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) Version/18.1 Safari/604.1') {
-  const jar = new Map<string, string>();
-  return async (rest: string, body?: unknown, method = 'POST') => {
-    const res = await handleAccount(
-      new Request(`${origin}/api/account/${rest}`, {
-        method,
-        headers: {
-          Origin: origin,
-          'User-Agent': userAgent,
-          Cookie: [...jar].map(([k, v]) => `${k}=${v}`).join('; '),
-          'Content-Type': 'application/json',
-        },
-        body: body === undefined ? undefined : JSON.stringify(body),
-      }),
-      rest === '' ? undefined : rest,
-      deps,
-    );
-    for (const cookie of res.headers.getSetCookie()) {
-      const [pair] = cookie.split(';');
-      const [name, value] = pair!.split('=');
-      if (value) jar.set(name!, value);
-      else jar.delete(name!);
-    }
-    return res;
-  };
-}
+const browser = (origin = SITE, userAgent?: string) => testBrowser(deps, origin, userAgent);
 
 const profile = { displayName: '  Ana ', email: 'ana@example.com' };
 
-async function signUp(send: ReturnType<typeof browser>, key: TestAuthenticator, origin = SITE) {
+async function signUp(send: TestBrowser, key: TestAuthenticator, origin = SITE) {
   const options = await (await send('sign-up/options', profile)).json<never>();
   return send('sign-up', { ...profile, response: await key.register(options, origin) });
 }
 
-async function signIn(send: ReturnType<typeof browser>, key: TestAuthenticator, origin = SITE) {
+async function signIn(send: TestBrowser, key: TestAuthenticator, origin = SITE) {
   const options = await (await send('sign-in/options')).json<never>();
   return send('sign-in', { response: await key.authenticate(options, origin) });
 }
