@@ -49,6 +49,33 @@ export async function signUpOptions(
   return { challengeId: accountId, options };
 }
 
+async function verifyNewPasskey(rp: RelyingParty, challenge: string, response: RegistrationResponseJSON) {
+  const verification = await verifyRegistrationResponse({
+    response,
+    expectedChallenge: challenge,
+    expectedOrigin: rp.origin,
+    expectedRPID: rp.id,
+    requireUserVerification: false,
+  }).catch(() => null);
+  return verification?.verified ? verification.registrationInfo.credential : null;
+}
+
+function insertPasskey(
+  db: D1Database,
+  id: string,
+  accountId: string,
+  credential: NonNullable<Awaited<ReturnType<typeof verifyNewPasskey>>>,
+  label: string,
+  at: string,
+) {
+  return db
+    .prepare(
+      `INSERT INTO sign_ins (id, account_id, kind, external_id, public_key, counter, transports, label, created_at, used_at)
+       VALUES (?, ?, 'passkey', ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(id, accountId, credential.id, credential.publicKey, credential.counter, JSON.stringify(credential.transports ?? []), label, at, at);
+}
+
 export async function signUp(
   { db, rp, now, newId }: Deps,
   challengeId: string,
@@ -56,38 +83,55 @@ export async function signUp(
 ): Promise<{ accountId: string } | Failure> {
   const challenge = await takeChallenge(db, challengeId, now);
   if (!challenge) return tooSlow;
-  const verification = await verifyRegistrationResponse({
-    response: sent.response,
-    expectedChallenge: challenge,
-    expectedOrigin: rp.origin,
-    expectedRPID: rp.id,
-    requireUserVerification: false,
-  }).catch(() => null);
-  if (!verification?.verified) return unchecked;
-  const { credential } = verification.registrationInfo;
+  const credential = await verifyNewPasskey(rp, challenge, sent.response);
+  if (!credential) return unchecked;
   const at = now.toISOString();
   await db.batch([
     db
       .prepare('INSERT INTO accounts (id, display_name, email, created_at) VALUES (?, ?, ?, ?)')
       .bind(challengeId, sent.displayName, sent.email, at),
-    db
-      .prepare(
-        `INSERT INTO sign_ins (id, account_id, kind, external_id, public_key, counter, transports, label, created_at, used_at)
-         VALUES (?, ?, 'passkey', ?, ?, ?, ?, ?, ?, ?)`,
-      )
-      .bind(
-        newId(),
-        challengeId,
-        credential.id,
-        credential.publicKey,
-        credential.counter,
-        JSON.stringify(credential.transports ?? []),
-        sent.label,
-        at,
-        at,
-      ),
+    insertPasskey(db, newId(), challengeId, credential, sent.label, at),
   ]);
   return { accountId: challengeId };
+}
+
+/** Starts adding another passkey to a signed-in account, leaving out the ones it already has. */
+export async function addPasskeyOptions(
+  { db, rp, now, newId }: Deps,
+  account: { id: string; displayName: string; email: string },
+): Promise<{ challengeId: string; options: PublicKeyCredentialCreationOptionsJSON }> {
+  const { results } = await db
+    .prepare("SELECT external_id, transports FROM sign_ins WHERE account_id = ? AND kind = 'passkey'")
+    .bind(account.id)
+    .all<{ external_id: string; transports: string }>();
+  const options = await generateRegistrationOptions({
+    rpName: RP_NAME,
+    rpID: rp.id,
+    userName: account.email,
+    userDisplayName: account.displayName,
+    userID: new Uint8Array(new TextEncoder().encode(account.id)),
+    attestationType: 'none',
+    authenticatorSelection: { residentKey: 'required', userVerification: 'preferred' },
+    excludeCredentials: results.map((r) => ({ id: r.external_id, transports: JSON.parse(r.transports) as string[] })),
+  });
+  const challengeId = newId();
+  await clearOldChallenges(db, now);
+  await saveChallenge(db, challengeId, options.challenge, now);
+  return { challengeId, options };
+}
+
+export async function addPasskey(
+  { db, rp, now, newId }: Deps,
+  challengeId: string,
+  accountId: string,
+  sent: { response: RegistrationResponseJSON; label: string },
+): Promise<{ ok: true } | Failure> {
+  const challenge = await takeChallenge(db, challengeId, now);
+  if (!challenge) return tooSlow;
+  const credential = await verifyNewPasskey(rp, challenge, sent.response);
+  if (!credential) return unchecked;
+  await insertPasskey(db, newId(), accountId, credential, sent.label, now.toISOString()).run();
+  return { ok: true };
 }
 
 /** Starts sign-in with no passkeys listed, so the device offers whichever of its passkeys are ours (ADR 0103). */
