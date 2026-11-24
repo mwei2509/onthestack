@@ -2,10 +2,10 @@ import type { SeatView } from '@onthestack/server/protocol';
 import { Fragment, useState } from 'react';
 import { Arrow } from '../../icons.js';
 import { Avatar } from '../parts.js';
-import { clockwiseFrom } from '../seats.js';
+import { clockwiseFrom, type SeatLook } from '../seats.js';
 
 /** Start asks who won the dice; turns go clockwise from them (ADR 0051). */
-export function WhoGoesFirst({ seats, colours, onCancel, onStart }: { seats: SeatView[]; colours: Record<string, string>; onCancel: () => void; onStart: (firstSeatId: string) => void }) {
+export function WhoGoesFirst({ seats, looks, onCancel, onStart }: { seats: SeatView[]; looks: Record<string, SeatLook>; onCancel: () => void; onStart: (firstSeatId: string) => void }) {
   const [picked, setPicked] = useState<string | null>(null);
   const order = picked ? clockwiseFrom(seats, picked) : seats;
   const first = seats.find((s) => s.id === picked);
@@ -25,7 +25,7 @@ export function WhoGoesFirst({ seats, colours, onCancel, onStart }: { seats: Sea
         <div className="pick-grid">
           {seats.map((s) => (
             <button key={s.id} className="pick" aria-pressed={picked === s.id} onClick={() => setPicked(s.id)}>
-              <Avatar name={s.name} colour={colours[s.id]!} size={36} />
+              <Avatar name={s.name} colour={looks[s.id]!.ring} size={36} />
               {s.name}
             </button>
           ))}

@@ -1,12 +1,13 @@
 import { DurableObject } from 'cloudflare:workers';
 import { createGame, replayTurn, sealTurn, stepsAhead, tableView, type GameState, type ReplayResult, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
-import { noDecks, type Deck, type DeckSource } from './decks.js';
+import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { DeviceMessage, type ServerMessage } from './protocol.js';
 
 interface Seat {
   id: string;
   name: string;
-  deckId?: string;
+  /** A summary of the seat's Deck, taken when it was picked (ADR 0085). Start reads the Deck afresh. */
+  deck?: Deck;
 }
 
 /** What the lobby stores (ADR 0054). Which device holds which seat lives on the sockets, not here. */
@@ -42,10 +43,11 @@ export class Game extends DurableObject<Env> {
   private version = 0;
   private turn: Turn | null = null;
   private board: ReplayResult | null = null;
-  protected decks: DeckSource = noDecks;
+  private readonly decks: DeckSource;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.decks = libraryDecks(env.DB);
     void ctx.blockConcurrencyWhile(async () => {
       const stored = await ctx.storage.get<unknown>(['setup', 'version', 'turn']);
       this.setup = (stored.get('setup') as Setup | undefined) ?? null;
@@ -113,8 +115,7 @@ export class Game extends DurableObject<Env> {
         this.inLobby('Joining');
         if (attachment(ws).seatId) throw new Rejected('This device already has a seat');
         if (setup.seats.length >= MAX_SEATS) throw new Rejected(`A game has at most ${MAX_SEATS} seats`);
-        const seat: Seat = { id: `p${setup.nextSeat}`, name: message.name };
-        if (message.deckId) seat.deckId = await this.savedDeck(message.deckId);
+        const seat: Seat = { id: `p${setup.nextSeat}`, name: message.name, deck: await this.savedDeck(message.deckId) };
         setup.nextSeat++;
         setup.seats.push(seat);
         attach(ws, { seatId: seat.id });
@@ -135,8 +136,7 @@ export class Game extends DurableObject<Env> {
         this.inLobby('Seats');
         const seat = this.seat(message.seatId);
         if (message.name !== undefined) seat.name = message.name;
-        if (message.deckId === null) delete seat.deckId;
-        else if (message.deckId !== undefined) seat.deckId = await this.savedDeck(message.deckId);
+        if (message.deckId !== undefined) seat.deck = await this.savedDeck(message.deckId);
         return;
       }
       case 'removeSeat': {
@@ -159,9 +159,12 @@ export class Game extends DurableObject<Env> {
         const first = setup.seats.indexOf(this.seat(message.firstSeatId));
         const decks: Record<string, Deck> = {};
         for (const seat of setup.seats) {
-          const deck = seat.deckId ? await this.decks.get(seat.deckId) : null;
-          if (deck) decks[seat.id] = deck;
+          if (!seat.deck) throw new Rejected(`${seat.name} needs to pick a Deck`);
+          const deck = await this.decks.get(seat.deck.id);
+          if (!deck) throw new Rejected(`${seat.name}'s Deck isn't in the library any more. Pick another.`);
+          decks[seat.id] = deck;
         }
+        for (const seat of setup.seats) seat.deck = decks[seat.id];
         const clockwiseFromFirst = [...setup.seats.slice(first), ...setup.seats.slice(0, first)];
         const turnStart = createGame(clockwiseFromFirst.map((s) => ({ id: s.id, name: s.name, commander: decks[s.id]?.commanders[0] })));
         setup.started = true;
@@ -216,9 +219,10 @@ export class Game extends DurableObject<Env> {
     return seat;
   }
 
-  private async savedDeck(id: string): Promise<string> {
-    if (!(await this.decks.get(id))) throw new Rejected('That Deck isn\'t saved');
-    return id;
+  private async savedDeck(id: string): Promise<Deck> {
+    const deck = await this.decks.get(id);
+    if (!deck) throw new Rejected('That Deck isn\'t saved');
+    return deck;
   }
 
   private holders(seatId: string, except?: WebSocket): WebSocket[] {

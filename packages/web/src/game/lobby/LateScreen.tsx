@@ -1,12 +1,12 @@
 import { ScreenIcon } from '../../icons.js';
 import { Avatar, GameHeader, SeatWash } from '../parts.js';
-import { seatColours } from '../seats.js';
+import { seatLooks } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
 import { ThatsMe } from './JoinScreen.js';
 
 /** A device opening a game that has started: it can only take an existing seat or watch (ADR 0051). */
 export function LateScreen({ code, game, update }: ScreenProps) {
-  const colours = seatColours(update.seats);
+  const looks = seatLooks(update.seats);
   const turn = update.view?.turn.number;
   return (
     <div className="phone" style={{ gap: 18 }}>
@@ -27,9 +27,9 @@ export function LateScreen({ code, game, update }: ScreenProps) {
       <ol className="seat-list" style={{ gap: 6 }}>
         {update.seats.map((seat) => (
           <li key={seat.id} className={`seat-row${seat.connected ? '' : ' waiting'}`} style={{ padding: '8px 8px 8px 12px' }}>
-            <SeatWash colour={colours[seat.id]!} />
+            <SeatWash colour={looks[seat.id]!.colour} identity={looks[seat.id]!.identity} />
             <div className="seat-main" style={{ gap: 12 }}>
-              <Avatar name={seat.name} colour={colours[seat.id]!} size={36} />
+              <Avatar name={seat.name} colour={looks[seat.id]!.ring} size={36} />
               <div className="seat-text">
                 <span className="seat-name" style={{ fontSize: 16 }}>{seat.name}</span>
                 <span className="seat-sub" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

@@ -1,6 +1,6 @@
 import { Logo } from '../../icons.js';
 import { Avatar, ConnectionPill, gameLink, SeatDot, SeatWash } from '../parts.js';
-import { seatColours } from '../seats.js';
+import { seatLooks, type SeatLook } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
 import { useState } from 'react';
 import type { SeatView } from '@onthestack/server/protocol';
@@ -11,7 +11,7 @@ import { WhoGoesFirst } from './WhoGoesFirst.js';
  * (the bottom row runs right to left).
  */
 export function SharedLobby({ code, game, update }: ScreenProps) {
-  const colours = seatColours(update.seats);
+  const looks = seatLooks(update.seats);
   const [choosingFirst, setChoosingFirst] = useState(false);
   const half = Math.ceil(update.seats.length / 2);
   const top = update.seats.slice(0, half);
@@ -53,7 +53,7 @@ export function SharedLobby({ code, game, update }: ScreenProps) {
         </section>
 
         <section className="shared-table">
-          <SeatRow seats={top} colours={colours} />
+          <SeatRow seats={top} looks={looks} />
           <div className="table-oval">
             <p className="faint" style={{ margin: 0, fontSize: 15, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Clockwise · {update.seats.length} {update.seats.length === 1 ? 'player' : 'players'} · 40 life
@@ -62,25 +62,25 @@ export function SharedLobby({ code, game, update }: ScreenProps) {
               Start game
             </button>
           </div>
-          <SeatRow seats={bottom} colours={colours} />
+          <SeatRow seats={bottom} looks={looks} />
         </section>
       </main>
 
       {choosingFirst && (
-        <WhoGoesFirst seats={update.seats} colours={colours} onCancel={() => setChoosingFirst(false)} onStart={(firstSeatId) => game.send({ type: 'start', firstSeatId })} />
+        <WhoGoesFirst seats={update.seats} looks={looks} onCancel={() => setChoosingFirst(false)} onStart={(firstSeatId) => game.send({ type: 'start', firstSeatId })} />
       )}
     </div>
   );
 }
 
-function SeatRow({ seats, colours }: { seats: SeatView[]; colours: Record<string, string> }) {
+function SeatRow({ seats, looks }: { seats: SeatView[]; looks: Record<string, SeatLook> }) {
   if (seats.length === 0) return <div className="shared-row" />;
   return (
     <div className="shared-row">
       {seats.map((s) => (
         <div key={s.id} className="shared-seat">
-          <SeatWash colour={colours[s.id]!} />
-          <Avatar name={s.name} colour={colours[s.id]!} size={48} />
+          <SeatWash colour={looks[s.id]!.colour} identity={looks[s.id]!.identity} />
+          <Avatar name={s.name} colour={looks[s.id]!.ring} size={48} />
           <span className="display" style={{ fontSize: 20, fontWeight: 700, flexGrow: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</span>
           <SeatDot seat={s} />
         </div>

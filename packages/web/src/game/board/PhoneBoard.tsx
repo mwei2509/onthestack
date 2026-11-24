@@ -20,7 +20,7 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
     <div className="phone board">
       <header className="game-header" style={{ minHeight: 48 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: online ? 1 : 0.6 }}>
-          <Avatar name={active.name} colour={active.colour} size={32} active />
+          <Avatar name={active.name} colour={active.ring} size={32} active />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span className="display" style={{ fontSize: 17, fontWeight: 700, letterSpacing: '0.02em' }}>
               {myTurn ? 'Your turn' : `${active.name}'s turn`}
@@ -104,7 +104,7 @@ function YourSeat({ me, players, game, disabled, large }: { me: BoardPlayer; pla
   const life = me.life + pending;
   return (
     <section aria-label="Your seat" className={`your-seat${me.active ? ' glowing' : ''}`}>
-      <SeatWash colour={me.colour} strength={55} />
+      <SeatWash colour={me.colour} identity={me.identity} strength={55} />
       <div className="your-seat-body">
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -154,8 +154,8 @@ function OtherPlayer({ player }: { player: BoardPlayer }) {
   const sub = player.out ? ['Fallen', hit].filter(Boolean).join(' · ') : [player.commander, hit].filter(Boolean).join(' · ');
   return (
     <li className={`other${player.active ? ' glowing' : ''}${player.out ? ' out' : ''}`} aria-label={player.name}>
-      <SeatWash colour={player.colour} strength={28} />
-      <Avatar name={player.name} colour={player.colour} size={38} active={player.active} />
+      <SeatWash colour={player.colour} identity={player.identity} strength={28} />
+      <Avatar name={player.name} colour={player.ring} size={38} active={player.active} />
       <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <span className="display" style={{ fontSize: 16, fontWeight: 700 }}>

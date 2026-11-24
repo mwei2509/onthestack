@@ -1,14 +1,52 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
+import { getDeck } from '../../decks/api.js';
 import { ScreenIcon } from '../../icons.js';
 import { Avatar, ConnectionPill, GameHeader, Invite, SeatDot, SeatWash } from '../parts.js';
-import { seatColours } from '../seats.js';
+import { seatLooks } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
+import { DeckPicker, type SeatDeck } from './DeckPicker.js';
 
 const MAX_SEATS = 6;
 
+// The name typed so far, kept across a trip to import a Deck and back (ADR 0087).
+const draftKey = (code: string) => `join-name:${code}`;
+const readDraft = (code: string) => {
+  try {
+    return sessionStorage.getItem(draftKey(code)) ?? '';
+  } catch {
+    return '';
+  }
+};
+const saveDraft = (code: string, name: string) => {
+  try {
+    sessionStorage.setItem(draftKey(code), name);
+  } catch {
+    // Without storage the name is simply typed again after an import.
+  }
+};
+
 export function JoinScreen({ code, game, update }: ScreenProps) {
-  const [name, setName] = useState('');
-  const colours = seatColours(update.seats);
+  const [name, setName] = useState(() => readDraft(code));
+  const [deck, setDeck] = useState<SeatDeck | null>(null);
+  const [params] = useSearchParams();
+  const importedId = params.get('deck');
+
+  useEffect(() => {
+    if (!importedId) return;
+    getDeck(importedId).then(
+      (d) =>
+        setDeck({
+          id: d.id,
+          name: d.name,
+          commanders: d.cards.filter((c) => c.commander).map((c) => c.name),
+          colorIdentity: d.colorIdentity,
+        }),
+      () => undefined,
+    );
+  }, [importedId]);
+
+  const looks = seatLooks(update.seats);
   const full = update.seats.length >= MAX_SEATS;
 
   return (
@@ -19,7 +57,7 @@ export function JoinScreen({ code, game, update }: ScreenProps) {
         style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
         onSubmit={(e) => {
           e.preventDefault();
-          if (name.trim()) game.send({ type: 'join', name: name.trim() });
+          if (name.trim() && deck) game.send({ type: 'join', name: name.trim(), deckId: deck.id });
         }}
       >
         <h1 className="title">Join the game</h1>
@@ -31,9 +69,19 @@ export function JoinScreen({ code, game, update }: ScreenProps) {
           <>
             <label className="field">
               Your name
-              <input value={name} onChange={(e) => setName(e.target.value)} maxLength={24} autoComplete="nickname" autoFocus />
+              <input
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  saveDraft(code, e.target.value);
+                }}
+                maxLength={24}
+                autoComplete="nickname"
+                autoFocus
+              />
             </label>
-            <button type="submit" className="btn btn-primary" disabled={!name.trim()}>
+            <DeckPicker deck={deck} code={code} onPick={setDeck} />
+            <button type="submit" className="btn btn-primary" disabled={!name.trim() || !deck}>
               Take a seat
             </button>
           </>
@@ -55,9 +103,9 @@ export function JoinScreen({ code, game, update }: ScreenProps) {
           <ol className="seat-list">
             {update.seats.map((seat) => (
               <li key={seat.id} className="seat-row" style={{ padding: '6px 8px 6px 12px' }}>
-                <SeatWash colour={colours[seat.id]!} />
+                <SeatWash colour={looks[seat.id]!.colour} identity={looks[seat.id]!.identity} />
                 <div className="seat-main">
-                  <Avatar name={seat.name} colour={colours[seat.id]!} size={36} />
+                  <Avatar name={seat.name} colour={looks[seat.id]!.ring} size={36} />
                   <div className="seat-text">
                     <span className="seat-name">{seat.name}</span>
                   </div>

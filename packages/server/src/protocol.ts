@@ -8,11 +8,12 @@ const step = z.enum(STEPS);
 
 /** Everything a device can send. Devices are untrusted, so every message is parsed against this (ADR 0055). */
 export const DeviceMessage = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('join'), name, deckId: deckId.optional() }),
+  /** A seat needs a Deck from the library (ADR 0080). */
+  z.object({ type: z.literal('join'), name, deckId }),
   /** "That's me". Without `takeOver`, it fails while another device holds the seat, so a reload never steals one back. */
   z.object({ type: z.literal('claim'), seatId, takeOver: z.boolean().optional() }),
   z.object({ type: z.literal('watch') }),
-  z.object({ type: z.literal('editSeat'), seatId, name: name.optional(), deckId: deckId.nullable().optional() }),
+  z.object({ type: z.literal('editSeat'), seatId, name: name.optional(), deckId: deckId.optional() }),
   z.object({ type: z.literal('removeSeat'), seatId }),
   z.object({ type: z.literal('reorder'), seatIds: z.array(seatId).max(16) }),
   z.object({ type: z.literal('start'), firstSeatId: seatId }),
@@ -27,7 +28,8 @@ export type DeviceMessage = z.infer<typeof DeviceMessage>;
 export interface SeatView {
   id: string;
   name: string;
-  deckId?: string;
+  /** The seat's Deck as it was picked (ADR 0085); the game's copy from Start, once started. */
+  deck?: { id: string; name: string; commanders: string[]; colorIdentity: string[] };
   connected: boolean;
 }
 

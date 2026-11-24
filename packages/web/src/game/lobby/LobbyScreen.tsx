@@ -1,15 +1,27 @@
 import type { SeatView } from '@onthestack/server/protocol';
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import { EditIcon, Grip, ShareIcon } from '../../icons.js';
 import { Avatar, gameLink, Invite, GameHeader, SeatDot, SeatWash } from '../parts.js';
-import { moved, seatColours } from '../seats.js';
+import { deckLine, moved, seatLooks, type SeatLook } from '../seats.js';
 import type { ScreenProps } from '../useGame.js';
+import { DeckPicker } from './DeckPicker.js';
 import { WhoGoesFirst } from './WhoGoesFirst.js';
 
 export function LobbyScreen({ code, game, update, you }: ScreenProps & { you: string }) {
-  const colours = seatColours(update.seats);
+  const looks = seatLooks(update.seats);
   const [editing, setEditing] = useState<string | null>(null);
   const [choosingFirst, setChoosingFirst] = useState(false);
+  const [params, setParams] = useSearchParams();
+
+  // Back from importing a Deck for a seat being edited (ADR 0087): give that seat the new Deck, once.
+  const importedDeck = params.get('deck');
+  const importedFor = params.get('seat');
+  useEffect(() => {
+    if (!importedDeck || !importedFor) return;
+    game.send({ type: 'editSeat', seatId: importedFor, deckId: importedDeck });
+    setParams({}, { replace: true });
+  }, [importedDeck, importedFor, game, setParams]);
   const drag = useSeatDrag(update.seats, (seatIds) => game.send({ type: 'reorder', seatIds }));
   const seats = drag.order.map((id) => update.seats.find((s) => s.id === id)!).filter(Boolean);
 
@@ -43,13 +55,14 @@ export function LobbyScreen({ code, game, update, you }: ScreenProps & { you: st
           <SeatRow
             key={seat.id}
             seat={seat}
-            colour={colours[seat.id]!}
+            look={looks[seat.id]!}
             you={seat.id === you}
             dragging={drag.dragging === seat.id}
             editing={editing === seat.id}
             onEdit={() => setEditing(seat.id)}
             onDone={() => setEditing(null)}
             game={game}
+            code={code}
             grip={{
               onPointerDown: (e) => drag.start(e, seat.id),
               onKeyDown: (e) => drag.key(e, seat.id, i),
@@ -72,7 +85,7 @@ export function LobbyScreen({ code, game, update, you }: ScreenProps & { you: st
       {choosingFirst && (
         <WhoGoesFirst
           seats={update.seats}
-          colours={colours}
+          looks={looks}
           onCancel={() => setChoosingFirst(false)}
           onStart={(firstSeatId) => game.send({ type: 'start', firstSeatId })}
         />
@@ -83,17 +96,18 @@ export function LobbyScreen({ code, game, update, you }: ScreenProps & { you: st
 
 interface SeatRowProps {
   seat: SeatView;
-  colour: string;
+  look: SeatLook;
   you: boolean;
   dragging: boolean;
   editing: boolean;
   onEdit: () => void;
   onDone: () => void;
   game: ScreenProps['game'];
+  code: string;
   grip: { onPointerDown: (e: PointerEvent<HTMLButtonElement>) => void; onKeyDown: (e: KeyboardEvent<HTMLButtonElement>) => void };
 }
 
-function SeatRow({ seat, colour, you, dragging, editing, onEdit, onDone, game, grip }: SeatRowProps) {
+function SeatRow({ seat, look, you, dragging, editing, onEdit, onDone, game, code, grip }: SeatRowProps) {
   const [name, setName] = useState(seat.name);
   const classes = ['seat-row', you && 'you', editing && 'editing', dragging && 'dragging'].filter(Boolean).join(' ');
 
@@ -105,18 +119,18 @@ function SeatRow({ seat, colour, you, dragging, editing, onEdit, onDone, game, g
 
   return (
     <li className={classes} data-seat={seat.id}>
-      <SeatWash colour={colour} />
+      <SeatWash colour={look.colour} identity={look.identity} />
       <div className="seat-main">
         <button className="grip" aria-label={`Move ${seat.name}. Drag, or use the arrow keys`} {...grip}>
           <Grip />
         </button>
-        <Avatar name={seat.name} colour={colour} />
+        <Avatar name={seat.name} colour={look.ring} />
         <div className="seat-text">
           <span className="seat-name">
             {seat.name}
             {you && <span className="you-tag">YOU</span>}
           </span>
-          {!seat.deckId && <span className="seat-sub">No deck</span>}
+          <span className="seat-sub">{seat.deck ? deckLine(seat.deck) : 'No deck'}</span>
         </div>
         <SeatDot seat={seat} />
         {!editing && (
@@ -143,6 +157,12 @@ function SeatRow({ seat, colour, you, dragging, editing, onEdit, onDone, game, g
             Name
             <input value={name} onChange={(e) => setName(e.target.value)} maxLength={24} style={{ height: 44, fontSize: 16, background: 'var(--ink)' }} autoFocus />
           </label>
+          <DeckPicker
+            deck={seat.deck ?? null}
+            code={code}
+            seatId={seat.id}
+            onPick={(deck) => game.send({ type: 'editSeat', seatId: seat.id, deckId: deck.id })}
+          />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button type="button" className="btn btn-text" style={{ color: 'var(--danger)' }} onClick={() => game.send({ type: 'removeSeat', seatId: seat.id })}>
               Remove seat

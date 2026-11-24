@@ -1,6 +1,7 @@
 import type { SeatView } from '@onthestack/server/protocol';
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { CopyIcon, Logo, ShareIcon } from '../icons.js';
+import { IdentityWash } from '../decks/identity.js';
 import { initial } from './seats.js';
 import type { Connection } from './useGame.js';
 
@@ -41,8 +42,9 @@ export function Avatar({ name, colour, size, active }: { name: string; colour: s
   );
 }
 
-/** The painted glow behind a seat, in its colour. Its parent must be positioned. */
-export function SeatWash({ colour, strength = 24 }: { colour: string; strength?: number }) {
+/** The painted glow behind a seat: its Deck's colour identity, or its seat colour. Its parent must be positioned. */
+export function SeatWash({ colour, identity = [], strength = 24 }: { colour: string; identity?: string[]; strength?: number }) {
+  if (identity.length > 0) return <IdentityWash identity={identity} strength={strength / 150} />;
   const wash = `radial-gradient(60% 140% at 70% 0%, color-mix(in srgb, ${colour} ${strength}%, transparent), transparent 70%)`;
   return <span className="wash" style={{ '--wash': wash } as CSSProperties} aria-hidden />;
 }

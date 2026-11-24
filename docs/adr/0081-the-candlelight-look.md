@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-24, in the session following #42)
 
+Amended by ADR 0086 (coins and glows switch to colour identity in the lobby and on the board).
+
 The web app moves from the first screens' look (ink grey, one amber accent, Space Grotesk numbers) to the "Candlelight" direction on the Claude Design canvas: a plum table-felt background, gold for whose turn it is and the main buttons, names and numbers in Cinzel, life inside a crest, and − / + as coins. Only the active turn glows; nothing else moves.
 
 Each seat is identified by its commander's colour identity: a coin ringed in its colours, a painted glow behind the seat, and gem pips. The gems are original diamond shapes, not the mana symbols. Every coin carries the player's initial, so colour is never the only cue.

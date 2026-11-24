@@ -1649,3 +1649,30 @@ h1.title {
   color: var(--danger);
   box-shadow: inset 0 0 0 1.5px #6a3e2a;
 }
+
+.deck-choice {
+  min-height: 64px;
+  border-radius: 12px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  background: var(--field);
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.deck-choice-text {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.accent-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
