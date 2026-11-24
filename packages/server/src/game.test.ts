@@ -448,7 +448,7 @@ describe('Statements', () => {
     const screen = await connect(game.code);
     await screen.update();
     screen.send({ type: 'statement', text: 'Theo loses 3 life' });
-    expect(await screen.next()).toEqual({ type: 'error', message: 'Only a seated device can say what happened' });
+    expect(await screen.next()).toEqual({ type: 'error', message: 'Say whose statement this is' });
     game.devices[0]!.send({ type: 'statement', text: '   ' });
     expect(await game.devices[0]!.next()).toEqual({ type: 'error', message: 'Say what happened first' });
   });
@@ -727,5 +727,27 @@ describe("The reading's questions (ADR 0068)", () => {
     for (const d of game.devices) after.push(await d.update());
     expect(after[0]!.log!.questions).toEqual([]);
     expect(after[0]!.view!.players.p2!.life).toBe(37);
+  });
+});
+
+describe('The Shared screen speaks for a seat (ADR 0107)', () => {
+  it("takes a watching device's statement as the seat it names, and a seated phone's only as its own", async () => {
+    const game = await interpreting();
+    const screen = await connect(game.code);
+    await screen.update();
+    screen.send({ type: 'watch' });
+    await screen.update();
+    for (const d of game.devices) await d.update();
+
+    screen.send({ type: 'statement', text: 'I lose 2 life', seatId: 'p3' });
+    const updates = [await screen.update()];
+    for (const d of game.devices) updates.push(await d.update());
+    expect(updates[0]!.log!.statements).toMatchObject([{ id: 's1', playerId: 'p3', text: 'I lose 2 life' }]);
+    expect((await game.call(0)).user).toContain('[s1] Michael (p3): "I lose 2 life"');
+
+    game.devices[0]!.send({ type: 'statement', text: 'Elena loses 1', seatId: 'p2' });
+    expect(await game.devices[0]!.next()).toEqual({ type: 'error', message: 'A phone speaks only for its own seat' });
+    screen.send({ type: 'statement', text: 'I lose 1', seatId: 'p9' });
+    expect(await screen.next()).toEqual({ type: 'error', message: 'No such seat' });
   });
 });
