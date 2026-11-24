@@ -2407,3 +2407,54 @@ h1.title {
   font-size: 15px;
   line-height: 1.45;
 }
+
+/* The reading's questions (ADR 0068), as the canvas's "Question for you" card */
+.question-tray {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 40dvh;
+  overflow-y: auto;
+}
+
+.question-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+.question-card.mine {
+  box-shadow:
+    inset 0 0 0 1.5px var(--accent),
+    0 0 16px rgba(233, 185, 73, 0.18);
+}
+
+.question-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.question-text {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.question-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.question-answers .btn {
+  height: 44px;
+  padding: 0 16px;
+}
