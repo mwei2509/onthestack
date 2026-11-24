@@ -196,6 +196,7 @@ interface Game {
   timelineCorrections: TimelineCorrection[];
   interpreterQueue: { inFlight: PlayerStatementId | null; latestStatement: PlayerStatementId; latestApplied: PlayerStatementId };
   sealedTurns: SealedTurn[];
+  ended: { at: string; turn: number; by: PlayerId | null } | null;   // ADR 0101; null by = the shared screen
 }
 
 interface PlayerStatement { id: PlayerStatementId; playerId: PlayerId; pressedAt: string; text: string }
@@ -283,7 +284,7 @@ Interpretation produces the whole turn's timeline every time (ADR 0015, 0016), s
 | `replayTurn(turnStart, timeline, { currentStep })` | Walks the Steps from the snapshot: each Step's automatic actions, then its timeline entries, settling after each (the Stack waits when the next entry is a Response). Returns the `GameState`, the turn's `GameEvent[]`, its TableEvents (numbered `t1`, `t2`… in replay order; never stored in `GameState`) and RulesWarnings. Deterministic: same inputs, same output, IDs included. The card catalog lives in the state. |
 | `stepsAhead(state)` | The Steps still to come this turn given the board now, leaving out the ones the rules skip (no attackers: no blockers or combat damage; no first strikers: no first-strike damage). Next step moves to the first; after the last, the turn ends (ADR 0074). |
 | `tableView(result)` | What screens show: board with stats, Stack, zones, who still owes a combat response, the combat preview once everyone is Ready, PlayerTasks, reminders (the draw, menace short of blockers; computed, never stored), RulesWarnings and the Steps still to come (`stepsAhead`). |
-| `sealTurn(turnStart, timeline)` | Replays through cleanup, then returns the `SealedTurn` (with GameEvents and summary) and the next turn's `turnStart`, passing to the next player still in the game. |
+| `sealTurn(turnStart, timeline, { through? })` | Replays through cleanup (or through the given Step, when the game is ended: ADR 0100), then returns the `SealedTurn` (with GameEvents and summary) and the next turn's `turnStart`, passing to the next player still in the game. |
 | `applyBoardCorrection(state, correction, playerId)` | Applies a correction ("Heliod has two counters"), caused by `{ rule: 'boardCorrection' }`, then settles, and records it as a pair: a `BoardCorrectionMade` TableEvent plus the GameEvents it produced (ADR 0020, 0034). Corrections never trigger abilities. |
 | `stats(permanent, state)` | Current power, toughness and keywords, calculated whenever asked. |
 

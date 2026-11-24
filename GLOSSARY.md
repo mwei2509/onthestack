@@ -103,12 +103,16 @@ _Avoid_: pending, queued, draft
 A turn that has ended: the next player has started theirs. Its PlayerStatements, InterpretedTimeline and GameEvents stay readable, but its board can only be changed with a BoardCorrection.
 _Avoid_: committed turn, closed turn
 
+**Ended game**:
+A game someone at the table has ended (ADR 0092). Its current turn is Sealed as of the current Step and the game is read-only for good: no statements, taps, Step moves or BoardCorrections (ADR 0100, 0101).
+_Avoid_: finished game, closed game, archived game
+
 **Take-back**:
 Undoing something within the current turn, by saying so ("oops, I meant…") or with a TimelineCorrection.
 _Avoid_: undo, rewind, revert
 
 **BoardCorrection**:
-Correcting the app's copy of the board to match the physical table ("Heliod has two counters"). Always available, including after a turn is Sealed.
+Correcting the app's copy of the board to match the physical table ("Heliod has two counters"). Always available, including after a turn is Sealed, until the game is an Ended game.
 _Avoid_: edit, override, fix
 
 ## What the app shows
