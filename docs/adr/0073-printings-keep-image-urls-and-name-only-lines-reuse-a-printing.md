@@ -1,6 +1,6 @@
 # Printings keep their image URLs, and name-only lines reuse a stored printing
 
-Status: Proposed
+Status: Accepted (decided with Melissa, 2026-11-23, in a Claude Code session)
 
 Refines ADR 0071 with two details found while building the card store against Scryfall's real responses.
 
