@@ -1,29 +1,24 @@
 import type { DeckCard } from './api.js';
 
-const ORDER = ['Creature', 'Planeswalker', 'Battle', 'Instant', 'Sorcery', 'Artifact', 'Enchantment', 'Land', 'Other'] as const;
-const PLURAL: Record<(typeof ORDER)[number], string> = {
-  Creature: 'Creatures',
-  Planeswalker: 'Planeswalkers',
-  Battle: 'Battles',
-  Instant: 'Instants',
-  Sorcery: 'Sorceries',
-  Artifact: 'Artifacts',
-  Enchantment: 'Enchantments',
-  Land: 'Lands',
-  Other: 'Other',
-};
+const SECTIONS = [
+  { group: 'Commander', label: 'Commander', has: (c: DeckCard) => c.commander },
+  { group: 'Creature', label: 'Creatures', has: (c: DeckCard) => !c.commander && c.group === 'Creature' },
+  { group: 'Other permanent', label: 'Other permanents', has: (c: DeckCard) => !c.commander && c.group === 'Other permanent' },
+  { group: 'Spell', label: 'Spells', has: (c: DeckCard) => !c.commander && c.group === 'Spell' },
+  { group: 'Land', label: 'Lands', has: (c: DeckCard) => !c.commander && c.group === 'Land' },
+] as const;
 
 export interface CardGroupView {
-  group: DeckCard['group'];
+  group: (typeof SECTIONS)[number]['group'];
   label: string;
   count: number;
   cards: DeckCard[];
 }
 
-/** The Deck page's type groups (ADR 0084), empty ones left out, cards A–Z, counts by quantity. */
+/** The Deck page's sections (ADR 0097), empty ones left out, cards A–Z, counts by quantity. */
 export function groupCards(cards: DeckCard[]): CardGroupView[] {
-  return ORDER.map((group) => {
-    const inGroup = cards.filter((c) => c.group === group).sort((a, b) => a.name.localeCompare(b.name));
-    return { group, label: PLURAL[group], count: inGroup.reduce((n, c) => n + c.quantity, 0), cards: inGroup };
+  return SECTIONS.map(({ group, label, has }) => {
+    const inGroup = cards.filter(has).sort((a, b) => a.name.localeCompare(b.name));
+    return { group, label, count: inGroup.reduce((n, c) => n + c.quantity, 0), cards: inGroup };
   }).filter((g) => g.cards.length > 0);
 }

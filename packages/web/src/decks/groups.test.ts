@@ -2,23 +2,35 @@ import { describe, expect, it } from 'vitest';
 import type { DeckCard } from './api.js';
 import { groupCards } from './groups.js';
 
-const card = (name: string, group: DeckCard['group'], quantity = 1): DeckCard => ({
+const card = (name: string, group: DeckCard['group'], quantity = 1, commander = false): DeckCard => ({
   name,
   group,
   quantity,
+  commander,
   oracleId: name,
   scryfallId: name,
-  commander: false,
   legendary: false,
   doubleFaced: false,
+  typeLine: '',
+  manaCost: '',
+  manaValue: 0,
+  oracleText: '',
+  known: false,
 });
 
 describe('groupCards', () => {
-  it('orders groups by type, sorts cards, counts quantities and drops empty groups', () => {
-    const groups = groupCards([card('Swamp', 'Land', 11), card('Sol Ring', 'Artifact'), card('Plains', 'Land', 11), card('Vona', 'Creature')]);
+  it('puts the commander first, then the type sections, sorting cards, counting quantities and dropping empty ones', () => {
+    const groups = groupCards([
+      card('Swamp', 'Land', 11),
+      card('Sol Ring', 'Other permanent'),
+      card('Plains', 'Land', 11),
+      card('Vona', 'Creature', 1, true),
+      card('Blood Artist', 'Creature'),
+    ]);
     expect(groups.map((g) => [g.label, g.count, g.cards.map((c) => c.name)])).toEqual([
-      ['Creatures', 1, ['Vona']],
-      ['Artifacts', 1, ['Sol Ring']],
+      ['Commander', 1, ['Vona']],
+      ['Creatures', 1, ['Blood Artist']],
+      ['Other permanents', 1, ['Sol Ring']],
       ['Lands', 22, ['Plains', 'Swamp']],
     ]);
   });

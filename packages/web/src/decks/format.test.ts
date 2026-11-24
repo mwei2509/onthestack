@@ -67,13 +67,13 @@ describe('fixing a line', () => {
 
 describe('commanderChoices', () => {
   it('lists legendary creatures and planeswalkers first, then the rest, A–Z', () => {
-    const card = (name: string, group: string, legendary: boolean) => ({ name, group, legendary });
+    const card = (name: string, typeLine: string, legendary: boolean) => ({ name, typeLine, legendary });
     const order = commanderChoices([
       card('Sol Ring', 'Artifact', false),
-      card('Vona, Butcher of Magan', 'Creature', true),
-      card('Shadowspear', 'Artifact', true),
-      card('Sorin, Vengeful Bloodlord', 'Planeswalker', true),
-      card('Blood Artist', 'Creature', false),
+      card('Vona, Butcher of Magan', 'Legendary Creature — Vampire Knight', true),
+      card('Shadowspear', 'Legendary Artifact — Equipment', true),
+      card('Sorin, Vengeful Bloodlord', 'Legendary Planeswalker — Sorin', true),
+      card('Blood Artist', 'Creature — Vampire', false),
     ]).map((c) => c.name);
     expect(order).toEqual(['Sorin, Vengeful Bloodlord', 'Vona, Butcher of Magan', 'Blood Artist', 'Shadowspear', 'Sol Ring']);
   });
