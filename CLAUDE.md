@@ -2,7 +2,7 @@
 
 Voice-driven Magic: The Gathering table companion for casual Commander (onthestack.gg). Players speak their actions. The app tracks life, combat, triggers and the stack.
 
-**Status:** pre-code. The repo is a pnpm workspace (TypeScript): `packages/engine` (pure rules engine), `packages/interpreter` (turns the TurnTranscript into an InterpretedTimeline with an LLM; schema, name resolution, prompt and LLM providers so far), `packages/server` (Cloudflare Worker plus the `Game` Durable Object), `packages/web` (React app served by the Worker) and `packages/cli` (the repo-specific `stx` commands). Nothing is deployed yet. The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
+**Status:** pre-code. The repo is a pnpm workspace (TypeScript): `packages/engine` (pure rules engine), `packages/interpreter` (turns the TurnTranscript into an InterpretedTimeline with an LLM; schema, name resolution, prompt and LLM providers so far), `packages/server` (Cloudflare Worker plus the `Game` Durable Object), `packages/web` (React app served by the Worker) and `packages/cli` (the repo-specific `stx` commands). `main` deploys to onthestack.gg on every merge ([`docs/deploy.md`](docs/deploy.md)). The stack is recorded in `docs/adr/`. Still ask before adding dependencies, and record significant choices as ADRs.
 
 ## Dev CLI: `stx`
 
@@ -16,7 +16,7 @@ On the maintainer's machine `stx` is a shell function from a personal CLI kept o
 | `stx stack sync [-n]` | After a PR in a stack merges, rebase every branch above it and force-push them. See `.claude/rules/pull-requests.md`. |
 | `stx start [--no-open]` | (`packages/cli`) Run the local Worker (:8790) and Vite (:5190) in a new iTerm2 tab split into two panes (inline with prefixed output elsewhere), then open the browser. Offers to stop whatever already holds those ports. |
 | `pnpm cli:build` | Rebuild `packages/cli`. `stx` runs the main clone's build, so rebuild there after pulling changes to it. |
-| `pnpm build` / `pnpm typecheck` / `pnpm lint` / `pnpm test` | Run across all packages. CI (`.github/workflows/ci.yml`) runs all four on every PR; the server tests need the web build. |
+| `pnpm build` / `pnpm typecheck` / `pnpm lint` / `pnpm test` | Run across all packages. CI (`.github/workflows/ci.yml`) runs all four on every PR, then deploys `main`; the server tests need the web build. |
 | `pnpm --filter @onthestack/server dev` + `pnpm --filter @onthestack/web dev` | What `stx start` runs: the local Worker (game sockets, `/api`) and the Vite dev server, which proxies `/api` to it. `stx start` also builds `packages/web/dist` first, which the Worker serves; run that build yourself if you start these by hand. |
 
 ## Docs
@@ -24,6 +24,7 @@ On the maintainer's machine `stx` is a shell function from a personal CLI kept o
 - [`GLOSSARY.md`](GLOSSARY.md): the domain language. Use its terms in code, issues and tests.
 - [`docs/engine-model.md`](docs/engine-model.md): the engine spec: domains, the event loop, Steps, the Stack, combat, GameEvents, Ability definitions, data structures, engine functions, property tests and a worked example. Read it before working on `packages/engine` or `packages/interpreter`.
 - `docs/adr/`: architecture decision records, one file per decision (`NNNN-short-title.md`), each with a `Status:` line. Only Accepted ones are decided. They take precedence over the proposal. If a decision changes something, write a new ADR rather than editing an old one or the proposal.
+- [`docs/deploy.md`](docs/deploy.md): how `main` reaches onthestack.gg, and the one-time Cloudflare and GitHub setup.
 - [`docs/proposal.md`](docs/proposal.md): the original dictated first draft (data structures, engine loop, combat). Useful background, but read the ADRs and glossary first; much of its product shape has been superseded.
 
 ## Non-negotiable principles
