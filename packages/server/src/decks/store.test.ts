@@ -2,6 +2,7 @@ import { env } from 'cloudflare:workers';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { fakeScryfall } from '../cards/fake-scryfall.js';
 import { createCardStore } from '../cards/store.js';
+import type { ArchidektDeck } from './archidekt.js';
 import { createDeckStore, DeckChanged, NotOnDeck } from './store.js';
 
 const VONA = { oracleId: 'b1c56e23-eae6-47a1-a1cd-3a2d01621768', scryfallId: '27beed9c-a42e-46de-8fbc-885da337ae75' };
@@ -142,5 +143,48 @@ describe('fixing a Deck', () => {
     expect(await store.remove(id)).toBe(false);
     const left = await env.DB.prepare('SELECT count(*) AS n FROM deck_cards').first<{ n: number }>();
     expect(left!.n).toBe(0);
+  });
+});
+
+describe('importing from Archidekt', () => {
+  const deckOf = (name: string, cards: [string, string, string, string[]][]): ArchidektDeck => ({
+    id: 28451037,
+    name,
+    categories: [
+      { name: 'Commander', includedInDeck: true, isPremier: true },
+      { name: 'Ramp', includedInDeck: true, isPremier: false },
+    ],
+    cards: cards.map(([uid, cardName, set, categories]) => ({
+      quantity: 1,
+      categories,
+      card: { uid, collectorNumber: '1', edition: { editioncode: set }, oracleCard: { name: cardName, uid: '' } },
+    })),
+  });
+
+  it('saves a new Deck, then replaces it, name and all, when the same Archidekt Deck is imported again (ADR 0079)', async () => {
+    const store = deckStore();
+    const first = await store.importArchidekt(
+      deckOf('Vona', [
+        [VONA.scryfallId, 'Vona, Butcher of Magan', 'lcc', ['Commander']],
+        [SOL_RING.scryfallId, 'Sol Ring', 'trc', ['Ramp']],
+      ]),
+    );
+    expect(first.updated).toBe(false);
+    expect(first.deck).toMatchObject({ name: 'Vona', archidektId: '28451037' });
+    await store.rename(first.deck.id, 'My name');
+
+    const again = await store.importArchidekt(
+      deckOf('Vona v2', [
+        [SOL_RING.scryfallId, 'Sol Ring', 'trc', ['Commander']],
+        ['00000000-0000-0000-0000-000000000000', 'Gone Card', 'xyz', ['Ramp']],
+      ]),
+    );
+
+    expect(again.updated).toBe(true);
+    expect(again.deck.id).toBe(first.deck.id);
+    expect(again.deck.name).toBe('Vona v2');
+    expect(again.deck.cards.map((c) => [c.name, c.commander])).toEqual([['Sol Ring', true]]);
+    expect(again.deck.unmatched).toEqual([{ text: '1x Gone Card (xyz) 1', reason: 'not-found' }]);
+    expect(await store.list()).toHaveLength(1);
   });
 });
