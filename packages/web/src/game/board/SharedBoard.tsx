@@ -1,5 +1,6 @@
 import type { TableView } from '@onthestack/engine';
 import { useState, type CSSProperties } from 'react';
+import { Link } from 'react-router';
 import { Logo } from '../../icons.js';
 import { Avatar, SeatWash } from '../parts.js';
 import { formatJoinCode } from '../joinCode.js';
@@ -67,6 +68,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
             <span className="muted" style={{ fontSize: 14 }}>
               {endedLine(ended, view, clockTime)}
             </span>
+            <Link to="/">Back to start</Link>
           </div>
         </section>
       ) : (
