@@ -6,7 +6,8 @@ import type { ScreenProps } from '../useGame.js';
 import { createTapCombiner } from './lifeTaps.js';
 import { GameMenuButton } from './GameMenu.js';
 import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
-import { clockTime, Crest, EndedPill, HitChips, NextStepButton, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
+import { LogStatus, SayBar, ThisTurn } from '../log/TurnLog.js';
+import { clockTime, Crest, EndedPill, HitChips, NextStepCompact, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
 
 export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { you: string; view: TableView }) {
@@ -61,8 +62,10 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
               <OtherPlayer key={p.id} player={p} />
             ))}
         </ul>
+        {update.log && <ThisTurn log={update.log} view={view} game={game} />}
       </div>
 
+      {online && !ended && <LogStatus log={update.log} game={game} />}
       <footer className="board-dock">
         {ended ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignSelf: 'center' }}>
@@ -74,12 +77,8 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
         ) : online ? (
           <>
             <StepMenuButton onOpen={() => setMenuOpen(true)} />
-            {myTurn && <NextStepButton view={view} onNext={() => game.send({ type: 'nextStep', from: view.turn.step })} />}
-            {!myTurn && (
-              <span className="faint" style={{ alignSelf: 'center', fontSize: 14 }}>
-                {active.name} moves the steps on
-              </span>
-            )}
+            {myTurn && <NextStepCompact view={view} onNext={() => game.send({ type: 'nextStep', from: view.turn.step })} />}
+            <SayBar game={game} />
           </>
         ) : (
           <div className="offline-banner" role="status">

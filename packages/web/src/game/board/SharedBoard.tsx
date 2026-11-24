@@ -9,6 +9,8 @@ import { GameMenuButton } from './GameMenu.js';
 import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
 import { clockTime, cue, EndedPill, NextStepButton, StepMenuButton, StepStrip, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
+import { STEP_NAMES } from './steps.js';
+import { TurnLogList } from '../log/TurnLog.js';
 
 /** The board on a Shared screen: every seat around the table, clockwise from the top left, with the step controls. */
 export function SharedBoard({ code, game, update, view }: ScreenProps & { view: TableView }) {
@@ -57,46 +59,58 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
         </div>
       </header>
 
-      <div className="shared-seats" style={rowStyle}>
-        {top.map((p) => (
-          <SeatCard key={p.id} player={p} players={byId} />
-        ))}
-      </div>
+      <div className="shared-body">
+        <div className="shared-table-col">
+          <div className="shared-seats" style={rowStyle}>
+            {top.map((p) => (
+              <SeatCard key={p.id} player={p} players={byId} />
+            ))}
+          </div>
 
-      {ended ? (
-        <section aria-label="Game over" className="turn-strip">
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span className="display" style={{ fontSize: 26, fontWeight: 800 }}>
-              Game over · Turn {view.turn.number}
-            </span>
-            <span className="muted" style={{ fontSize: 14 }}>
-              {endedLine(ended, view, clockTime)}
-            </span>
-            <Link to="/">Back to start</Link>
-          </div>
-        </section>
-      ) : (
-        <section aria-label="Turn and step" className="turn-strip">
-          <div className="turn-who">
-            <span className="faint" style={{ fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
-              Turn {view.turn.number}
-            </span>
-            <span className="display" style={{ fontSize: 26, fontWeight: 800 }}>
-              {active.name}'s turn
-            </span>
-          </div>
-          <StepStrip view={view} />
-          <div className="turn-controls">
-            <StepMenuButton onOpen={() => setMenuOpen(true)} disabled={!online} />
-            <NextStepButton view={view} disabled={!online} onNext={() => game.send({ type: 'nextStep', from: view.turn.step })} />
-          </div>
-        </section>
-      )}
+          {ended ? (
+            <section aria-label="Game over" className="turn-strip">
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span className="display" style={{ fontSize: 26, fontWeight: 800 }}>
+                  Game over · Turn {view.turn.number}
+                </span>
+                <span className="muted" style={{ fontSize: 14 }}>
+                  {endedLine(ended, view, clockTime)}
+                </span>
+                <Link to="/">Back to start</Link>
+              </div>
+            </section>
+          ) : (
+            <section aria-label="Turn and step" className="turn-strip">
+              <div className="turn-who">
+                <span className="faint" style={{ fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                  Turn {view.turn.number} · <span style={{ color: 'var(--accent)' }}>{STEP_NAMES[view.turn.step]}</span>
+                </span>
+                <span className="display" style={{ fontSize: 26, fontWeight: 800 }}>
+                  {active.name}'s turn
+                </span>
+              </div>
+              <StepStrip view={view} />
+              <div className="turn-controls">
+                <StepMenuButton onOpen={() => setMenuOpen(true)} disabled={!online} />
+                <NextStepButton view={view} disabled={!online} onNext={() => game.send({ type: 'nextStep', from: view.turn.step })} />
+              </div>
+            </section>
+          )}
 
-      <div className="shared-seats" style={rowStyle}>
-        {bottom.map((p) => (
-          <SeatCard key={p.id} player={p} players={byId} />
-        ))}
+          <div className="shared-seats" style={rowStyle}>
+            {bottom.map((p) => (
+              <SeatCard key={p.id} player={p} players={byId} />
+            ))}
+          </div>
+        </div>
+        {update.log && (
+          <aside className="shared-log" aria-label="This turn">
+            <h2 className="section-label" style={{ fontSize: 12 }}>
+              This turn
+            </h2>
+            <TurnLogList log={update.log} view={view} />
+          </aside>
+        )}
       </div>
 
       {menuOpen && !ended && <StepMenu view={view} game={game} confirmFirst={false} onClose={() => setMenuOpen(false)} />}

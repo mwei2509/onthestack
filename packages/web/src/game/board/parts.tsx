@@ -70,6 +70,18 @@ export function NextStepButton({ view, disabled, onNext }: { view: TableView; di
   );
 }
 
+/** Next step as a compact square, leaving the dock's wide space to typing now and the mic later (ADR 0106). */
+export function NextStepCompact({ view, disabled, onNext }: { view: TableView; disabled?: boolean; onNext: () => void }) {
+  return (
+    <button className="next-compact" aria-label={`Next step: ${nextLabel(view)}`} onClick={onNext} disabled={disabled}>
+      <svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M8 5l6 6-6 6" />
+      </svg>
+      <span>Next</span>
+    </button>
+  );
+}
+
 export function StepMenuButton({ onOpen, disabled }: { onOpen: () => void; disabled?: boolean }) {
   return (
     <button className="menu-button" aria-label="Jump to a step" onClick={onOpen} disabled={disabled}>

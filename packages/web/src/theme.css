@@ -2123,3 +2123,231 @@ h1.title {
 .home-top a:hover {
   color: var(--text);
 }
+
+/* Typing what happened and the turn's log (ADR 0106) */
+.next-compact {
+  width: 64px;
+  height: 58px;
+  border-radius: 16px;
+  border: 0;
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.say-bar {
+  flex-grow: 1;
+  min-width: 0;
+  height: 58px;
+  border-radius: 29px;
+  border: 0;
+  background: var(--field);
+  box-shadow:
+    inset 0 0 0 1.5px var(--gold-line),
+    0 0 16px rgba(233, 185, 73, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  font-size: 16px;
+  color: var(--text-2);
+  text-align: left;
+}
+
+.say-bar svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.compose {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(180deg, var(--raised-2) 0%, var(--field) 40%);
+  border-radius: 24px 24px 0 0;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow:
+    0 -12px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 var(--line-3);
+}
+
+.compose textarea {
+  width: 100%;
+  min-height: 72px;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent);
+  background: var(--ink);
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 17px;
+  color: var(--text);
+  resize: none;
+  outline: none;
+}
+
+.log-status-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 32px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.log-status-line.failed {
+  color: var(--danger);
+}
+
+.this-turn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 15px;
+  text-align: left;
+  color: var(--text);
+}
+
+.this-turn svg {
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.log-chip {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  padding: 3px 7px;
+  color: var(--text-2);
+  box-shadow: inset 0 0 0 1px var(--line-3);
+}
+
+.log-chip.failed {
+  color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
+}
+
+.turn-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.log-statements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.log-statement {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.log-statement.failed {
+  box-shadow: inset 0 0 0 1px var(--danger);
+}
+
+.log-who {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.log-said {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--italic);
+}
+
+.log-readings {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.log-readings li::before {
+  content: '→ ';
+  color: var(--accent);
+}
+
+.log-status {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.log-statement.failed .log-status {
+  color: var(--danger);
+}
+
+.shared-body {
+  flex-grow: 1;
+  min-height: 0;
+  display: flex;
+  gap: 18px;
+}
+
+.shared-table-col {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.shared-log {
+  width: 300px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(28, 22, 34, 0.9);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+@media (max-width: 860px) {
+  .shared-body {
+    flex-direction: column;
+  }
+  .shared-log {
+    width: auto;
+    max-height: 40dvh;
+  }
+}
+
+/* Beside the log panel the strip is too narrow to name every Step; the current one is named above it. */
+.shared-body .strip-step span {
+  display: none;
+}
