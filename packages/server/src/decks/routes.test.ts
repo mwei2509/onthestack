@@ -2,6 +2,8 @@ import { env, exports } from 'cloudflare:workers';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { fakeScryfall } from '../cards/fake-scryfall.js';
 import { createCardStore } from '../cards/store.js';
+import { handleDecks } from './routes.js';
+import { createDeckStore } from './store.js';
 
 const api = (path: string, init?: RequestInit) => exports.default.fetch(`http://test/api/decks${path}`, init);
 const post = (body: unknown) =>
@@ -74,5 +76,52 @@ describe('/api/decks/:id', () => {
     const deck = (await fixed.json()) as { cards: { name: string }[]; unmatched: unknown[] };
     expect(deck.cards.map((c) => c.name)).toEqual(['Sol Ring', 'Vona, Butcher of Magan']);
     expect(deck.unmatched).toEqual([]);
+  });
+});
+
+describe('importing an Archidekt link', () => {
+  it('refuses something that is not an Archidekt Deck link', async () => {
+    const res = await post({ archidekt: 'https://moxfield.com/decks/abc' });
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "That isn't an Archidekt Deck link" });
+  });
+
+  it('imports through the proxy: 201 the first time, 200 when it updates the Deck', async () => {
+    const archidekt = (async () =>
+      Response.json({
+        id: 5,
+        name: 'Rings',
+        categories: [{ name: 'Ramp', includedInDeck: true, isPremier: false }],
+        cards: [
+          {
+            quantity: 1,
+            categories: ['Ramp'],
+            card: {
+              uid: 'fc817e07-c1f3-469f-9cf7-0945dea7400f',
+              collectorNumber: '499',
+              edition: { editioncode: 'trc' },
+              oracleCard: { name: 'Sol Ring', uid: '6ad8011d-3471-4369-9d68-b264cc027487' },
+            },
+          },
+        ],
+      })) as unknown as typeof fetch;
+    const store = createDeckStore({
+      db: env.DB,
+      cards: createCardStore({ db: env.DB, fetch: fakeScryfall().fetch, sleep: async () => {}, now: () => new Date() }),
+      now: () => new Date(),
+      newId: () => crypto.randomUUID(),
+    });
+    const importLink = () =>
+      handleDecks(
+        new Request('http://test/api/decks', { method: 'POST', body: JSON.stringify({ archidekt: 'archidekt.com/decks/5' }) }),
+        undefined,
+        undefined,
+        { store, fetch: archidekt },
+      );
+
+    expect((await importLink()).status).toBe(201);
+    const updated = await importLink();
+    expect(updated.status).toBe(200);
+    expect(((await updated.json()) as { name: string }).name).toBe('Rings');
   });
 });

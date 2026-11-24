@@ -37,7 +37,7 @@ export default {
       const cards = createCardStore({ db: env.DB, fetch, sleep: (ms) => new Promise((r) => setTimeout(r, ms)), now });
       const store = createDeckStore({ db: env.DB, cards, now, newId: () => crypto.randomUUID() });
       const lineIndex = decks[2] === undefined ? undefined : Number(decks[2]);
-      return handleDecks(request, decks[1], lineIndex, store);
+      return handleDecks(request, decks[1], lineIndex, { store, fetch });
     }
 
     const match = GAME.exec(url.pathname);

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ScryfallUnavailable } from '../cards/scryfall.js';
+import { archidektIdOf, ArchidektUnavailable, fetchArchidektDeck } from './archidekt.js';
 import { DeckChanged, NotOnDeck, type DeckStore } from './store.js';
 
 export const DECKS_PATH = /^\/api\/decks(?:\/([A-Za-z0-9-]{1,64})(?:\/unmatched\/(\d{1,4}))?)?$/;
@@ -9,6 +10,10 @@ const deckName = z.string().trim().min(1, 'A Deck needs a name').max(60, 'Deck n
 const ImportList = z.object({
   name: deckName,
   list: z.string().min(1, 'Paste a Deck list').max(30_000, 'That list is too long for one Deck'),
+});
+
+const ImportArchidekt = z.object({
+  archidekt: z.string().refine((link) => archidektIdOf(link) !== null, "That isn't an Archidekt Deck link"),
 });
 
 const EditDeck = z.union([
@@ -35,13 +40,21 @@ export async function handleDecks(
   request: Request,
   id: string | undefined,
   lineIndex: number | undefined,
-  store: DeckStore,
+  { store, fetch }: { store: DeckStore; fetch: typeof globalThis.fetch },
 ): Promise<Response> {
   try {
     if (id === undefined && request.method === 'GET') return Response.json(await store.list());
 
     if (id === undefined && request.method === 'POST') {
-      const body = ImportList.safeParse(await json(request));
+      const raw: unknown = await json(request);
+      if (raw !== null && typeof raw === 'object' && 'archidekt' in raw) {
+        const body = ImportArchidekt.safeParse(raw);
+        if (!body.success) return badRequest(body.error);
+        const archidekt = await fetchArchidektDeck(archidektIdOf(body.data.archidekt)!, fetch);
+        const { deck, updated } = await store.importArchidekt(archidekt);
+        return Response.json(deck, { status: updated ? 200 : 201 });
+      }
+      const body = ImportList.safeParse(raw);
       if (!body.success) return badRequest(body.error);
       return Response.json(await store.importList(body.data.name, body.data.list), { status: 201 });
     }
@@ -70,6 +83,7 @@ export async function handleDecks(
     if (e instanceof DeckChanged) {
       return Response.json({ error: 'Someone else changed this Deck. Reload it and try again.' }, { status: 409 });
     }
+    if (e instanceof ArchidektUnavailable) return Response.json({ error: e.message }, { status: 502 });
     if (e instanceof NotOnDeck) return Response.json({ error: "That card isn't on this Deck" }, { status: 400 });
     if (e instanceof ScryfallUnavailable) {
       return Response.json({ error: "Scryfall isn't answering. Try again in a minute." }, { status: 503 });

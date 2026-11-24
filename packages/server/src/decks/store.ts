@@ -1,4 +1,5 @@
-import type { CardRequest, CardStore } from '../cards/store.js';
+import type { CardRequest, CardStore, ResolvedCard } from '../cards/store.js';
+import { entriesOf, type ArchidektDeck } from './archidekt.js';
 import { parseDeckList, type DeckLine } from './parse.js';
 
 /** A line kept on a Deck because it couldn't be read, or names a card the card store can't find (ADR 0077). */
@@ -40,8 +41,15 @@ export interface DeckStoreDeps {
   newId: () => string;
 }
 
+/** A line of an import in order: a card to resolve, or text that couldn't be read. */
+type Entry =
+  | { request: CardRequest; quantity: number; commander: boolean; text: string }
+  | { text: string };
+
 export interface DeckStore {
   importList(name: string, list: string): Promise<DeckDetail>;
+  /** Saves an Archidekt Deck, replacing the Deck an earlier import of the same Archidekt Deck made (ADR 0050, 0079). */
+  importArchidekt(deck: ArchidektDeck): Promise<{ deck: DeckDetail; updated: boolean }>;
   list(): Promise<DeckSummary[]>;
   get(id: string): Promise<DeckDetail | null>;
   rename(id: string, name: string): Promise<DeckDetail | null>;
@@ -156,35 +164,69 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
     return unmatched.filter((_, i) => i !== line.index);
   }
 
+  async function resolveEntries(entries: Entry[]) {
+    const wanted = entries.filter((e) => 'request' in e);
+    const resolved = await cards.resolve(wanted.map((e) => e.request));
+    const found = new Map<Entry, ResolvedCard | null | undefined>(wanted.map((e, i) => [e, resolved[i]]));
+    const deckCards: Omit<DeckCard, 'name'>[] = [];
+    const unmatched: UnmatchedLine[] = [];
+    for (const e of entries) {
+      const card = found.get(e);
+      if (!('request' in e)) unmatched.push({ text: e.text, reason: 'unreadable' });
+      else if (!card) unmatched.push({ text: e.text, reason: 'not-found' });
+      else deckCards.push({ ...card, quantity: e.quantity, commander: e.commander });
+    }
+    return { deckCards, unmatched };
+  }
+
+  const insertCards = (id: string, deckCards: Omit<DeckCard, 'name'>[]) =>
+    db.prepare(INSERT_CARDS).bind(id, JSON.stringify(deckCards.map((c) => ({ ...c, commander: c.commander ? 1 : 0 }))));
+
   const setUnmatched = (id: string, unmatched: UnmatchedLine[]) =>
     db.prepare('UPDATE decks SET unmatched = ? WHERE id = ?').bind(JSON.stringify(unmatched), id);
 
   return {
     async importList(name, list) {
       const parsed = parseDeckList(list);
-      const resolved = await cards.resolve(parsed.lines.map(requestFor));
-
-      const deckCards: Omit<DeckCard, 'name'>[] = [];
-      const unmatched: (UnmatchedLine & { lineNumber: number })[] = parsed.unreadable.map((u) => ({
-        lineNumber: u.lineNumber,
-        text: u.text,
-        reason: 'unreadable',
-      }));
-      parsed.lines.forEach((line, i) => {
-        const card = resolved[i];
-        if (card) deckCards.push({ ...card, quantity: line.quantity, commander: line.commander });
-        else unmatched.push({ lineNumber: line.lineNumber, text: line.text, reason: 'not-found' });
-      });
-      unmatched.sort((a, b) => a.lineNumber - b.lineNumber);
-
+      const entries: Entry[] = [
+        ...parsed.lines.map((line) => ({ ...line, request: requestFor(line) })),
+        ...parsed.unreadable,
+      ].sort((a, b) => a.lineNumber - b.lineNumber);
       const id = newId();
+      const { deckCards, unmatched } = await resolveEntries(entries);
       await db.batch([
-        db
-          .prepare(INSERT_DECK)
-          .bind(id, name, null, JSON.stringify(unmatched.map(({ text, reason }) => ({ text, reason }))), now().toISOString()),
-        db.prepare(INSERT_CARDS).bind(id, JSON.stringify(deckCards.map((c) => ({ ...c, commander: c.commander ? 1 : 0 })))),
+        db.prepare(INSERT_DECK).bind(id, name, null, JSON.stringify(unmatched), now().toISOString()),
+        insertCards(id, deckCards),
       ]);
       return (await get(id))!;
+    },
+
+    async importArchidekt(deck) {
+      const archidektId = String(deck.id);
+      const name = deck.name.trim().slice(0, 60) || 'Archidekt Deck';
+      const { deckCards, unmatched } = await resolveEntries(entriesOf(deck));
+      const existing = await db
+        .prepare('SELECT id FROM decks WHERE archidekt_id = ?')
+        .bind(archidektId)
+        .first<{ id: string }>();
+
+      // Re-importing replaces everything on the Deck, its name included (ADR 0079).
+      const id = existing?.id ?? newId();
+      await db.batch(
+        existing
+          ? [
+              db
+                .prepare('UPDATE decks SET name = ?2, unmatched = ?3, imported_at = ?4 WHERE id = ?1')
+                .bind(id, name, JSON.stringify(unmatched), now().toISOString()),
+              db.prepare('DELETE FROM deck_cards WHERE deck_id = ?').bind(id),
+              insertCards(id, deckCards),
+            ]
+          : [
+              db.prepare(INSERT_DECK).bind(id, name, archidektId, JSON.stringify(unmatched), now().toISOString()),
+              insertCards(id, deckCards),
+            ],
+      );
+      return { deck: (await get(id))!, updated: existing !== null };
     },
 
     async list() {
