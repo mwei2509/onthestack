@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-24, in the session following #72)
 
+Amended by ADR 0096 (the Deck viewer from the canvas; Cards becomes the default view).
+
 The Deck page (ADR 0084) lists its cards by name in type groups. It gains a second view, **Cards**: the same groups in the same order, each card shown as its image (ADR 0071) in a grid, with a quantity badge on cards with more than one copy and a gold ring on the commander. A List / Cards switch sits beside the Cards heading, and each device remembers which view it used last.
 
 Tapping a card, in either view, opens it large in a sheet with its quantity. A double-faced card has a Flip button that shows its back image.
