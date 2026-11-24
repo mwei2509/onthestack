@@ -2,12 +2,14 @@ import { AUTOCOMPLETE_PATH, handleAutocomplete } from './cards/autocomplete.js';
 import { IMAGE_PATH, serveImage } from './cards/images.js';
 import { createCardStore } from './cards/store.js';
 import { GAME_CODE, newGameCode } from './codes.js';
+import { findGameByJoinCode, JOIN_CODE } from './joinCodes.js';
 import { DECKS_PATH, handleDecks } from './decks/routes.js';
 import { createDeckStore } from './decks/store.js';
 
 export { Game } from './game.js';
 
 const GAME = /^\/api\/games\/([A-Za-z0-9-]{1,32})(\/ws)?$/;
+const JOIN_PATH = /^\/api\/join\/(\d{1,12})$/;
 
 export default {
   async fetch(request, env): Promise<Response> {
@@ -20,11 +22,18 @@ export default {
     if (url.pathname === '/api/games' && request.method === 'POST') {
       for (let attempt = 0; attempt < 5; attempt++) {
         const code = newGameCode();
-        if (await env.GAME.getByName(code).create(code, new Date().toISOString())) {
-          return Response.json({ code }, { status: 201 });
-        }
+        const created = await env.GAME.getByName(code).create(code, new Date().toISOString());
+        if (created) return Response.json({ code, joinCode: created.joinCode }, { status: 201 });
       }
       return Response.json({ error: 'Could not find a free game code' }, { status: 503 });
+    }
+
+    const join = JOIN_PATH.exec(url.pathname);
+    if (join?.[1] !== undefined && request.method === 'GET') {
+      const { success } = await env.JOIN_LIMITER.limit({ key: request.headers.get('CF-Connecting-IP') ?? 'unknown' });
+      if (!success) return Response.json({ error: 'Too many tries. Wait a minute and try again.' }, { status: 429 });
+      const game = JOIN_CODE.test(join[1]) ? await findGameByJoinCode(env.DB, join[1], new Date()) : null;
+      return game ? Response.json({ code: game }) : Response.json({ error: 'No game with that code' }, { status: 404 });
     }
 
     const image = IMAGE_PATH.exec(url.pathname);

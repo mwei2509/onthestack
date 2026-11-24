@@ -44,6 +44,8 @@ export type ServerMessage =
       you: string | null;
       seats: SeatView[];
       started: boolean;
+      /** The six-digit code for Join game, until it's retired (ADR 0095). */
+      joinCode: string | null;
       /** What every screen shows, once the game has started. */
       view: TableView | null;
     }

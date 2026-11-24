@@ -25,6 +25,8 @@
     }
   ],
   "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "onthestack-card-images" }],
+  // Slows down anyone sweeping join codes (ADR 0095).
+  "ratelimits": [{ "name": "JOIN_LIMITER", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } }],
   // Previews don't inherit production bindings; repeat each one here.
   "previews": {
     "durable_objects": {
@@ -37,7 +39,8 @@
         "database_id": "0609b2d5-d479-4d7c-b67f-25df8017407d"
       }
     ],
-    "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "onthestack-card-images" }]
+    "r2_buckets": [{ "binding": "IMAGES", "bucket_name": "onthestack-card-images" }],
+    "ratelimits": [{ "name": "JOIN_LIMITER", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } }]
   },
   "dev": { "port": 8790 }
 }
