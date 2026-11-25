@@ -538,7 +538,11 @@ export class Game extends DurableObject<Env> {
       type: 'update',
       version: this.version,
       you: attachment(ws).seatId,
-      seats: setup.seats.map((s) => ({ ...s, connected: this.holders(s.id, closing).length > 0 })),
+      seats: setup.seats.map(({ deck, ...s }) => ({
+        ...s,
+        ...(deck ? { deck: { id: deck.id, name: deck.name, commanders: deck.commanders, colorIdentity: deck.colorIdentity } } : {}),
+        connected: this.holders(s.id, closing).length > 0,
+      })),
       started: setup.started,
       ended: setup.ended ?? null,
       joinCode: setup.joinCode ?? null,
