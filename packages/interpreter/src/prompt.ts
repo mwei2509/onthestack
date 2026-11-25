@@ -56,6 +56,7 @@ Record every tap a player says they made, including tapping a land for mana: "I 
 Re-read the whole turn every time. Later statements can change earlier ones:
 - Take-backs ("oops", "wait, no", "I didn't mean that", "actually it attacked Michael") change or remove what they refer to.
 - Late statements ("back in my main phase I played a land", "I forgot my upkeep trigger") go in the Step they describe, unless the player says they do it now.
+- Players often skip ahead without saying so. Something said while the table is in an earlier Step goes in the Step where it happens, and the table moves forward to it: a land or a creature said during upkeep goes in main1, an attack in declareAttackers. Never ask which Step for that; ask whichStep only when two Steps are both plausible ("Shock before or after first-strike damage?").
 - Each statement has an id. List every statement an entry came from in its "from".
 - Some actions were recorded by a tap on the board and are listed separately. They're already in the record: never add an entry for them, even when someone also says them ("that's the 3 I tapped off").
 
