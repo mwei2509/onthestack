@@ -129,7 +129,7 @@ describe('applyAction', () => {
     const before = newGame();
     const r = applyAction(before, { type: 'playerTask', playerId: 'theo', text: 'Reveal the top card of your library' }, said('michael'));
     expect(r.events).toEqual([]);
-    expect(r.tableEvents).toEqual([{ type: 'PlayerTaskCreated', playerId: 'theo', text: 'Reveal the top card of your library', causedBy: { playerStatement: 's1' } }]);
+    expect(r.tableEvents).toEqual([{ type: 'PlayerTaskCreated', playerId: 'theo', text: 'Reveal the top card of your library', from: [], causedBy: { playerStatement: 's1' } }]);
     expect(r.state).toEqual(before);
   });
 

@@ -191,7 +191,7 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
 
     case 'playerTask': {
       if (!player(action.playerId)) break;
-      tableEvents.push({ type: 'PlayerTaskCreated', playerId: action.playerId, text: action.text, causedBy: ctx.cause });
+      tableEvents.push({ type: 'PlayerTaskCreated', playerId: action.playerId, text: action.text, from: [], causedBy: ctx.cause });
       break;
     }
 

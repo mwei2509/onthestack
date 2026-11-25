@@ -3,14 +3,14 @@ import { applyAction } from './apply.js';
 import { clone } from './clone.js';
 import { dealCombatDamage, endCombat, firstStrikeStepNeeded, menaceShortOfBlockers } from './combat.js';
 import { emit } from './emit.js';
-import type { GameEvent, TableEvent, TableEventDraft } from './events.js';
-import type { PermanentId, PlayerId } from './ids.js';
+import type { Cause, GameEvent, TableEvent, TableEventDraft } from './events.js';
+import type { PermanentId, PlayerId, PlayerStatementId } from './ids.js';
 import { settle } from './settle.js';
 import type { GameState, Permanent, StackItem } from './state.js';
 import { stats, type Stats } from './stats.js';
 import { STEPS, type Step } from './steps.js';
 import type { TimelineEntry } from './timeline.js';
-import type { RulesWarning } from './warnings.js';
+import { overrideMatches, taskDoneMatches, type PlayerTaskDone, type RulesWarning, type WarningOverride } from './warnings.js';
 
 export interface ReplayResult {
   state: GameState;
@@ -26,6 +26,15 @@ const numbered = (drafts: TableEventDraft[]): TableEvent[] => drafts.map((t, i) 
 
 const stepIndex = (step: Step) => STEPS.indexOf(step);
 
+export interface ReplayOptions {
+  currentStep?: Step;
+  responsePending?: boolean;
+  /** The turn's "Do it anyway" choices: matching warnings come back with `overriddenBy` (ADR 0123). */
+  overrides?: WarningOverride[];
+  /** The turn's PlayerTasks marked done (ADR 0125). */
+  doneTasks?: PlayerTaskDone[];
+}
+
 /**
  * Replays a turn from its starting snapshot (ADR 0014, 0016): each Step in order, its automatic actions, then the
  * timeline entries placed in it, settling the board after each. Pure: the same snapshot and timeline always give
@@ -35,7 +44,7 @@ const stepIndex = (step: Step) => STEPS.indexOf(step);
 export function replayTurn(
   turnStart: GameState,
   timeline: TimelineEntry[],
-  options: { currentStep?: Step; responsePending?: boolean } = {},
+  options: ReplayOptions = {},
 ): ReplayResult {
   const last = options.currentStep ?? timeline.reduce<Step>((s, e) => (stepIndex(e.step) > stepIndex(s) ? e.step : s), 'untap');
   let state = clone(turnStart);
@@ -43,13 +52,33 @@ export function replayTurn(
   const tableEvents: TableEventDraft[] = [];
   const warnings: RulesWarning[] = [];
 
-  const take = (r: StepResult) => {
+  const { overrides = [], doneTasks = [] } = options;
+
+  /** `entry`: the timeline entry being applied or settled after, which sets off its PlayerTasks and raises its warnings. */
+  const take = (r: StepResult, entry?: TimelineEntry, raisedBy?: TimelineEntry) => {
     state = r.state;
     events.push(...r.events);
-    tableEvents.push(...(r.tableEvents ?? []));
-    warnings.push(...r.warnings);
+    for (const t of r.tableEvents ?? []) {
+      if (t.type !== 'PlayerTaskCreated') {
+        tableEvents.push(t);
+        continue;
+      }
+      const task = { ...t, from: entry?.from ?? [] };
+      tableEvents.push(task);
+      const done = doneTasks.find((d) => taskDoneMatches(d, task));
+      if (done) tableEvents.push({ type: 'PlayerTaskDone', playerId: task.playerId, text: task.text, doneBy: done.doneBy, causedBy: task.causedBy });
+    }
+    for (const w of r.warnings) {
+      const warning: RulesWarning = raisedBy ? { ...w, entry: { step: raisedBy.step, playerId: raisedBy.playerId, from: raisedBy.from } } : w;
+      const override = overrides.find((o) => overrideMatches(o, warning));
+      if (override) {
+        warning.overriddenBy = override.playerId;
+        tableEvents.push({ type: 'WarningOverridden', code: warning.code, objectIds: warning.objectIds ?? [], playerId: override.playerId, causedBy: causeOf(raisedBy!) });
+      }
+      warnings.push(warning);
+    }
   };
-  const settleNow = (resolveStack = true) => take(settle(state, { resolveStack }));
+  const settleNow = (resolveStack = true, entry?: TimelineEntry) => take(settle(state, { resolveStack }), entry);
 
   for (const step of STEPS.slice(0, stepIndex(last) + 1)) {
     if (stepSkipped(step, state, timeline.some((e) => e.step === step))) continue;
@@ -64,13 +93,15 @@ export function replayTurn(
     settleNow(!(holdAtEnd && entries.length === 0));
 
     entries.forEach((entry, i) => {
-      take(applyAction(state, entry.gameAction, { playerId: entry.playerId, cause: entry.from[0] ? { playerStatement: entry.from[0] } : { rule: 'turnStructure' } }));
+      take(applyAction(state, entry.gameAction, { playerId: entry.playerId, cause: causeOf(entry) }), entry, entry);
       const next = entries[i + 1];
-      settleNow(next ? !next.response : !holdAtEnd);
+      settleNow(next ? !next.response : !holdAtEnd, entry);
     });
   }
   return { state, events, tableEvents: numbered(tableEvents), warnings };
 }
+
+const causeOf = (entry: TimelineEntry): Cause => (entry.from[0] ? { playerStatement: entry.from[0] } : { rule: 'turnStructure' });
 
 /** Whether the rules skip a Step, given the board as it reaches it. `recorded`: the timeline has entries in that Step. */
 function stepSkipped(step: Step, state: GameState, recorded: boolean): boolean {
@@ -144,9 +175,9 @@ export interface SealedTurn {
 export function sealTurn(
   turnStart: GameState,
   timeline: TimelineEntry[],
-  options: { through?: Step } = {},
+  options: { through?: Step } & Pick<ReplayOptions, 'overrides' | 'doneTasks'> = {},
 ): { sealed: SealedTurn; nextTurnStart: GameState; warnings: RulesWarning[] } {
-  const { state, events, tableEvents, warnings } = replayTurn(turnStart, timeline, { currentStep: options.through ?? 'cleanup' });
+  const { state, events, tableEvents, warnings } = replayTurn(turnStart, timeline, { currentStep: options.through ?? 'cleanup', overrides: options.overrides, doneTasks: options.doneTasks });
   const summary: SealedTurn['summary'] = {};
   for (const id of state.turnOrder) {
     summary[id] = { lifeChange: events.reduce((n, e) => n + (e.type === 'LifeChanged' && e.playerId === id ? e.delta : 0), 0) };
@@ -198,7 +229,8 @@ export interface TableView {
   awaitingResponseFrom: PlayerId[];
   /** The damage that would happen, once every attacked player is Ready. */
   combatPreview: GameEvent[] | null;
-  playerTasks: { playerId: PlayerId; text: string; from: string }[];
+  /** `from`: the statements that set it off; `doneBy`: who marked it done (ADR 0125). */
+  playerTasks: { id: string; playerId: PlayerId; text: string; from: PlayerStatementId[]; doneBy?: PlayerId }[];
   /** Things to do now that need no record, like the draw (ADR 0028). Computed for the screen, never stored. */
   reminders: { text: string; playerId?: PlayerId; permanentId?: PermanentId }[];
   warnings: RulesWarning[];
@@ -238,11 +270,21 @@ export function tableView(result: ReplayResult): TableView {
     commandZone: state.commandZone,
     awaitingResponseFrom,
     combatPreview,
-    playerTasks: result.tableEvents.flatMap((e) => (e.type === 'PlayerTaskCreated' ? [{ playerId: e.playerId, text: e.text, from: e.id }] : [])),
+    playerTasks: playerTasks(result.tableEvents),
     reminders: [...stepReminders(state), ...combatReminders(state)],
     warnings: result.warnings,
     stepsAhead: stepsAhead(state),
   };
+}
+
+function playerTasks(tableEvents: TableEvent[]): TableView['playerTasks'] {
+  const tasks: TableView['playerTasks'] = [];
+  for (const e of tableEvents) {
+    if (e.type === 'PlayerTaskCreated') tasks.push({ id: e.id, playerId: e.playerId, text: e.text, from: e.from });
+    // A replay records PlayerTaskDone right after the task it marks.
+    if (e.type === 'PlayerTaskDone' && tasks.length) tasks[tasks.length - 1]!.doneBy = e.doneBy;
+  }
+  return tasks;
 }
 
 function combatReminders(state: GameState): TableView['reminders'] {
