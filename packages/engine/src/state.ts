@@ -12,6 +12,8 @@ export interface Player {
   /** Combat damage taken, keyed by the commander card that dealt it. */
   commanderDamage: Record<CardName, number>;
   out: boolean;
+  /** Their commander's colour identity in WUBRG order, both commanders' with partners; absent with no commander (ADR 0110). */
+  colorIdentity?: string[];
 }
 
 export interface Effect {

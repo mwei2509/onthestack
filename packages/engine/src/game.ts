@@ -8,6 +8,8 @@ export interface Seat {
   id: PlayerId;
   name: string;
   commander?: CardName;
+  /** From the seat's Deck, so partner commanders count (ADR 0120). */
+  colorIdentity?: string[];
 }
 
 export function createGame(seats: Seat[], cards: Record<CardName, CardDefinition> = {}): GameState {
@@ -21,7 +23,15 @@ export function createGame(seats: Seat[], cards: Record<CardName, CardDefinition
 
   const players: Record<PlayerId, Player> = {};
   for (const s of seats) {
-    players[s.id] = { id: s.id, name: s.name, life: STARTING_LIFE, poison: 0, commanderDamage: {}, out: false };
+    players[s.id] = {
+      id: s.id,
+      name: s.name,
+      life: STARTING_LIFE,
+      poison: 0,
+      commanderDamage: {},
+      out: false,
+      ...(s.colorIdentity ? { colorIdentity: s.colorIdentity } : {}),
+    };
   }
 
   return {

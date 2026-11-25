@@ -238,3 +238,38 @@ describe('applyAction properties', () => {
     expect(ids).toEqual(ids.map((_, i) => i + 1));
   });
 });
+
+describe('cards outside the game or its colours (ADR 0028, 0110)', () => {
+  const colourCards: Record<string, CardDefinition> = {
+    ...cards,
+    Plains: { ...cards.Plains!, colorIdentity: [] },
+    'Savannah Lions': { ...cards['Savannah Lions']!, colorIdentity: ['W'] },
+    'Fatal Push': { ...cards['Fatal Push']!, colorIdentity: ['B'] },
+    'Goblin Shrine': { name: 'Goblin Shrine', types: ['Enchantment'], colorIdentity: ['R'], abilities: [] },
+    'Mountain Valley': { name: 'Mountain Valley', types: ['Land'], colorIdentity: ['R', 'G'], abilities: [] },
+  };
+  const game = () =>
+    createGame(
+      [
+        { id: 'theo', name: 'Theo', commander: 'Teysa Karlov', colorIdentity: ['W', 'B'] },
+        { id: 'melissa', name: 'Melissa' },
+      ],
+      colourCards,
+    );
+  const codes = (steps: [GameAction, ApplyContext][]) => run(game(), steps).warnings.map((w) => w.code);
+
+  it('flags a spell or land outside the commander colours, but not one inside them', () => {
+    expect(codes([[{ type: 'cast', card: 'Savannah Lions' }, said('theo')], [{ type: 'playLand', card: 'Plains' }, said('theo')]])).toEqual([]);
+    const shrine = run(game(), [[{ type: 'cast', card: 'Goblin Shrine' }, said('theo')]]).warnings;
+    expect(shrine).toEqual([{ code: 'outsideColourIdentity', message: 'Goblin Shrine is red; your commander is white and black.' }]);
+    expect(codes([[{ type: 'playLand', card: 'Mountain Valley' }, said('theo')]])).toEqual(['outsideColourIdentity']);
+  });
+
+  it('gives a player with no commander no colour warning', () => {
+    expect(codes([[{ type: 'cast', card: 'Goblin Shrine' }, said('melissa')]])).toEqual([]);
+  });
+
+  it('flags a land the game doesn\'t know, as it does a spell', () => {
+    expect(codes([[{ type: 'playLand', card: 'Volcanic Island' }, said('theo')]])).toEqual(['unknownCard']);
+  });
+});
