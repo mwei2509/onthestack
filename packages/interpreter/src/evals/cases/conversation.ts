@@ -20,6 +20,19 @@ export const corrections: EvalCase[] = [
     },
   },
   {
+    id: 'skips-ahead-from-upkeep',
+    checks: "a land and a creature said in upkeep go in main1 without asking which Step (ADR 0066, from a real game)",
+    turnStart: table('theo'),
+    statements: conversation(['theo', 'I play a Plains and Serra Angel.']),
+    currentStep: 'upkeep',
+    expected: {
+      entries: [
+        entry('main1', 'theo', { type: 'playLand', card: 'Plains' }, ['s1']),
+        entry('main1', 'theo', { type: 'cast', card: 'Serra Angel' }, ['s1']),
+      ],
+    },
+  },
+  {
     id: 'late-land-drop',
     checks: 'a statement placed back in an earlier Step',
     turnStart: table('theo', [before('theo', { type: 'cast', card: 'Grizzly Bears' })]),

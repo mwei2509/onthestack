@@ -1,4 +1,4 @@
-import { replayTurn, type GameState, type ReplayResult } from '@onthestack/engine';
+import { replayTurn, STEPS, type GameState, type ReplayResult, type Step } from '@onthestack/engine';
 import { resolveTimeline } from '../resolve.js';
 import type { InterpretedQuestion, InterpretedTimeline, TimelineEntry } from '../schema.js';
 import { resolveOptions, type EvalCase } from './case.js';
@@ -21,8 +21,10 @@ type ExpectedQuestion = NonNullable<EvalCase['expected']['questions']>[number];
 export function scoreCase(c: EvalCase, actual: InterpretedTimeline): EvalScore {
   const expected = resolveTimeline(c.turnStart, { entries: c.expected.entries, questions: [] }, resolveOptions(c));
   const got = resolveTimeline(c.turnStart, actual, resolveOptions(c));
-  const want = summarize(replayTurn(c.turnStart, expected.timeline, { currentStep: c.currentStep }));
-  const have = summarize(replayTurn(c.turnStart, got.timeline, { currentStep: c.currentStep }));
+  // Statements can move the table forward (ADR 0066), so both readings replay as far as either reaches.
+  const upTo = [...expected.timeline, ...got.timeline].reduce<Step>((s, e) => (STEPS.indexOf(e.step) > STEPS.indexOf(s) ? e.step : s), c.currentStep);
+  const want = summarize(replayTurn(c.turnStart, expected.timeline, { currentStep: upTo }));
+  const have = summarize(replayTurn(c.turnStart, got.timeline, { currentStep: upTo }));
 
   const outcome = Object.keys(want)
     .filter((part) => JSON.stringify(want[part]) !== JSON.stringify(have[part]))
