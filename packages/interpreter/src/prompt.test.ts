@@ -26,7 +26,7 @@ const statements: PlayerStatement[] = [
 ];
 
 describe('buildPrompt', () => {
-  const prompt = buildPrompt({ turnStart, statements, currentStep: 'declareBlockers', oracleText: (c) => (c === 'Serra Angel' ? 'Flying, vigilance' : undefined) });
+  const prompt = buildPrompt({ turnStart, statements, currentStep: 'declareBlockers' });
 
   it('keeps the system prompt identical across requests, so it can be cached', () => {
     const other = buildPrompt({ turnStart: start, statements: [], currentStep: 'untap' });
@@ -53,9 +53,41 @@ describe('buildPrompt', () => {
     expect(prompt.user).toContain('commander Teysa Karlov (in the command zone)');
   });
 
-  it('includes Oracle text where the app has it', () => {
-    expect(prompt.user).toContain('- Serra Angel: Creature; 4/4; Flying, Vigilance\n    Flying, vigilance');
-    expect(prompt.user).toContain('- Plains: Land\n');
+  it("lists the engine's cards in the user message when the game has no Deck cards", () => {
+    expect(prompt.user).toContain('Cards in this game:\n- Plains: Land\n- Serra Angel: Creature; 4/4; Flying, Vigilance');
+    expect(prompt.cards).toBeUndefined();
+  });
+
+  describe("the game's Deck cards (ADR 0121)", () => {
+    const deckCards = {
+      'Serra Angel': { typeLine: 'Creature — Angel', oracleText: 'Flying, vigilance' },
+      Plains: { typeLine: 'Basic Land — Plains', oracleText: '({T}: Add {W}.)' },
+    };
+    const withTokens = { ...turnStart, cards: { ...turnStart.cards, Soldier: { name: 'Soldier', types: ['Creature'], power: 1, toughness: 1, abilities: [] } } };
+    const carded = buildPrompt({ turnStart: withTokens, statements, currentStep: 'declareBlockers', deckCards });
+
+    it('go in a block of their own, every card in full and sorted by name', () => {
+      expect(carded.cards).toContain('- Plains — Basic Land — Plains\n    ({T}: Add {W}.)\n- Serra Angel — Creature — Angel — 4/4\n    Flying, vigilance');
+      expect(carded.user).not.toContain('Flying, vigilance\n');
+    });
+
+    it("stay the same all game, whatever the board, the statements or the tokens, so the block can be cached", () => {
+      const later = buildPrompt({ turnStart: start, statements: [], currentStep: 'untap', deckCards });
+      expect(later.cards).toBe(carded.cards);
+      expect(later.cardsVersion).toBe(carded.cardsVersion);
+      expect(carded.cardsVersion).toMatch(/^[0-9a-f]{8}$/);
+    });
+
+    it('leave only cards on no Deck, like tokens, in the user message', () => {
+      expect(carded.user).toContain('Other cards in this game, not on any Deck (tokens):\n- Soldier: Creature; 1/1');
+      expect(carded.user).not.toContain('- Serra Angel: Creature');
+    });
+
+    it('say when a power or toughness varies instead of printing a number', () => {
+      const goyf = { ...start, cards: { Tarmogoyf: { name: 'Tarmogoyf', types: ['Creature'], power: 0, toughness: 1, ptVaries: true, abilities: [] } } };
+      const p = buildPrompt({ turnStart: goyf, statements: [], currentStep: 'main1', deckCards: { Tarmogoyf: { typeLine: 'Creature — Lhurgoyf', oracleText: '' } } });
+      expect(p.cards).toContain('- Tarmogoyf — Creature — Lhurgoyf — power/toughness varies');
+    });
   });
 
   it('says where the table is now', () => {

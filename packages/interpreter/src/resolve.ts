@@ -136,17 +136,19 @@ class Resolver {
   action(a: InterpretedGameAction): GameAction {
     const me = this.entry.player;
     switch (a.type) {
-      case 'cast':
+      case 'cast': {
+        const card = gameName(this.state, a.card);
         return {
           type: 'cast',
-          card: a.card,
+          card,
           ...(a.targets ? { targets: a.targets.map((t) => this.target(t)) } : {}),
-          ...(a.effects ? { effects: a.effects.map((e) => new Resolver(this.state, this.entry, { card: a.card, id: nextStackItemId(this.state) }).action(e)) } : {}),
+          ...(a.effects ? { effects: a.effects.map((e) => new Resolver(this.state, this.entry, { card, id: nextStackItemId(this.state) }).action(e)) } : {}),
         };
+      }
       case 'counter':
         return { type: 'counter', stackItemId: this.spell(a.spell) };
       case 'playLand':
-        return a;
+        return { type: 'playLand', card: gameName(this.state, a.card) };
       case 'move':
         return { type: 'move', objectId: this.permanent(a.object), to: a.to, ...(a.how ? { how: a.how } : {}) };
       case 'tap':
@@ -173,7 +175,7 @@ class Resolver {
       case 'damage':
         return {
           type: 'damage',
-          sourceId: this.self && sameName(a.source.card, this.self.card) ? this.self.id : this.permanent(a.source),
+          sourceId: this.self && names(this.state, this.self.card, a.source.card) ? this.self.id : this.permanent(a.source),
           recipient: this.recipient(a.recipient),
           amount: a.amount,
         };
@@ -226,7 +228,7 @@ class Resolver {
 
   private spellsNamed(ref: CardRef) {
     return this.state.stack.filter(
-      (k) => k.kind === 'spell' && k.status === 'pending' && sameName(k.source.card, ref.card) && (!ref.controller || k.controllerId === ref.controller),
+      (k) => k.kind === 'spell' && k.status === 'pending' && names(this.state, k.source.card, ref.card) && (!ref.controller || k.controllerId === ref.controller),
     );
   }
 
@@ -239,7 +241,7 @@ class Resolver {
   }
 
   private permanentsNamed(ref: CardRef): Permanent[] {
-    return Object.values(this.state.permanents).filter((p) => sameName(p.card, ref.card) && (!ref.controller || p.controllerId === ref.controller));
+    return Object.values(this.state.permanents).filter((p) => names(this.state, p.card, ref.card) && (!ref.controller || p.controllerId === ref.controller));
   }
 
   private permanent(ref: CardRef, need: Need = {}): ObjectId {
@@ -263,6 +265,22 @@ class Resolver {
 }
 
 const sameName = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: 'base' }) === 0;
+
+/** A name with case, accents and punctuation set aside: "akromas memorial" is "Akroma's Memorial". */
+const fold = (name: string) => name.normalize('NFD').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
+
+/** Whether a name a player said refers to a card: its full name or either face's (ADR 0120, 0121). */
+function names(state: GameState, card: string, said: string): boolean {
+  const wanted = fold(said);
+  if (fold(card) === wanted) return true;
+  return state.cards[card]?.faces?.some((f) => fold(f.name) === wanted) ?? false;
+}
+
+/** The game's exact name for a card a player named, or the name as said when no card in the game matches (ADR 0121). */
+function gameName(state: GameState, said: string): string {
+  if (state.cards[said]) return said;
+  return Object.keys(state.cards).find((card) => names(state, card, said)) ?? said;
+}
 
 function fits(p: Permanent, need: Need, state: GameState): boolean {
   if (need.untapped && p.tapped) return false;

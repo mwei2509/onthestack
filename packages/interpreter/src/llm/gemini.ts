@@ -15,7 +15,8 @@ export function geminiProvider({ apiKey, model = 'gemini-3.5-flash-lite', fetch:
   const id = `gemini:${model}`;
   return {
     id,
-    async complete<T>({ system, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
+    async complete<T>({ system: base, context, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
+      const system = context ? `${base}\n\n${context}` : base;
       const started = Date.now();
       const response = await doFetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: 'POST',

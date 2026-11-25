@@ -4,7 +4,12 @@ import { InterpretedTimeline } from './schema.js';
 
 /** Sends a built prompt the way games and the evals both call providers, with ADR 0046's one retry. */
 export function interpretPrompt(provider: LlmProvider, prompt: Prompt): Promise<LlmResult<InterpretedTimeline>> {
-  return retryInvalidOutput(provider).complete({ system: prompt.system, user: prompt.user, schema: InterpretedTimeline });
+  return retryInvalidOutput(provider).complete({
+    system: prompt.system,
+    ...(prompt.cards ? { context: prompt.cards } : {}),
+    user: prompt.user,
+    schema: InterpretedTimeline,
+  });
 }
 
 /** Reads the whole turn so far into an InterpretedTimeline. */

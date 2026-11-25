@@ -97,13 +97,18 @@ export interface InterpretationRecord {
   model: string;
   /** Which system prompt was sent; its text is in the code that version was built from. */
   promptVersion: string;
-  /** The user message sent: the board, the card list and what was said this turn. */
+  /** Which card block was sent, never its text (ADR 0121); absent for games without Deck cards. */
+  cardsVersion?: string;
+  /** The user message sent: the board, cards on no Deck, and what was said this turn. */
   user: string;
   /** The answer as the provider returned it, when there was one; a malformed answer is kept too. */
   answer?: string;
   error?: string;
   inputTokens?: number;
   outputTokens?: number;
+  /** Input tokens read from the provider's cache, and written to it, on top of `inputTokens`. */
+  cacheReadTokens?: number;
+  cacheWriteTokens?: number;
   latencyMs: number;
 }
 

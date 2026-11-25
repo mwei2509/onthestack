@@ -264,3 +264,55 @@ describe('players named instead of by id', () => {
     expect(questions).toMatchObject([{ kind: 'choosePlayers', text: 'Who is "sam"?' }]);
   });
 });
+
+describe("card names in the game's Decks (ADR 0121)", () => {
+  const deckCards: Record<string, CardDefinition> = {
+    "Akroma's Memorial": card("Akroma's Memorial", ['Artifact']),
+    'Brightclimb Pathway // Grimclimb Pathway': {
+      ...card('Brightclimb Pathway // Grimclimb Pathway', ['Land']),
+      faces: [
+        { name: 'Brightclimb Pathway', types: ['Land'] },
+        { name: 'Grimclimb Pathway', types: ['Land'] },
+      ],
+    },
+    'Delver of Secrets // Insectile Aberration': {
+      ...card('Delver of Secrets // Insectile Aberration', ['Creature'], 1, 1),
+      faces: [
+        { name: 'Delver of Secrets', types: ['Creature'], power: 1, toughness: 1 },
+        { name: 'Insectile Aberration', types: ['Creature'], power: 3, toughness: 2 },
+      ],
+    },
+  };
+  const game = () => createGame([{ id: 'theo', name: 'Theo' }, { id: 'melissa', name: 'Melissa' }], deckCards);
+
+  it("records a cast or a land under the game's exact name, whatever the case or punctuation, or a face's name", () => {
+    const { timeline: resolved } = resolveTimeline(
+      game(),
+      timeline(
+        said('main1', 'theo', { type: 'cast', card: 'akromas memorial' }),
+        said('main1', 'theo', { type: 'playLand', card: 'Grimclimb Pathway' }),
+      ),
+    );
+    expect(resolved.map((e) => e.gameAction)).toEqual([
+      { type: 'cast', card: "Akroma's Memorial" },
+      { type: 'playLand', card: 'Brightclimb Pathway // Grimclimb Pathway' },
+    ]);
+  });
+
+  it("finds a permanent by either face's name", () => {
+    const { timeline: resolved, questions } = resolveTimeline(
+      game(),
+      timeline(
+        said('main1', 'theo', { type: 'cast', card: 'Delver of Secrets' }),
+        said('declareAttackers', 'theo', { type: 'attack', attacks: [{ attacker: { card: 'Insectile Aberration' }, target: 'melissa' }] }),
+      ),
+    );
+    expect(questions).toEqual([]);
+    expect(resolved[1]!.gameAction).toMatchObject({ type: 'attack', attacks: [{ attackerId: 'p1', target: 'melissa' }] });
+  });
+
+  it('keeps a name that matches no card in the game, for the engine to flag', () => {
+    const { timeline: resolved } = resolveTimeline(game(), timeline(said('main1', 'theo', { type: 'cast', card: 'Black Lotus' })));
+    expect(resolved[0]!.gameAction).toEqual({ type: 'cast', card: 'Black Lotus' });
+  });
+});

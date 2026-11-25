@@ -4,6 +4,7 @@ export interface Recording {
   providerId: string;
   model: string;
   system: string;
+  context?: string;
   user: string;
   raw: string;
   usage: { inputTokens: number; outputTokens: number };
@@ -14,8 +15,8 @@ export interface Recording {
 export function recordedProvider(recordings: Recording[], id = 'recorded'): LlmProvider {
   return {
     id,
-    async complete<T>({ system, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
-      const hit = recordings.find((r) => r.system === system && r.user === user);
+    async complete<T>({ system, context, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
+      const hit = recordings.find((r) => r.system === system && (r.context ?? '') === (context ?? '') && r.user === user);
       if (!hit) throw new Error(`${id}: no recorded response for this prompt`);
       return { output: parseOutput(hit.providerId, schema, hit.raw), raw: hit.raw, model: hit.model, usage: hit.usage, latencyMs: hit.latencyMs };
     },
@@ -28,7 +29,16 @@ export function recordingProvider(inner: LlmProvider, save: (recording: Recordin
     id: inner.id,
     async complete<T>(request: LlmRequest<T>): Promise<LlmResult<T>> {
       const result = await inner.complete(request);
-      save({ providerId: inner.id, model: result.model, system: request.system, user: request.user, raw: result.raw, usage: result.usage, latencyMs: result.latencyMs });
+      save({
+        providerId: inner.id,
+        model: result.model,
+        system: request.system,
+        ...(request.context ? { context: request.context } : {}),
+        user: request.user,
+        raw: result.raw,
+        usage: result.usage,
+        latencyMs: result.latencyMs,
+      });
       return result;
     },
   };

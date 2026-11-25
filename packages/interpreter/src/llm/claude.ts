@@ -20,12 +20,15 @@ export function claudeProvider({ apiKey, model = 'claude-haiku-5-5', effort = 'l
   const id = `claude:${model}`;
   return {
     id,
-    async complete<T>({ system, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
+    async complete<T>({ system, context, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
       const started = Date.now();
       const response = await client.messages.create({
         model,
         max_tokens: 16000,
-        system: [{ type: 'text', text: `${system}\n\nGive your answer by calling the ${TOOL} tool.`, cache_control: { type: 'ephemeral' } }],
+        system: [
+          { type: 'text', text: `${system}\n\nGive your answer by calling the ${TOOL} tool.`, cache_control: { type: 'ephemeral' } },
+          ...(context ? [{ type: 'text' as const, text: context, cache_control: { type: 'ephemeral' as const } }] : []),
+        ],
         messages: [{ role: 'user', content: user }],
         tools: [{ name: TOOL, description: 'Records your answer.', input_schema: jsonSchemaOf(schema) as Anthropic.Tool.InputSchema }],
         tool_choice: { type: 'auto' },
@@ -41,7 +44,12 @@ export function claudeProvider({ apiKey, model = 'claude-haiku-5-5', effort = 'l
         output: parseOutput(id, schema, raw),
         raw,
         model,
-        usage: { inputTokens: response.usage.input_tokens, outputTokens: response.usage.output_tokens },
+        usage: {
+          inputTokens: response.usage.input_tokens,
+          outputTokens: response.usage.output_tokens,
+          cacheReadTokens: response.usage.cache_read_input_tokens ?? 0,
+          cacheWriteTokens: response.usage.cache_creation_input_tokens ?? 0,
+        },
         latencyMs: Date.now() - started,
       };
     },

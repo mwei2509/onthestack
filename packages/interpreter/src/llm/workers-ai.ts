@@ -18,7 +18,8 @@ export function workersAiProvider({ accountId, apiToken, model = '@cf/meta/llama
   const id = `workers-ai:${model}`;
   return {
     id,
-    async complete<T>({ system, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
+    async complete<T>({ system: base, context, user, schema }: LlmRequest<T>): Promise<LlmResult<T>> {
+      const system = context ? `${base}\n\n${context}` : base;
       const started = Date.now();
       const response = await doFetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`, {
         method: 'POST',

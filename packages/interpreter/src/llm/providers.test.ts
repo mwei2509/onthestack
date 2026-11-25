@@ -46,6 +46,17 @@ describe('claudeProvider', () => {
     expect(JSON.stringify(body?.system)).toContain('You add numbers.');
   });
 
+  it("sends a game's card block as a second cached system block, and reports cache use (ADR 0121)", async () => {
+    const reply = { ...answer({ answer: 4 }), usage: { input_tokens: 120, output_tokens: 8, cache_read_input_tokens: 30000, cache_creation_input_tokens: 0 } };
+    const f = fakeFetch(reply);
+    const result = await claudeProvider({ apiKey: 'k', fetch: f.fn }).complete({ ...request, context: 'Every card in this game.' });
+    expect(f.calls[0]?.json.system).toEqual([
+      { type: 'text', text: expect.stringContaining('You add numbers.'), cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: 'Every card in this game.', cache_control: { type: 'ephemeral' } },
+    ]);
+    expect(result.usage).toEqual({ inputTokens: 120, outputTokens: 8, cacheReadTokens: 30000, cacheWriteTokens: 0 });
+  });
+
   it('rejects tool input that does not match the schema', async () => {
     const f = fakeFetch(answer({ answer: 'four' }));
     await expect(claudeProvider({ apiKey: 'k', fetch: f.fn }).complete(request)).rejects.toBeInstanceOf(LlmOutputError);

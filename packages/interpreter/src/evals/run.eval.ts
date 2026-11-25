@@ -31,11 +31,18 @@ describe.each(providers.map((p) => [p.id, p] as const))('%s', (providerId, live)
   const provider = retryInvalidOutput(recorded);
 
   it.each(CASES.map((c) => [c.id, c] as const))('%s', async (_id, c) => {
-    const prompt = buildPrompt({ turnStart: c.turnStart, statements: c.statements, currentStep: c.currentStep, pinned: c.pinned, openQuestions: c.openQuestions });
+    const prompt = buildPrompt({
+      turnStart: c.turnStart,
+      statements: c.statements,
+      currentStep: c.currentStep,
+      pinned: c.pinned,
+      openQuestions: c.openQuestions,
+      ...(c.deckCards ? { deckCards: c.deckCards } : {}),
+    });
     const started = Date.now();
     let result;
     try {
-      result = await withRetries(provider, { ...prompt, schema: InterpretedTimeline });
+      result = await withRetries(provider, { system: prompt.system, ...(prompt.cards ? { context: prompt.cards } : {}), user: prompt.user, schema: InterpretedTimeline });
     } catch (e) {
       const raw = e instanceof LlmOutputError ? `\n\nThe model returned:\n${e.raw.slice(0, 4000)}` : '';
       rows.push({ provider: providerId, caseId: c.id, pass: false, latencyMs: Date.now() - started, cost: 0, failure: `${String(e)}${raw}` });
