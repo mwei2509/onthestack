@@ -11,6 +11,9 @@ import { clockTime, cue, EndedPill, NextStepButton, StepMenuButton, StepStrip, T
 import { StepMenu } from './StepMenu.js';
 import { STEP_NAMES } from './steps.js';
 import { SayFor, TurnLogList } from '../log/TurnLog.js';
+import { FieldScreen } from '../field/FieldScreen.js';
+import { useGameDecks, type GameDecks } from '../field/gameDecks.js';
+import { GameDeckView } from '../field/GameDeckView.js';
 
 /** The board on a Shared screen: every seat around the table, clockwise from the top left, with the step controls. */
 export function SharedBoard({ code, game, update, view }: ScreenProps & { view: TableView }) {
@@ -25,6 +28,15 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
   const online = game.connection === 'open' || ended !== null;
   const rowStyle = { opacity: online ? 1 : 0.6, '--cols': Math.max(1, top.length) } as CSSProperties;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [fieldOf, setFieldOf] = useState<string | null>(null);
+  const [deckOf, setDeckOf] = useState<string | null>(null);
+  const decks = useGameDecks(code);
+  const open = { field: setFieldOf, deck: setDeckOf, decks };
+
+  const deckView = (seatId: string) => {
+    const deck = decks?.decks.find((d) => d.seatId === seatId);
+    return deck ? <GameDeckView deck={deck} whose={`${byId[seatId]?.name ?? 'Their'}'s Deck`} onClose={() => setDeckOf(null)} /> : null;
+  };
 
   return (
     <div className="shared shared-board">
@@ -63,7 +75,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
         <div className="shared-table-col">
           <div className="shared-seats" style={rowStyle}>
             {top.map((p) => (
-              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} />
+              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} open={open} />
             ))}
           </div>
 
@@ -99,7 +111,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
 
           <div className="shared-seats" style={rowStyle}>
             {bottom.map((p) => (
-              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} />
+              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} open={open} />
             ))}
           </div>
         </div>
@@ -113,12 +125,21 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
         )}
       </div>
 
+      {fieldOf && <FieldScreen view={view} players={seatOrder} you={null} start={fieldOf} decks={decks} game={online && !ended ? game : undefined} onClose={() => setFieldOf(null)} />}
+      {deckOf && deckView(deckOf)}
       {menuOpen && !ended && <StepMenu view={view} game={game} confirmFirst={false} onClose={() => setMenuOpen(false)} />}
     </div>
   );
 }
 
-function SeatCard({ player, players, game, disabled }: { player: BoardPlayer; players: Record<string, BoardPlayer>; game?: ScreenProps['game']; disabled?: boolean }) {
+/** What a seat card opens: that player's field (ADR 0126) and their Deck as brought to the game (ADR 0129). */
+interface SeatOpeners {
+  field: (seatId: string) => void;
+  deck: (seatId: string) => void;
+  decks: GameDecks | null;
+}
+
+function SeatCard({ player, players, game, disabled, open }: { player: BoardPlayer; players: Record<string, BoardPlayer>; game?: ScreenProps['game']; disabled?: boolean; open: SeatOpeners }) {
   const hit = worstHit(player.hits);
   return (
     <section aria-label={player.name} className={`seat-card${player.active ? ' glowing' : ''}${player.out ? ' out' : ''}`}>
@@ -131,6 +152,14 @@ function SeatCard({ player, players, game, disabled }: { player: BoardPlayer; pl
         <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           {player.active && <Tag kind="their turn" />}
           {!player.connected && <span className="muted" style={{ fontSize: 12 }}>no device</span>}
+          <button className="say-for" onClick={() => open.field(player.id)} aria-label={`${player.name}'s field`}>
+            Field
+          </button>
+          {open.decks?.decks.some((d) => d.seatId === player.id) && (
+            <button className="say-for" onClick={() => open.deck(player.id)} aria-label={`${player.name}'s Deck`}>
+              Deck
+            </button>
+          )}
           {game && !player.out && <SayFor game={game} seat={{ id: player.id, name: player.name }} disabled={disabled} />}
         </span>
       </div>
