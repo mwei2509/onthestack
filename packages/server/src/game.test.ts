@@ -971,3 +971,54 @@ describe("A game knows its Decks' cards (ADR 0119, 0120)", () => {
     expect(Object.values(view.players).map((p) => p.colorIdentity)).toEqual([['W', 'B'], ['W', 'B'], ['W', 'B']]);
   });
 });
+
+describe('"Do it anyway" and done PlayerTasks (ADR 0123, 0125)', () => {
+  const castUnknown = { entries: [{ step: 'upkeep', player: 'p1', action: { type: 'cast', card: 'Not A Real Card' }, from: ['s1'] }], questions: [] };
+  const task = (from: string) => ({ step: 'upkeep', player: 'p1', action: { type: 'playerTask', player: 'p2', text: 'Reveal your top card' }, from: [from] });
+
+  it('keeps a warning overridden through later re-reads, naming who chose it, and seals it', async () => {
+    const { code, devices, call, say } = await interpreting();
+    await say(0, 'I cast not a real card');
+    (await call(0)).answer(castUnknown);
+    const warning = (await everyone(devices)).warnings.find((w) => w.code === 'unknownCard')!;
+    expect(warning.entry).toEqual({ step: 'upkeep', playerId: 'p1', from: ['s1'] });
+
+    devices[1]!.send({ type: 'doItAnyway', code: 'unknownCard', from: ['s1'], objectIds: [] });
+    expect((await everyone(devices)).warnings.find((w) => w.code === 'unknownCard')?.overriddenBy).toBe('p2');
+
+    await say(1, 'Okay');
+    (await call(1)).answer(castUnknown);
+    expect((await everyone(devices)).warnings.find((w) => w.code === 'unknownCard')?.overriddenBy).toBe('p2');
+
+    devices[0]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'endTurn' });
+    await everyone(devices);
+    await runInDurableObject(env.GAME.getByName(code), async (_instance, state) => {
+      const sealed = (await state.storage.get('sealed:1')) as { warnings: { code: string; overriddenBy?: string }[]; tableEvents: { type: string; playerId?: string }[] };
+      expect(sealed.warnings.find((w) => w.code === 'unknownCard')?.overriddenBy).toBe('p2');
+      expect(sealed.tableEvents).toContainEqual(expect.objectContaining({ type: 'WarningOverridden', playerId: 'p2' }));
+    });
+  });
+
+  it('refuses "Do it anyway" for a warning that is not there', async () => {
+    const { devices } = await interpreting();
+    devices[0]!.send({ type: 'doItAnyway', code: 'unknownCard', from: ['s1'], objectIds: [] });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: 'That warning is no longer there' });
+  });
+
+  it('marks only the PlayerTask that was done, through later re-reads', async () => {
+    const { devices, call, say } = await interpreting();
+    await say(0, 'Reveal your top card, twice');
+    (await call(0)).answer({ entries: [task('s1')], questions: [] });
+    await everyone(devices);
+
+    devices[1]!.send({ type: 'taskDone', playerId: 'p2', text: 'Reveal your top card', from: ['s1'] });
+    expect((await everyone(devices)).playerTasks.map((t) => t.doneBy)).toEqual(['p2']);
+
+    await say(0, 'And again');
+    (await call(1)).answer({ entries: [task('s1'), task('s2')], questions: [] });
+    expect((await everyone(devices)).playerTasks.map((t) => [t.from, t.doneBy])).toEqual([
+      [['s1'], 'p2'],
+      [['s2'], undefined],
+    ]);
+  });
+});

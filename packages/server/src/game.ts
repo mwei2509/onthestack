@@ -1,5 +1,5 @@
 import { DurableObject } from 'cloudflare:workers';
-import { createGame, replayTurn, sealTurn, STEPS, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type RulesWarning, type SealedTurn, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
+import { createGame, overrideMatches, replayTurn, sealTurn, STEPS, stepsAhead, tableView, taskDoneMatches, type GameState, type PlayerStatement, type PlayerTaskDone, type ReplayResult, type RulesWarning, type RulesWarningCode, type SealedTurn, type Step, type TableView, type TimelineEntry, type WarningOverride } from '@onthestack/engine';
 import { buildPrompt, claudeProvider, interpretPrompt, LlmOutputError, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
 import { replaySummary } from './log.js';
 import { fitDump } from './reports.js';
@@ -42,6 +42,10 @@ interface Turn {
   transcriptVersion: number;
   /** The last InterpretedTimeline applied, and the transcript version it read. */
   reading?: { timeline: InterpretedTimeline; transcriptVersion: number };
+  /** "Do it anyway" choices, passed to every replay of the turn (ADR 0123). */
+  overrides: WarningOverride[];
+  /** PlayerTasks marked done, passed to every replay of the turn (ADR 0125). */
+  doneTasks: PlayerTaskDone[];
 }
 
 /** What a sealed turn's key holds: the engine's record plus the turn's TurnTranscript and the warnings it ended with. */
@@ -320,6 +324,26 @@ export class Game extends DurableObject<Env> {
         turn.pinned.push({ entry, afterStatements: turn.statements.length });
         return;
       }
+      case 'doItAnyway': {
+        const turn = this.inGame();
+        const playerId = attachment(ws).seatId;
+        if (!playerId) throw new Rejected('Only a seated player can choose Do it anyway');
+        const override = { code: message.code as RulesWarningCode, from: message.from, objectIds: message.objectIds, playerId };
+        const warning = this.board?.warnings.find((w) => overrideMatches(override, w));
+        if (!warning) throw new Rejected('That warning is no longer there');
+        if (!warning.overriddenBy) turn.overrides.push(override);
+        return;
+      }
+      case 'taskDone': {
+        const turn = this.inGame();
+        const doneBy = attachment(ws).seatId;
+        if (!doneBy) throw new Rejected('Only a seated player can mark a task done');
+        const done = { playerId: message.playerId, text: message.text, from: message.from, doneBy };
+        const task = this.board && tableView(this.board).playerTasks.find((t) => taskDoneMatches(done, t));
+        if (!task) throw new Rejected('That task is no longer there');
+        if (!task.doneBy) turn.doneTasks.push(done);
+        return;
+      }
       case 'nextStep':
       case 'jumpToStep': {
         const turn = this.inGame();
@@ -338,7 +362,7 @@ export class Game extends DurableObject<Env> {
   }
 
   private async sealTurn(turn: Turn): Promise<void> {
-    const { sealed, nextTurnStart, warnings } = sealTurn(turn.turnStart, this.resolved.timeline);
+    const { sealed, nextTurnStart, warnings } = sealTurn(turn.turnStart, this.resolved.timeline, { overrides: turn.overrides, doneTasks: turn.doneTasks });
     await this.storeSealed(sealed, turn, warnings);
     this.logEvent('turn-sealed', { sealed: sealed.turn, warnings: warnings.map((w) => `${w.code}: ${w.message}`) });
     this.turn = newTurn(nextTurnStart);
@@ -347,7 +371,7 @@ export class Game extends DurableObject<Env> {
   /** Seals the turn where the table is and freezes the game (ADR 0100, 0101). */
   private async end(turn: Turn, by: string | null): Promise<void> {
     const setup = this.setup!;
-    const { sealed, warnings } = sealTurn(turn.turnStart, this.resolved.timeline, { through: turn.currentStep });
+    const { sealed, warnings } = sealTurn(turn.turnStart, this.resolved.timeline, { through: turn.currentStep, overrides: turn.overrides, doneTasks: turn.doneTasks });
     await this.storeSealed(sealed, turn, warnings);
     clearTimeout(this.interpretTimer);
     this.turn = null;
@@ -471,7 +495,7 @@ export class Game extends DurableObject<Env> {
       return;
     }
     this.resolved = resolveTurn(turn);
-    this.board = replayTurn(turn.turnStart, this.resolved.timeline, { currentStep: turn.currentStep });
+    this.board = replayTurn(turn.turnStart, this.resolved.timeline, { currentStep: turn.currentStep, overrides: turn.overrides, doneTasks: turn.doneTasks });
     this.logEvent('replayed', replaySummary(this.resolved, this.board));
   }
 
@@ -590,7 +614,7 @@ export class Game extends DurableObject<Env> {
 }
 
 function newTurn(turnStart: GameState): Turn {
-  return { turnStart, pinned: [], currentStep: 'upkeep', statements: [], transcriptVersion: 0 };
+  return { turnStart, pinned: [], currentStep: 'upkeep', statements: [], transcriptVersion: 0, overrides: [], doneTasks: [] };
 }
 
 /** A turn as stored before taps were pinned: its taps were the whole `timeline`, all before any statement. */
@@ -603,6 +627,8 @@ function loadTurn(stored: StoredTurn | undefined): Turn | null {
     statements: [],
     transcriptVersion: 0,
     currentStep: 'upkeep',
+    overrides: [],
+    doneTasks: [],
     ...turn,
     pinned: turn.pinned ?? (timeline ?? []).map((entry) => ({ entry, afterStatements: 0 })),
   } as Turn;
