@@ -148,8 +148,12 @@ _Avoid_: player screen, profile
 ## Cards
 
 **Deck**:
-A list of cards, imported from an Archidekt link or a pasted list, that exists on its own, independent of any player or account, so it can be shared and reused. A Deck imported by someone signed in belongs to them and is public (in the shared library) or private (only theirs); Decks with no owner are open to everyone. Each player picks one when joining a game, and the game copies it at Start. It may be incomplete; cards not on it can still come up in a game.
+A list of cards, imported from an Archidekt link or a pasted list, that exists on its own, independent of any player or account, so it can be shared and reused. A Deck imported by someone signed in belongs to them and is public (in the shared library) or private (only theirs); Decks with no owner are open to everyone. Each player picks one when joining a game, and the game keeps the Deck version it was at Start. It may be incomplete; cards not on it can still come up in a game.
 _Avoid_: decklist, list
+
+**Deck version**:
+A Deck's cards as they were at one moment. Re-importing a Deck, fixing a line so it joins the cards, or changing its commander makes a new version; renaming it or skipping a line doesn't. A game refers to the version each seat brought, so later edits never change it (ADR 0119).
+_Avoid_: snapshot, revision
 
 **Unmatched line**:
 A line of an imported Deck list that couldn't be read, or names a card or printing the card store can't find. It stays on the Deck, to be fixed or skipped on the Deck's page, and is never guessed at.
