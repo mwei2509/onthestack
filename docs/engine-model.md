@@ -16,7 +16,7 @@ Type shapes here are the target. Once code exists, the code is the source of tru
 ```mermaid
 flowchart LR
   T["<b>TurnTranscript</b><br/><i>PlayerStatements this turn,<br/>speaker-tagged, by button press</i>"] --> I
-  B["<b>Board summary</b><br/><i>cards in play, stats, keywords,<br/>Oracle text, Step, Stack</i>"] --> I
+  B["<b>Board summary</b><br/><i>every Deck card in full (cached),<br/>cards in play, stats, Step, Stack</i>"] --> I
   R["<b>Rules primer</b><br/><i>steps and timing words</i>"] --> I
   C["<b>TimelineCorrections</b><br/><i>fixes made by tapping</i>"] --> I
   I["<b>Interpreter (LLM)</b><br/><i>re-reads the whole turn</i>"] --> TL["<b>InterpretedTimeline</b><br/><i>GameActions, each in its Step,<br/>schema-checked</i>"]
@@ -129,7 +129,7 @@ State-based actions for M1:
 
 ## 7. Cards and Ability definitions
 
-The card catalog is built from the game's Decks and stored once per game. Each card's `abilities` is its Translation (M3; empty in M1, where players say the effects). The trigger scan reads these as data; the engine has no card-specific code.
+The card catalog is built from the game's Deck versions (ADR 0119), loaded when the game wakes and never stored in saved turns; each Scryfall card becomes a `CardDefinition` as ADR 0120 describes, with Oracle text kept beside the catalog rather than in it. Each card's `abilities` is its Translation (M3; empty in M1, where players say the effects). The trigger scan reads these as data; the engine has no card-specific code.
 
 ```js
 "Authority of the Consuls": { cost: "{W}", types: ["Enchantment"],
@@ -188,7 +188,7 @@ The engine's types live in `packages/engine/src` (`state.ts`, `actions.ts`, `eve
 interface Game {
   id: GameId;
   seats: { playerId: PlayerId; name: string; deckId?: DeckId }[];
-  cards: Record<CardName, CardDefinition>;   // the catalog, section 7
+  deckVersions: Record<PlayerId, DeckVersionId>;   // ADR 0119; the catalog, section 7, is loaded from these
   turnStart: GameState;                      // snapshot the engine replays from
   currentStep: Step;                         // replayed to, ADR 0074
   turnTranscript: PlayerStatement[];

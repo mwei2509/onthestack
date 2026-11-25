@@ -2,7 +2,7 @@
 
 Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42).
 
-Amended by ADR 0079 (re-importing replaces everything, name included). Amended by ADR 0093 (re-importing updates your own Deck or an unowned one).
+Amended by ADR 0079 (re-importing replaces everything, name included). Amended by ADR 0093 (re-importing updates your own Deck or an unowned one). Amended by ADR 0119 (a game references its Decks' versions instead of copying them).
 
 Decks change between games. Importing an Archidekt link that was imported before updates that Deck instead of making a second one. A pasted list always makes a new Deck, because nothing identifies it as an earlier one.
 

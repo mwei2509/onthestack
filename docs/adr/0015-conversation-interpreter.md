@@ -1,6 +1,6 @@
 # An LLM interprets the whole turn's conversation; the engine calculates
 
-Status: Accepted (decided with Melissa, 2026-11-21). Amended by ADR 0043 (the InterpretedTimeline also carries PlayerQuestions).
+Status: Accepted (decided with Melissa, 2026-11-21). Amended by ADR 0043 (the InterpretedTimeline also carries PlayerQuestions). Amended by ADR 0121 (every card in the game's Decks, not only cards in play).
 
 At a real table, meaning depends on the conversation: "after that creature's first strike" only makes sense next to "this double striker attacks you", people speak out of order, and they take things back ("oops, I didn't mean that", "wait, I forgot my trigger"). Interpreting one Hold-to-talk at a time can't follow that.
 
