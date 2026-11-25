@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Sheet } from '../../decks/parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { describeEntry, namesFor } from './describe.js';
-import { openWarnings, placeWarnings } from './warnings.js';
+import { openWarnings, placeTasks, placeWarnings, undoneTasks } from './warnings.js';
 
 const STATUS_TEXT = { interpreting: 'Interpreting…', failed: "Couldn't interpret" } as const;
 
@@ -60,14 +60,46 @@ export function QuestionCard({ q, view, you, game, forAnyone }: { q: Question; v
   );
 }
 
-/** The phone's tray above the dock: the reading's open questions (ADR 0057, 0068). */
+/** A PlayerTask on its player's phone, with Done (ADR 0125). */
+function TaskCard({ task, game }: { task: TableView['playerTasks'][number]; game: ScreenProps['game'] }) {
+  return (
+    <section className="question-card mine" aria-label="Task for you">
+      <span className="question-label display">Task for you</span>
+      <p className="question-text display">{task.text}</p>
+      <div className="question-answers">
+        <button className="btn" onClick={() => game.send({ type: 'taskDone', playerId: task.playerId, text: task.text, from: task.from })}>
+          Done
+        </button>
+      </div>
+    </section>
+  );
+}
+
+/** The phone's tray above the dock: the reading's open questions and this player's PlayerTasks (ADR 0057, 0068, 0125). */
 export function QuestionTray({ log, view, you, game }: { log: TurnLog | null; view: TableView; you: string; game: ScreenProps['game'] }) {
-  if (!log?.questions.length) return null;
+  const tasks = undoneTasks(view.playerTasks).filter((t) => t.playerId === you);
+  if (!log?.questions.length && tasks.length === 0) return null;
   return (
     <div className="question-tray" aria-live="polite">
-      {log.questions.map((q) => (
+      {log?.questions.map((q) => (
         <QuestionCard key={`${q.kind}:${q.askPlayer}:${q.about.join(',')}`} q={q} view={view} you={you} game={game} />
       ))}
+      {tasks.map((t) => (
+        <TaskCard key={t.id} task={t} game={game} />
+      ))}
+    </div>
+  );
+}
+
+/** A PlayerTask as a line in the log, for everyone (ADR 0125). */
+function TaskNote({ task, view }: { task: TableView['playerTasks'][number]; view: TableView }) {
+  const names = namesFor(view);
+  return (
+    <div className={`log-task${task.doneBy ? ' settled' : ''}`}>
+      <span className="log-warning-text">
+        Task for {names.player(task.playerId)}: {task.text}
+      </span>
+      <span className="faint">{task.doneBy ? `Done · ${names.player(task.doneBy)}` : 'Not done yet'}</span>
     </div>
   );
 }
@@ -103,8 +135,9 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
   const names = namesFor(view);
   const taps = log.entries.filter((e) => e.from.length === 0);
   const warned = placeWarnings(view.warnings, log.statements.map((s) => s.id));
+  const tasked = placeTasks(view.playerTasks, log.statements.map((s) => s.id));
   const overrideWith = override ? game : undefined;
-  if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0 && view.warnings.length === 0) {
+  if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0 && view.warnings.length === 0 && view.playerTasks.length === 0) {
     return <p className="faint" style={{ margin: 0, fontSize: 14 }}>Nothing yet this turn.</p>;
   }
   const anyFailed = log.statements.some((s) => s.status === 'failed');
@@ -118,6 +151,9 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
       ))}
       {warned.top.map((w, i) => (
         <WarningNote key={`top${i}`} w={w} view={view} game={overrideWith} />
+      ))}
+      {tasked.top.map((t) => (
+        <TaskNote key={t.id} task={t} view={view} />
       ))}
       {log.statements.length > 0 && (
         <ol className="log-statements">
@@ -152,6 +188,9 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
                 )}
                 {warned.byStatement.get(s.id)?.map((w, i) => (
                   <WarningNote key={i} w={w} view={view} game={overrideWith} />
+                ))}
+                {tasked.byStatement.get(s.id)?.map((t) => (
+                  <TaskNote key={t.id} task={t} view={view} />
                 ))}
               </li>
             );

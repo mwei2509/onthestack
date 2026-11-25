@@ -2338,6 +2338,43 @@ h1.title {
   color: var(--accent-hover);
 }
 
+.log-task {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: inset 0 0 0 1px var(--line-3);
+}
+
+.log-task.settled {
+  color: var(--text-2);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+/* A Step change with a PlayerTask still undone (ADR 0125): a gentle pulse, never a block. */
+.step-card.nudge,
+.strip.nudge {
+  animation: nudge 0.8s ease-in-out 3;
+}
+
+@keyframes nudge {
+  50% {
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-card.nudge,
+  .strip.nudge {
+    animation: none;
+    box-shadow: inset 0 0 0 1.5px var(--accent);
+  }
+}
+
 .log-chip.warning {
   color: var(--accent-hover);
   box-shadow: inset 0 0 0 1px var(--gold-line);

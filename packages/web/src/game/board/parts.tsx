@@ -1,13 +1,35 @@
+import { useEffect, useRef, useState } from 'react';
 import type { TableView } from '@onthestack/engine';
 import { Avatar } from '../parts.js';
 import type { BoardPlayer, CommanderHit } from './model.js';
 import { CUE_AT } from './model.js';
 import { nextPlayerId, STEP_NAMES, stepTrack } from './steps.js';
 
+/**
+ * True for a moment after the Step changes with a PlayerTask still undone, so the Step pulses; it never blocks
+ * (ADR 0125).
+ */
+export function useStepNudge(view: TableView): boolean {
+  const step = view.turn.step;
+  const undone = view.playerTasks.some((t) => !t.doneBy);
+  const last = useRef(step);
+  const [nudge, setNudge] = useState(false);
+  useEffect(() => {
+    if (last.current === step) return;
+    last.current = step;
+    if (!undone) return;
+    setNudge(true);
+    const timer = setTimeout(() => setNudge(false), 2400);
+    return () => clearTimeout(timer);
+  }, [step, undone]);
+  return nudge;
+}
+
 export function StepCard({ view }: { view: TableView }) {
   const track = stepTrack(view);
+  const nudge = useStepNudge(view);
   return (
-    <section aria-label="Current step" className="step-card">
+    <section aria-label="Current step" className={`step-card${nudge ? ' nudge' : ''}`}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
         <span className="display" style={{ fontSize: 20, fontWeight: 700 }}>
           {STEP_NAMES[view.turn.step]}
@@ -30,8 +52,9 @@ export function StepCard({ view }: { view: TableView }) {
 /** The step strip on a Shared screen: every Step named, the current one in amber. */
 export function StepStrip({ view }: { view: TableView }) {
   const track = stepTrack(view);
+  const nudge = useStepNudge(view);
   return (
-    <ol className="strip" aria-label="Steps">
+    <ol className={`strip${nudge ? ' nudge' : ''}`} aria-label="Steps">
       {track.phases.map((p, i) => (
         <li key={i} style={{ flexGrow: p.steps.length }}>
           <span className="strip-phase">{p.label}</span>
