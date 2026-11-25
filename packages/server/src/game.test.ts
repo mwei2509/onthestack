@@ -895,3 +895,62 @@ describe('The Shared screen speaks for a seat (ADR 0107)', () => {
     expect(await screen.next()).toEqual({ type: 'error', message: 'No such seat' });
   });
 });
+
+describe("A game knows its Decks' cards (ADR 0119, 0120)", () => {
+  const castSolRing = { entries: [{ step: 'upkeep', player: 'p2', action: { type: 'cast', card: 'Sol Ring' }, from: ['s1'] }], questions: [] };
+
+  it("fills the engine's card list at Start, so a cast card reaches the battlefield with its types", async () => {
+    const { devices, call, say } = await interpreting();
+    await say(1, 'I cast Sol Ring');
+    (await call(0)).answer(castSolRing);
+    const view = await everyone(devices);
+    expect(view.permanents.map((p) => [p.card, p.types])).toEqual([['Sol Ring', ['Artifact']]]);
+    expect(view.warnings.map((w) => w.code)).not.toContain('unknownCard');
+  });
+
+  it("keeps the Decks' cards out of saved and sealed turns, and loads them again when the game wakes", async () => {
+    const { code, devices, call, say } = await interpreting();
+    await say(1, 'I cast Sol Ring');
+    (await call(0)).answer(castSolRing);
+    const view = await everyone(devices);
+
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      const turn = (await state.storage.get('turn')) as { turnStart: { cards: Record<string, unknown> } };
+      expect(Object.keys(turn.turnStart.cards)).toEqual([]);
+      const woken = new Game(state, env);
+      await state.blockConcurrencyWhile(async () => {});
+      expect((woken as unknown as { view(): { permanents: unknown } }).view().permanents).toEqual(view.permanents);
+    });
+
+    devices[1]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'endTurn' });
+    await everyone(devices);
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      const sealed = (await state.storage.get('sealed:1')) as { finalBoard: { cards: Record<string, unknown>; permanents: Record<string, unknown> } };
+      expect(Object.keys(sealed.finalBoard.cards)).toEqual([]);
+      expect(Object.keys(sealed.finalBoard.permanents)).toHaveLength(1);
+    });
+  });
+
+  it('refers to the Deck version each seat brought, which later edits leave alone', async () => {
+    const id = 'edited-deck';
+    await deckStore(id).importList('Edited', '1x Vona, Butcher of Magan (lcc) 293 [Commander]\n1 Sol Ring');
+    const code = await createGame();
+    const device = await connect(code);
+    await device.update();
+    device.send({ type: 'join', name: 'Theo', deckId: id });
+    await device.update();
+    device.send({ type: 'start', firstSeatId: 'p1' });
+    await device.update();
+
+    await deckStore(id).markCommanders(id, ['6ad8011d-3471-4369-9d68-b264cc027487']);
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      const setup = (await state.storage.get('setup')) as { decks: Record<string, { versionId: string }> };
+      expect(setup.decks.p1!.versionId).toBe(`${id}.1`);
+    });
+  });
+
+  it("gives each player their Deck's colour identity, for ADR 0110's warning", async () => {
+    const { view } = await started();
+    expect(Object.values(view.players).map((p) => p.colorIdentity)).toEqual([['W', 'B'], ['W', 'B'], ['W', 'B']]);
+  });
+});

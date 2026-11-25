@@ -5,6 +5,7 @@ import { replaySummary } from './log.js';
 import { fitDump } from './reports.js';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
+import { loadGameCards, NO_CARDS, withCards, withoutDeckCards, type GameCards } from './gameCards.js';
 import { DeviceMessage, type GameSummary, type Ended, type InterpretationRecord, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
 
 interface Seat {
@@ -25,7 +26,7 @@ interface Setup {
   ended?: Ended;
   /** The six-digit code typed into Join game; null once retired (ADR 0095). */
   joinCode?: string | null;
-  /** Each seat's Deck, copied at Start so later edits never change the game (ADR 0050). */
+  /** Each seat's Deck as it was at Start, with the version whose cards the game uses (ADR 0119). */
   decks?: Record<string, Deck>;
 }
 
@@ -86,6 +87,9 @@ export class Game extends DurableObject<Env> {
   private interpretWaiting = false;
   private interpretTimer: ReturnType<typeof setTimeout> | undefined;
 
+  /** The Decks' cards, loaded from D1 when the game wakes and never stored here (ADR 0119). */
+  private cards: GameCards = NO_CARDS;
+
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.decks = libraryDecks(env.DB);
@@ -93,10 +97,12 @@ export class Game extends DurableObject<Env> {
       const stored = await ctx.storage.get<unknown>(['setup', 'version', 'turn']);
       this.setup = (stored.get('setup') as Setup | undefined) ?? null;
       this.version = (stored.get('version') as number | undefined) ?? 0;
-      this.turn = loadTurn(stored.get('turn') as StoredTurn | undefined);
+      this.cards = await this.loadCards();
+      const turn = loadTurn(stored.get('turn') as StoredTurn | undefined);
+      this.turn = turn && { ...turn, turnStart: withCards(turn.turnStart, this.cards) };
       if (this.setup?.ended) {
         const last = await ctx.storage.get<StoredSealedTurn>(`sealed:${this.setup.ended.turn}`);
-        if (last) this.endedBoard = { state: last.finalBoard, events: [], tableEvents: [], warnings: last.warnings ?? [] };
+        if (last) this.endedBoard = { state: withCards(last.finalBoard, this.cards), events: [], tableEvents: [], warnings: last.warnings ?? [] };
       }
       this.replay();
     });
@@ -134,12 +140,12 @@ export class Game extends DurableObject<Env> {
       currentTurn: turn && {
         number: turn.turnStart.turn.number,
         currentStep: turn.currentStep,
-        turnStart: turn.turnStart,
+        turnStart: withoutDeckCards(turn.turnStart, this.cards),
         statements: turn.statements,
         pinned: turn.pinned,
         reading: turn.reading ?? null,
         resolved: this.resolved,
-        board: this.board && { ...this.board, summary: replaySummary(this.resolved, this.board) },
+        board: this.board && { ...this.board, state: withoutDeckCards(this.board.state, this.cards), summary: replaySummary(this.resolved, this.board) },
       },
       interpretations: (await this.ctx.storage.get<InterpretationRecord[]>(INTERPRETATIONS)) ?? [],
     };
@@ -267,11 +273,19 @@ export class Game extends DurableObject<Env> {
           decks[seat.id] = deck;
         }
         for (const seat of setup.seats) seat.deck = decks[seat.id];
+        setup.decks = decks;
+        this.cards = await this.loadCards();
         const clockwiseFromFirst = [...setup.seats.slice(first), ...setup.seats.slice(0, first)];
-        const turnStart = createGame(clockwiseFromFirst.map((s) => ({ id: s.id, name: s.name, commander: decks[s.id]?.commanders[0] })));
+        const turnStart = createGame(
+          clockwiseFromFirst.map((s) => {
+            const deck = decks[s.id];
+            const commander = deck?.commanders[0];
+            return { id: s.id, name: s.name, ...(commander ? { commander, colorIdentity: deck.colorIdentity } : {}) };
+          }),
+          this.cards.definitions,
+        );
         setup.started = true;
         setup.firstSeatId = message.firstSeatId;
-        setup.decks = decks;
         this.turn = newTurn(turnStart);
         return;
       }
@@ -348,7 +362,7 @@ export class Game extends DurableObject<Env> {
   }
 
   private async storeSealed(sealed: SealedTurn, turn: Turn, warnings: RulesWarning[]): Promise<void> {
-    const stored: StoredSealedTurn = { ...sealed, statements: turn.statements, warnings };
+    const stored: StoredSealedTurn = { ...sealed, finalBoard: withoutDeckCards(sealed.finalBoard, this.cards), statements: turn.statements, warnings };
     await this.ctx.storage.put(`sealed:${sealed.turn}`, stored);
   }
 
@@ -499,7 +513,20 @@ export class Game extends DurableObject<Env> {
   }
 
   private async save(): Promise<void> {
-    await this.ctx.storage.put({ setup: this.setup, version: this.version, turn: this.turn });
+    const turn = this.turn && { ...this.turn, turnStart: withoutDeckCards(this.turn.turnStart, this.cards) };
+    await this.ctx.storage.put({ setup: this.setup, version: this.version, turn });
+  }
+
+  /** The cards of every seat's Deck version. Games from before versions have none (ADR 0119). */
+  private async loadCards(): Promise<GameCards> {
+    const versionIds = Object.values(this.setup?.decks ?? {}).flatMap((d) => (d.versionId ? [d.versionId] : []));
+    try {
+      return await loadGameCards(this.env.DB, versionIds);
+    } catch (e) {
+      // Without D1 the game runs without card data, as games did before, until the next wake-up (ADR 0119).
+      console.error('Loading the game\'s cards failed', e);
+      return NO_CARDS;
+    }
   }
 
   private view(): TableView | null {
