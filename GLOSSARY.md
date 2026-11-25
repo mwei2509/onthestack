@@ -72,7 +72,7 @@ Something that happened in the game, by the rules, as a result of a GameAction, 
 _Avoid_: event, outcome, bookkeeping event
 
 **TableEvent**:
-The app's own record of something at the table that isn't part of the game: a PlayerTask given, a PlayerQuestion asked or answered, a RulesWarning raised, a correction said. It shares the history and its causes with GameEvents, but never changes the board and no trigger sees it.
+The app's own record of something at the table that isn't part of the game: a PlayerTask given or done, a PlayerQuestion asked or answered, a RulesWarning raised or done anyway, a correction said. It shares the history and its causes with GameEvents, but never changes the board and no trigger sees it.
 _Avoid_: log entry, notification
 
 **Stack**:
@@ -122,7 +122,7 @@ What every screen shows: the board, the current Step, the Stack, the Interpreted
 _Avoid_: view, screen state
 
 **RulesWarning**:
-A flag on something that looks illegal ("Hinterland Sanctifier has summoning sickness"), with a choice to do it anyway. It never blocks play.
+A flag on something that looks illegal ("Hinterland Sanctifier has summoning sickness"), shown on the timeline entry that raised it, with a choice to do it anyway that any player can make (ADR 0122, 0123). It never blocks play.
 _Avoid_: warning, error, block
 
 **PlayerQuestion**:
@@ -130,7 +130,7 @@ Something the app needs a specific player to answer before it can finish its boo
 _Avoid_: question, prompt, clarification
 
 **PlayerTask**:
-A physical action a specific player still needs to do at the table, usually because a card touches their library or hand ("reveal the top card of your library"). PlayerTasks never block play.
+A physical action a specific player still needs to do at the table, usually because a card touches their library or hand ("reveal the top card of your library"). It shows on that player's phone until they mark it done (ADR 0125). PlayerTasks never block play.
 _Avoid_: task, reminder, todo
 
 **Banner**:
