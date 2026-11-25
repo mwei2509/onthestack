@@ -2587,3 +2587,22 @@ h1.title {
 .continue-game .muted {
   font-size: 14px;
 }
+
+/* "Something's wrong?" (ADR 0118) */
+.report-text {
+  min-height: 112px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line-2);
+  background: var(--field);
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+}
+
+.report-text:focus {
+  border-color: var(--accent);
+}
