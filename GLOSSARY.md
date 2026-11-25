@@ -152,7 +152,7 @@ A list of cards, imported from an Archidekt link or a pasted list, that exists o
 _Avoid_: decklist, list
 
 **Deck version**:
-A Deck's cards as they were at one moment. Re-importing a Deck, fixing or skipping a line, or changing its commander makes a new version; renaming doesn't. A game refers to the version each seat brought, so later edits never change it (ADR 0119).
+A Deck's cards as they were at one moment. Re-importing a Deck, fixing a line so it joins the cards, or changing its commander makes a new version; renaming it or skipping a line doesn't. A game refers to the version each seat brought, so later edits never change it (ADR 0119).
 _Avoid_: snapshot, revision
 
 **Unmatched line**:

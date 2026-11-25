@@ -2,7 +2,7 @@
 
 Status: Accepted (decided with Melissa, 2026-11-24, in the session that planned #45)
 
-Amends ADR 0050. A Deck's cards are now kept in **versions**. Re-importing it, fixing or skipping a line, or changing its commander makes a new version; renaming it doesn't, because the name is a label, not the cards. The Deck points at its latest version.
+Amends ADR 0050. A Deck's cards are now kept in **versions**. Re-importing it, fixing a line so it joins the cards, or changing its commander makes a new version. Renaming it or skipping an unmatched line doesn't, because neither changes its cards. The Deck points at its latest version.
 
 At Start, a game records the Deck version each seat brought, not a copy of its cards. When the game's Durable Object wakes up, it loads those versions' cards from D1 in one query and keeps them in memory for the engine and the interpreter. So editing or re-importing a Deck still never changes a game in progress or its history (ADR 0050's promise), without the game holding a copy.
 
