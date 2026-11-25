@@ -2,6 +2,7 @@ import { DurableObject } from 'cloudflare:workers';
 import { createGame, replayTurn, sealTurn, STEPS, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type RulesWarning, type SealedTurn, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
 import { buildPrompt, claudeProvider, interpretPrompt, LlmOutputError, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
 import { replaySummary } from './log.js';
+import { fitDump } from './reports.js';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
 import { DeviceMessage, type GameSummary, type Ended, type InterpretationRecord, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
@@ -180,7 +181,7 @@ export class Game extends DurableObject<Env> {
       }
       throw e;
     }
-    if (parsed.data.type === 'debugLog') return;
+    if (parsed.data.type === 'debugLog' || parsed.data.type === 'report') return;
     if (parsed.data.type === 'statement' || parsed.data.type === 'retryInterpretation') this.interpretSoon();
     await this.changed();
   }
@@ -192,6 +193,22 @@ export class Game extends DurableObject<Env> {
   private async handle(ws: WebSocket, message: DeviceMessage): Promise<void> {
     const setup = this.setup!;
     switch (message.type) {
+      case 'report': {
+        if (this.env.TEST_PHASE !== 'true') throw new Rejected('Reports are only taken during the test phase');
+        const seatId = attachment(ws).seatId;
+        const dump = (await this.debugDump())!;
+        const { json, trimmed } = fitDump(dump);
+        const id = crypto.randomUUID();
+        const turn = this.turn;
+        await this.env.DB.prepare(
+          `INSERT INTO reports (id, game_code, turn, step, reporter_seat, reporter_name, text, dump, dump_trimmed, created_at)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`,
+        )
+          .bind(id, setup.code, turn?.turnStart.turn.number ?? null, turn?.currentStep ?? null, seatId, seatId ? (this.seat(seatId).name ?? null) : null, message.text, json, trimmed ? 1 : 0, new Date().toISOString())
+          .run();
+        console.log({ message: 'report', game: setup.code, id, seat: seatId, text: message.text, trimmed });
+        return send(ws, { type: 'reported', id });
+      }
       case 'debugLog': {
         const interpretations = (await this.ctx.storage.get<InterpretationRecord[]>(INTERPRETATIONS)) ?? [];
         return send(ws, { type: 'debugLog', interpretations: [...interpretations].reverse() });

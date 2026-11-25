@@ -466,6 +466,31 @@ describe('Debug dump (ADR 0117)', () => {
   });
 });
 
+describe('Reports (ADR 0118)', () => {
+  it("saves what a seat expected with the game as it is now, during the test phase", async () => {
+    const { code, devices } = await started();
+    await runInDurableObject(env.GAME.getByName(code), (instance) => {
+      Object.assign(instance, { env: { ...(instance as unknown as { env: Env }).env, TEST_PHASE: 'true' } });
+    });
+    devices[0]!.send({ type: 'adjustLife', delta: -2 });
+    await everyone(devices);
+    devices[0]!.send({ type: 'report', text: 'I would have expected Hinterland Sanctifier to gain me life' });
+    const reply = await devices[0]!.next();
+    if (reply.type !== 'reported') throw new Error(`Expected reported, got ${JSON.stringify(reply)}`);
+
+    const row = await env.DB.prepare('SELECT * FROM reports WHERE id = ?').bind(reply.id).first<Record<string, unknown>>();
+    expect(row).toMatchObject({ game_code: code, turn: 1, step: 'upkeep', reporter_seat: 'p1', reporter_name: 'Theo', text: 'I would have expected Hinterland Sanctifier to gain me life', dump_trimmed: 0 });
+    const dump = JSON.parse(row!.dump as string) as { currentTurn: { board: { summary: { life: Record<string, number> } } } };
+    expect(dump.currentTurn.board.summary.life.p1).toBe(38);
+  });
+
+  it('takes no reports outside the test phase', async () => {
+    const { devices } = await started();
+    devices[0]!.send({ type: 'report', text: 'Something looks off' });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: 'Reports are only taken during the test phase' });
+  });
+});
+
 describe('Who may read a dump', () => {
   const env = (DEBUG_TOKEN?: string, LOCAL_DEV?: string) => ({ DEBUG_TOKEN, LOCAL_DEV });
   const get = (url: string, token?: string) => new Request(url, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
