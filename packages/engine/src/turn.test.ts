@@ -319,3 +319,54 @@ describe('replayTurn with a Response pending', () => {
     expect(Object.values(resolved.permanents).map((p) => p.card)).toEqual(['Grizzly Bears']);
   });
 });
+
+describe('RulesWarnings and PlayerTasks across re-reads (ADR 0122, 0123, 0125)', () => {
+  const castAndAttack = () => {
+    const cast = e('main1', 'theo', { type: 'cast', card: 'Grizzly Bears' });
+    const attack = e('declareAttackers', 'theo', { type: 'attack', attacks: [{ attackerId: 'p1', target: 'michael' }] });
+    return { cast, attack, timeline: [cast, attack] };
+  };
+
+  it('tags a warning with the timeline entry that raised it', () => {
+    const { attack, timeline } = castAndAttack();
+    const sick = replayTurn(newGame(), timeline).warnings.find((w) => w.code === 'summoningSickness');
+    expect(sick?.entry).toEqual({ step: 'declareAttackers', playerId: 'theo', from: attack.from });
+  });
+
+  it('"Do it anyway" marks the matching warning and records who chose it', () => {
+    const { attack, timeline } = castAndAttack();
+    const r = replayTurn(newGame(), timeline, { overrides: [{ code: 'summoningSickness', from: attack.from, objectIds: ['p1'], playerId: 'michael' }] });
+    expect(r.warnings.find((w) => w.code === 'summoningSickness')?.overriddenBy).toBe('michael');
+    expect(r.tableEvents).toContainEqual(expect.objectContaining({ type: 'WarningOverridden', code: 'summoningSickness', objectIds: ['p1'], playerId: 'michael' }));
+  });
+
+  it('an override from other statements, about other objects or of another code does not match', () => {
+    const { attack, timeline } = castAndAttack();
+    const overrides = [
+      { code: 'summoningSickness' as const, from: ['s999'], objectIds: ['p1'], playerId: 'michael' },
+      { code: 'summoningSickness' as const, from: attack.from, objectIds: ['p2'], playerId: 'michael' },
+      { code: 'tapped' as const, from: attack.from, objectIds: ['p1'], playerId: 'michael' },
+    ];
+    const r = replayTurn(newGame(), timeline, { overrides });
+    expect(r.warnings.find((w) => w.code === 'summoningSickness')?.overriddenBy).toBeUndefined();
+    expect(r.tableEvents.map((t) => t.type)).not.toContain('WarningOverridden');
+  });
+
+  it('sealing keeps the override in the sealed record', () => {
+    const { attack, timeline } = castAndAttack();
+    const { sealed, warnings } = sealTurn(newGame(), timeline, { overrides: [{ code: 'summoningSickness', from: attack.from, objectIds: ['p1'], playerId: 'theo' }] });
+    expect(warnings.find((w) => w.code === 'summoningSickness')?.overriddenBy).toBe('theo');
+    expect(sealed.tableEvents.map((t) => t.type)).toContain('WarningOverridden');
+  });
+
+  it('a PlayerTask carries the statements that set it off, and a done mark matches only that task', () => {
+    const first = e('main1', 'theo', { type: 'playerTask', playerId: 'michael', text: 'Reveal your top card' });
+    const second = e('main1', 'theo', { type: 'playerTask', playerId: 'michael', text: 'Reveal your top card' });
+    const r = replayTurn(newGame(), [first, second], { doneTasks: [{ playerId: 'michael', text: 'Reveal your top card', from: second.from, doneBy: 'michael' }] });
+    expect(tableView(r).playerTasks).toEqual([
+      { id: 't1', playerId: 'michael', text: 'Reveal your top card', from: first.from },
+      { id: 't2', playerId: 'michael', text: 'Reveal your top card', from: second.from, doneBy: 'michael' },
+    ]);
+    expect(r.tableEvents.map((t) => t.type)).toEqual(['PlayerTaskCreated', 'PlayerTaskCreated', 'PlayerTaskDone']);
+  });
+});

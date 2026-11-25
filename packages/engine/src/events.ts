@@ -3,6 +3,7 @@ import type { AbilityId, CardName, GameEventId, ObjectId, PermanentId, PlayerId,
 import type { Effect, StackItem } from './state.js';
 import type { GameAction, TokenDefinition } from './actions.js';
 import type { Step, Zone } from './steps.js';
+import type { RulesWarningCode } from './warnings.js';
 
 /** Why a GameEvent happened. Every GameEvent has exactly one cause, so the chain can always be followed back. */
 export type Cause =
@@ -95,7 +96,10 @@ export type GameEventType = GameEventBody['type'];
  * board, no trigger sees it, and it isn't stored in GameState, so folding GameEvents alone still rebuilds the board.
  */
 export type TableEventBody =
-  | { type: 'PlayerTaskCreated'; playerId: PlayerId; text: string }
+  /** `from`: the statements of the timeline entry that set it off, so a done mark survives re-reads (ADR 0125). */
+  | { type: 'PlayerTaskCreated'; playerId: PlayerId; text: string; from: PlayerStatementId[] }
+  | { type: 'PlayerTaskDone'; playerId: PlayerId; text: string; doneBy: PlayerId }
+  | { type: 'WarningOverridden'; code: RulesWarningCode; objectIds: string[]; playerId: PlayerId }
   /** A BoardCorrection (ADR 0034): who corrected what, and the GameEvents it produced. */
   | { type: 'BoardCorrectionMade'; playerId: PlayerId; gameAction: GameAction; gameEvents: GameEventId[] };
 
