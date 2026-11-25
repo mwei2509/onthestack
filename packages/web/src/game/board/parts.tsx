@@ -1,13 +1,43 @@
+import { useEffect, useRef, useState } from 'react';
 import type { TableView } from '@onthestack/engine';
 import { Avatar } from '../parts.js';
 import type { BoardPlayer, CommanderHit } from './model.js';
 import { CUE_AT } from './model.js';
 import { nextPlayerId, STEP_NAMES, stepTrack } from './steps.js';
 
+/**
+ * True for a moment after the Step changes with a PlayerTask still undone, so the Step pulses; it never blocks
+ * (ADR 0125).
+ */
+export function useStepNudge(view: TableView): boolean {
+  const step = view.turn.step;
+  const undone = view.playerTasks.some((t) => !t.doneBy);
+  const undoneNow = useRef(undone);
+  const last = useRef(step);
+  const [until, setUntil] = useState(0);
+  useEffect(() => {
+    undoneNow.current = undone;
+  }, [undone]);
+  // Only a Step change starts the pulse; tasks being done during it mustn't cancel the timer that ends it.
+  useEffect(() => {
+    if (last.current === step) return;
+    last.current = step;
+    if (undoneNow.current) setUntil(Date.now() + 2400);
+  }, [step]);
+  // Re-armed from the end time whenever this runs again, so the pulse always ends.
+  useEffect(() => {
+    if (until === 0) return;
+    const timer = setTimeout(() => setUntil(0), Math.max(0, until - Date.now()));
+    return () => clearTimeout(timer);
+  }, [until]);
+  return until !== 0;
+}
+
 export function StepCard({ view }: { view: TableView }) {
   const track = stepTrack(view);
+  const nudge = useStepNudge(view);
   return (
-    <section aria-label="Current step" className="step-card">
+    <section aria-label="Current step" className={`step-card${nudge ? ' nudge' : ''}`}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
         <span className="display" style={{ fontSize: 20, fontWeight: 700 }}>
           {STEP_NAMES[view.turn.step]}
@@ -30,8 +60,9 @@ export function StepCard({ view }: { view: TableView }) {
 /** The step strip on a Shared screen: every Step named, the current one in amber. */
 export function StepStrip({ view }: { view: TableView }) {
   const track = stepTrack(view);
+  const nudge = useStepNudge(view);
   return (
-    <ol className="strip" aria-label="Steps">
+    <ol className={`strip${nudge ? ' nudge' : ''}`} aria-label="Steps">
       {track.phases.map((p, i) => (
         <li key={i} style={{ flexGrow: p.steps.length }}>
           <span className="strip-phase">{p.label}</span>
