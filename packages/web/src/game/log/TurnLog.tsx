@@ -1,4 +1,4 @@
-import type { TableView } from '@onthestack/engine';
+import type { RulesWarning, TableView } from '@onthestack/engine';
 import type { TurnLog } from '@onthestack/server/protocol';
 
 type Question = TurnLog['questions'][number];
@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Sheet } from '../../decks/parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { describeEntry, namesFor } from './describe.js';
+import { openWarnings, placeWarnings } from './warnings.js';
 
 const STATUS_TEXT = { interpreting: 'Interpreting…', failed: "Couldn't interpret" } as const;
 
@@ -71,11 +72,39 @@ export function QuestionTray({ log, view, you, game }: { log: TurnLog | null; vi
   );
 }
 
-/** The turn's log: open questions, each statement with who said it and how it was read, then what was tapped (ADR 0106). */
-export function TurnLogList({ log, view, game, answerQuestions }: { log: TurnLog; view: TableView; game?: ScreenProps['game']; answerQuestions?: boolean }) {
+/** A RulesWarning under the line that raised it, with "Do it anyway" for a seated player (ADR 0122, 0123). */
+function WarningNote({ w, view, game }: { w: RulesWarning; view: TableView; game?: ScreenProps['game'] }) {
+  const names = namesFor(view);
+  const entry = w.entry;
+  return (
+    <div className={`log-warning${w.overriddenBy ? ' settled' : ''}`} role={w.overriddenBy ? undefined : 'alert'}>
+      <span className="log-warning-text">{w.message}</span>
+      {w.overriddenBy ? (
+        <span className="faint">Done anyway · {names.player(w.overriddenBy)}</span>
+      ) : (
+        game &&
+        entry &&
+        entry.from.length > 0 && (
+          <button className="btn btn-text log-warning-action" onClick={() => game.send({ type: 'doItAnyway', code: w.code, from: entry.from, objectIds: w.objectIds ?? [] })}>
+            Do it anyway
+          </button>
+        )
+      )}
+    </div>
+  );
+}
+
+/**
+ * The turn's log: open questions, warnings no statement raised, each statement with who said it, how it was read and
+ * the warnings it raised, then what was tapped (ADR 0106, 0122). `override`: this device is a seat, so it can choose
+ * "Do it anyway".
+ */
+export function TurnLogList({ log, view, game, answerQuestions, override }: { log: TurnLog; view: TableView; game?: ScreenProps['game']; answerQuestions?: boolean; override?: boolean }) {
   const names = namesFor(view);
   const taps = log.entries.filter((e) => e.from.length === 0);
-  if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0) {
+  const warned = placeWarnings(view.warnings, log.statements.map((s) => s.id));
+  const overrideWith = override ? game : undefined;
+  if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0 && view.warnings.length === 0) {
     return <p className="faint" style={{ margin: 0, fontSize: 14 }}>Nothing yet this turn.</p>;
   }
   const anyFailed = log.statements.some((s) => s.status === 'failed');
@@ -86,6 +115,9 @@ export function TurnLogList({ log, view, game, answerQuestions }: { log: TurnLog
     <div className="turn-log">
       {log.questions.map((q) => (
         <QuestionCard key={`${q.kind}:${q.askPlayer}:${q.about.join(',')}`} q={q} view={view} game={answerQuestions ? game : undefined} forAnyone={answerQuestions} />
+      ))}
+      {warned.top.map((w, i) => (
+        <WarningNote key={`top${i}`} w={w} view={view} game={overrideWith} />
       ))}
       {log.statements.length > 0 && (
         <ol className="log-statements">
@@ -118,6 +150,9 @@ export function TurnLogList({ log, view, game, answerQuestions }: { log: TurnLog
                     {STATUS_TEXT[s.status]}
                   </span>
                 )}
+                {warned.byStatement.get(s.id)?.map((w, i) => (
+                  <WarningNote key={i} w={w} view={view} game={overrideWith} />
+                ))}
               </li>
             );
           })}
@@ -149,6 +184,7 @@ export function ThisTurn({ log, view, game }: { log: TurnLog; view: TableView; g
   const [open, setOpen] = useState(false);
   const count = log.entries.length;
   const status = latestStatus(log);
+  const warnings = openWarnings(view.warnings).length;
   return (
     <>
       <button className="this-turn" onClick={() => setOpen(true)}>
@@ -164,12 +200,13 @@ export function ThisTurn({ log, view, game }: { log: TurnLog; view: TableView; g
           </span>{' '}
           <span className="muted">· {count === 1 ? '1 thing happened' : `${count} things happened`}</span>
         </span>
+        {warnings > 0 && <span className="log-chip warning">{warnings === 1 ? '1 warning' : `${warnings} warnings`}</span>}
         {status && <span className={`log-chip ${status}`}>{status === 'interpreting' ? 'Reading…' : 'Not read'}</span>}
       </button>
       {open && (
         <Sheet title="This turn" onClose={() => setOpen(false)}>
           <div style={{ maxHeight: '60dvh', overflowY: 'auto' }}>
-            <TurnLogList log={log} view={view} game={game} />
+            <TurnLogList log={log} view={view} game={game} override />
           </div>
         </Sheet>
       )}
