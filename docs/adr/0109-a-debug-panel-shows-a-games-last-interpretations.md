@@ -2,6 +2,8 @@
 
 Status: Accepted (decided with Melissa, 2026-11-24, in the session looking into a missing RulesWarning)
 
+Amended by ADR 0130 (a Game state tab shows the game's dump).
+
 Extends ADR 0069 (what the Game object stores).
 
 The Game object keeps its last 10 interpretations, across turns: when each was asked, the turn and transcript version, the user message sent, the raw answer or the error, the model, tokens and latency (the same fields as ADR 0108's log line). They're kept apart from the turn and never go into a Sealed turn's history.
