@@ -2606,3 +2606,128 @@ h1.title {
 .report-text:focus {
   border-color: var(--accent);
 }
+
+/* Battlefield screens (ADR 0126): each card in our own frame, identical copies fanned, tapped copies turned. */
+.field-zones {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-zone-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 12px;
+  align-items: flex-end;
+}
+
+.field-fan {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.field-fan-cards {
+  position: relative;
+  display: block;
+}
+
+.field-fan-caption {
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.field-fan.selected .field-fan-caption {
+  color: var(--text);
+}
+
+.field-card {
+  position: absolute;
+  top: 0;
+  width: 56px;
+  height: 78px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: linear-gradient(180deg, #2a2132, #17121c);
+  box-shadow:
+    inset 0 0 0 1px var(--gold-line),
+    0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+.field-card.commander {
+  box-shadow:
+    inset 0 0 0 1.5px var(--accent),
+    0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+.field-fan.selected .field-card {
+  box-shadow:
+    inset 0 0 0 1px var(--gold-line),
+    0 0 0 2px var(--text);
+}
+
+.field-card-name {
+  font-size: 7.5px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.field-card-art {
+  position: relative;
+  flex-grow: 1;
+  border-radius: 4px;
+  background: #120e16;
+  box-shadow: inset 0 0 0 1px rgba(201, 151, 58, 0.3);
+}
+
+.field-card-badge {
+  position: absolute;
+  left: 2px;
+  bottom: 2px;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.field-card-corner {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  padding: 0 3px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  background: rgba(17, 13, 20, 0.85);
+}
