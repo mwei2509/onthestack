@@ -15,14 +15,24 @@ export function GameMenuButton({ game }: { game: ScreenProps['game'] }) {
   const sentFrom = useRef<string | null>(null);
   const open = showing !== null;
   const confirming = showing === 'confirm';
-  const close = () => setShowing(null);
+  const close = () => {
+    sentFrom.current = null;
+    setShowing(null);
+  };
 
   useEffect(() => {
     if (showing === 'report' && sentFrom.current !== null && game.reportedId !== sentFrom.current) {
+      sentFrom.current = null;
       setReport('');
       setShowing('reported');
     }
   }, [game.reportedId, showing]);
+
+  /** Opening the form forgets any earlier send, so only a reply to this one shows "Thanks". */
+  const openReport = () => {
+    sentFrom.current = null;
+    setShowing('report');
+  };
 
   return (
     <>
@@ -33,7 +43,7 @@ export function GameMenuButton({ game }: { game: ScreenProps['game'] }) {
         <Sheet title="Game" onClose={close}>
           <div className="menu-list">
             {testPhase && (
-              <button className="btn" onClick={() => setShowing('report')}>
+              <button className="btn" onClick={openReport}>
                 Something's wrong?
               </button>
             )}
