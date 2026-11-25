@@ -21,7 +21,7 @@ function deckStore() {
 
 beforeEach(async () => {
   await env.DB.batch(
-    ['deck_cards', 'decks', 'printings', 'cards'].map((table) => env.DB.prepare(`DELETE FROM ${table}`)),
+    ['deck_version_cards', 'deck_versions', 'decks', 'printings', 'cards'].map((table) => env.DB.prepare(`DELETE FROM ${table}`)),
   );
 });
 
@@ -165,7 +165,7 @@ describe('fixing a Deck', () => {
     await expect(store.markCommanders(id, ['not-on-deck'])).rejects.toThrow(NotOnDeck);
   });
 
-  it('renames and deletes a Deck, cards and all', async () => {
+  it('renames and deletes a Deck, keeping its versions for the games that use them (ADR 0119)', async () => {
     const store = deckStore();
     const { id } = await store.importList('Vona', '1 Sol Ring');
 
@@ -173,8 +173,49 @@ describe('fixing a Deck', () => {
     expect(await store.remove(id)).toBe(true);
     expect(await store.get(id)).toBeNull();
     expect(await store.remove(id)).toBe(false);
-    const left = await env.DB.prepare('SELECT count(*) AS n FROM deck_cards').first<{ n: number }>();
-    expect(left!.n).toBe(0);
+    expect(await versionCards(`${id}.1`)).toEqual([[SOL_RING.oracleId, 1, 0]]);
+  });
+});
+
+/** A version's cards as [oracle id, quantity, commander], in order. */
+async function versionCards(versionId: string) {
+  const { results } = await env.DB.prepare(
+    'SELECT oracle_id, quantity, commander FROM deck_version_cards WHERE version_id = ? ORDER BY position',
+  )
+    .bind(versionId)
+    .all<{ oracle_id: string; quantity: number; commander: number }>();
+  return results.map((r) => [r.oracle_id, r.quantity, r.commander]);
+}
+
+const versionNumbers = async (deckId: string) =>
+  (await env.DB.prepare('SELECT number FROM deck_versions WHERE deck_id = ? ORDER BY number').bind(deckId).all<{ number: number }>()).results.map(
+    (r) => r.number,
+  );
+
+describe('Deck versions (ADR 0119)', () => {
+  it('makes a new version when the commander changes or a fixed line joins the cards, leaving earlier versions as they were', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', '1x Vona, Butcher of Magan (lcc) 293 [Commander]\n1 Sol Rnig');
+    expect(await versionNumbers(id)).toEqual([1]);
+
+    await store.markCommanders(id, [VONA.oracleId]);
+    await store.fixLine(id, { index: 0, was: '1 Sol Rnig' }, '1 Sol Ring');
+    expect(await versionNumbers(id)).toEqual([1, 2, 3]);
+    expect(await versionCards(`${id}.1`)).toEqual([[VONA.oracleId, 1, 1]]);
+    expect(await versionCards(`${id}.3`)).toEqual([
+      [VONA.oracleId, 1, 1],
+      [SOL_RING.oracleId, 1, 0],
+    ]);
+    expect((await store.get(id))!.cards.map((c) => c.name)).toEqual(['Vona, Butcher of Magan', 'Sol Ring']);
+  });
+
+  it('keeps the version for a rename, a skipped line, or a fix that still matches nothing', async () => {
+    const store = deckStore();
+    const { id } = await store.importList('Vona', '1 Sol Ring\nwhat is this\n1 Sol Rnig');
+    await store.rename(id, 'Rings');
+    await store.skipLine(id, { index: 0, was: 'what is this' });
+    await store.fixLine(id, { index: 0, was: '1 Sol Rnig' }, '1 Sol Rnigg');
+    expect(await versionNumbers(id)).toEqual([1]);
   });
 });
 
@@ -218,5 +259,10 @@ describe('importing from Archidekt', () => {
     expect(again.deck.cards.map((c) => [c.name, c.commander])).toEqual([['Sol Ring', true]]);
     expect(again.deck.unmatched).toEqual([{ text: '1x Gone Card (xyz) 1', reason: 'not-found' }]);
     expect((await store.list()).map((d) => d.source)).toEqual(['archidekt']);
+    expect(await versionNumbers(first.deck.id)).toEqual([1, 2]);
+    expect(await versionCards(`${first.deck.id}.1`)).toEqual([
+      [VONA.oracleId, 1, 1],
+      [SOL_RING.oracleId, 1, 0],
+    ]);
   });
 });
