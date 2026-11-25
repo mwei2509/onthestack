@@ -932,6 +932,26 @@ describe("A game knows its Decks' cards (ADR 0119, 0120)", () => {
     });
   });
 
+  it("serves each seat's Deck as the version it brought, with printed stats and colours (ADR 0129)", async () => {
+    const { code } = await started();
+    const res = await exports.default.fetch(`http://test/api/games/${code}/cards`);
+    const { decks } = (await res.json()) as { decks: { seatId: string; name: string; cards: { name: string; power?: string; toughness?: string; colorIdentity: string[]; commander: boolean }[] }[] };
+    expect(decks.map((d) => [d.seatId, d.name])).toEqual([
+      ['p1', 'Vampires'],
+      ['p2', 'Vampires'],
+      ['p3', 'Vampires'],
+    ]);
+    const vona = decks[0]!.cards.find((c) => c.commander)!;
+    expect([vona.name, vona.power, vona.toughness, vona.colorIdentity]).toEqual(['Vona, Butcher of Magan', '4', '4', ['B', 'W']]);
+    expect(decks[0]!.cards.find((c) => c.name === 'Sol Ring')).toMatchObject({ colorIdentity: [] });
+    expect(decks[0]!.cards.find((c) => c.name === 'Sol Ring')).not.toHaveProperty('power');
+  });
+
+  it('answers 404 for the cards of a game that does not exist', async () => {
+    const res = await exports.default.fetch('http://test/api/games/NO-SUCH-GAME-11/cards');
+    expect(res.status).toBe(404);
+  });
+
   it('refers to the Deck version each seat brought, which later edits leave alone', async () => {
     const id = 'edited-deck';
     await deckStore(id).importList('Edited', '1x Vona, Butcher of Magan (lcc) 293 [Commander]\n1 Sol Ring');

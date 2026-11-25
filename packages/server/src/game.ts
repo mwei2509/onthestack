@@ -5,6 +5,8 @@ import { replaySummary } from './log.js';
 import { fitDump } from './reports.js';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
+import type { GameDeck } from './decks/api.js';
+import { versionCards } from './decks/store.js';
 import { loadGameCards, NO_CARDS, withCards, withoutDeckCards, type GameCards } from './gameCards.js';
 import { DeviceMessage, type GameSummary, type Ended, type InterpretationRecord, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
 
@@ -129,6 +131,21 @@ export class Game extends DurableObject<Env> {
     if (this.setup.ended) return { status: 'ended', turn: this.setup.ended.turn };
     if (this.turn) return { status: 'playing', turn: this.turn.turnStart.turn.number };
     return { status: 'lobby', turn: null };
+  }
+
+  /** Each seat's Deck as the version it brought, for `GET /api/games/<code>/cards` (ADR 0119, 0129); null if there's no game. */
+  async gameDecks(): Promise<GameDeck[] | null> {
+    if (!this.setup) return null;
+    const decks = this.setup.decks ?? {};
+    return Promise.all(
+      Object.entries(decks).map(async ([seatId, deck]) => ({
+        seatId,
+        deckId: deck.id,
+        name: deck.name,
+        colorIdentity: deck.colorIdentity,
+        cards: deck.versionId ? await versionCards(this.env.DB, deck.versionId) : [],
+      })),
+    );
   }
 
   /** Everything about the game, for `GET /api/games/<code>/debug` (ADR 0117); null if there's no game. */
