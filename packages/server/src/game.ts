@@ -389,8 +389,16 @@ export class Game extends DurableObject<Env> {
       currentStep: turn.currentStep,
       pinned: [...turn.pinned],
       openQuestions: [...this.resolved.questions],
+      ...(Object.keys(this.cards.text).length > 0 ? { deckCards: this.cards.text } : {}),
     });
-    const record = { at: new Date().toISOString(), turn: asked.turn, transcriptVersion: asked.transcriptVersion, promptVersion: prompt.version, user: prompt.user };
+    const record = {
+      at: new Date().toISOString(),
+      turn: asked.turn,
+      transcriptVersion: asked.transcriptVersion,
+      promptVersion: prompt.version,
+      ...(prompt.cardsVersion ? { cardsVersion: prompt.cardsVersion } : {}),
+      user: prompt.user,
+    };
     const started = Date.now();
     try {
       let provider: LlmProvider | undefined;
@@ -411,6 +419,8 @@ export class Game extends DurableObject<Env> {
         answer: result.raw,
         inputTokens: result.usage.inputTokens,
         outputTokens: result.usage.outputTokens,
+        ...(result.usage.cacheReadTokens !== undefined ? { cacheReadTokens: result.usage.cacheReadTokens } : {}),
+        ...(result.usage.cacheWriteTokens !== undefined ? { cacheWriteTokens: result.usage.cacheWriteTokens } : {}),
         latencyMs: result.latencyMs,
       });
       const current = this.turn;

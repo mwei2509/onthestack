@@ -3,6 +3,11 @@ import { z } from 'zod';
 /** One request: a prompt, and the shape the answer must take (ADR 0037, 0041). */
 export interface LlmRequest<T> {
   system: string;
+  /**
+   * A long block that stays the same for a whole game, like its cards. It goes after the system prompt, where
+   * providers that cache can keep it between requests (ADR 0121).
+   */
+  context?: string;
   user: string;
   schema: z.ZodType<T>;
 }
@@ -12,7 +17,8 @@ export interface LlmResult<T> {
   /** The response text as the provider returned it, kept so it can be recorded and replayed. */
   raw: string;
   model: string;
-  usage: { inputTokens: number; outputTokens: number };
+  /** Cache counts are separate from `inputTokens`, as Claude reports them; providers without caching leave them out. */
+  usage: { inputTokens: number; outputTokens: number; cacheReadTokens?: number; cacheWriteTokens?: number };
   latencyMs: number;
 }
 

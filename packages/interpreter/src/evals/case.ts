@@ -1,5 +1,6 @@
 import { createGame, sealTurn, type CardDefinition, type GameState, type PlayerStatement, type Step } from '@onthestack/engine';
 import { resolveTimeline, type PinnedEntry } from '../resolve.js';
+import type { DeckCardText } from '../prompt.js';
 import type { InterpretedQuestion, InterpretedTimeline, TimelineEntry } from '../schema.js';
 
 /** An interpreter eval: a table and a turn's conversation in, the expected reading out (ADR 0015, 0039). */
@@ -14,6 +15,8 @@ export interface EvalCase {
   pinned?: PinnedEntry[];
   /** Questions players were shown after the last reading (ADR 0068). */
   openQuestions?: InterpretedQuestion[];
+  /** Every card in the table's Decks, sent as the cached card block (ADR 0121). */
+  deckCards?: Record<string, DeckCardText>;
   expected: {
     entries: TimelineEntry[];
     /** Questions the interpreter should ask instead of guessing (ADR 0043). Matched on kind, player and statements. */
@@ -21,7 +24,7 @@ export interface EvalCase {
   };
 }
 
-const card = (name: string, types: string[], power?: number, toughness?: number, keywords: string[] = []): CardDefinition => ({
+export const card = (name: string, types: string[], power?: number, toughness?: number, keywords: string[] = []): CardDefinition => ({
   name,
   types,
   ...(power !== undefined ? { power, toughness } : {}),
@@ -69,8 +72,8 @@ const SEATS = [
  * A four-player table on `active`'s turn, after the given earlier play. Setup entries use the same name-based
  * shape as the interpreter, so fixtures read like what was said.
  */
-export function table(active: string, setup: TimelineEntry[] = []): GameState {
-  const start = createGame(SEATS, CARDS);
+export function table(active: string, setup: TimelineEntry[] = [], cards: Record<string, CardDefinition> = CARDS): GameState {
+  const start = createGame(SEATS, cards);
   const resolved = resolveTimeline(start, { entries: setup, questions: [] });
   if (resolved.questions.length) throw new Error(`Fixture setup doesn't resolve: ${resolved.questions.map((q) => q.text).join('; ')}`);
   let next = sealTurn(start, resolved.timeline).nextTurnStart;

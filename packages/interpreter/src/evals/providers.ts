@@ -8,9 +8,11 @@ const PRICES: Record<string, { input: number; output: number }> = {
   'claude:claude-haiku-5-5': { input: 0.1, output: 0.5 },
 };
 
-export const costOf = (providerId: string, usage: { inputTokens: number; outputTokens: number }) => {
+/** Cache reads cost a tenth of the input price, and five-minute cache writes 1.25 times it. */
+export const costOf = (providerId: string, usage: { inputTokens: number; outputTokens: number; cacheReadTokens?: number; cacheWriteTokens?: number }) => {
   const price = PRICES[providerId] ?? { input: 0, output: 0 };
-  return (usage.inputTokens * price.input + usage.outputTokens * price.output) / 1_000_000;
+  const input = usage.inputTokens + 0.1 * (usage.cacheReadTokens ?? 0) + 1.25 * (usage.cacheWriteTokens ?? 0);
+  return (input * price.input + usage.outputTokens * price.output) / 1_000_000;
 };
 
 /**

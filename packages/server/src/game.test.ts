@@ -382,6 +382,7 @@ describe('Game', () => {
 
 interface Call {
   user: string;
+  context?: string;
   answer: (timeline: unknown) => void;
   fail: () => void;
 }
@@ -399,7 +400,7 @@ function fakeInterpreter() {
     id: 'fake',
     async complete(request) {
       let outcome: { timeline: unknown } | 'failed' | undefined;
-      calls.push({ user: request.user, answer: (timeline) => (outcome = { timeline }), fail: () => (outcome = 'failed') });
+      calls.push({ user: request.user, context: request.context, answer: (timeline) => (outcome = { timeline }), fail: () => (outcome = 'failed') });
       while (!outcome) await tick();
       if (outcome === 'failed') throw new LlmRequestError('fake', 529, 'overloaded');
       const raw = JSON.stringify(outcome.timeline);
@@ -946,6 +947,22 @@ describe("A game knows its Decks' cards (ADR 0119, 0120)", () => {
     await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
       const setup = (await state.storage.get('setup')) as { decks: Record<string, { versionId: string }> };
       expect(setup.decks.p1!.versionId).toBe(`${id}.1`);
+    });
+  });
+
+  it("sends every Deck card to the interpreter as the cached block, and logs only its fingerprint (ADR 0121)", async () => {
+    const { code, devices, call, say } = await interpreting();
+    await say(1, 'I cast Sol Ring');
+    const first = await call(0);
+    expect(first.context).toContain('- Sol Ring — Artifact\n    {T}: Add {C}{C}.');
+    expect(first.context).toContain('- Vona, Butcher of Magan — Legendary Creature — Vampire Knight — 4/4');
+    expect(first.user).not.toContain('Sol Ring — Artifact');
+    first.answer(castSolRing);
+    await everyone(devices);
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      const [record] = (await state.storage.get('interpretations')) as { cardsVersion?: string; user: string }[];
+      expect(record!.cardsVersion).toMatch(/^[0-9a-f]{8}$/);
+      expect(record!.user).not.toContain('{T}: Add {C}{C}.');
     });
   });
 

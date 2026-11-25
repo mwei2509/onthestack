@@ -9,24 +9,42 @@ export interface PromptInput {
   statements: PlayerStatement[];
   /** The Step the table is in now. */
   currentStep: Step;
-  /** Oracle text by card name, where the app has it. */
-  oracleText?: (card: CardName) => string | undefined;
+  /**
+   * The type line and Oracle text of every card in the game's Decks (ADR 0121), by name. It becomes the cached card
+   * block, so it must come from the Decks, never from the engine's list, which gains tokens mid-game.
+   */
+  deckCards?: Record<CardName, DeckCardText>;
   /** What players recorded by tapping on the board this turn; already in the record (ADR 0065). */
   pinned?: PinnedEntry[];
   /** Questions from the last reading that players can see and may be answering now (ADR 0043, 0068). */
   openQuestions?: InterpretedQuestion[];
 }
 
+export interface DeckCardText {
+  typeLine: string;
+  oracleText: string;
+}
+
 export interface Prompt {
   /** Identical for every request, so providers can cache it. */
   system: string;
+  /** Every card in the game's Decks, the same for the whole game, so providers can cache it too (ADR 0121). */
+  cards?: string;
   user: string;
   /** Names the system prompt's text, so a log line can say which one was sent without carrying it (ADR 0108). */
   version: string;
+  /** Names the card block the same way, so logs never carry its text (ADR 0121). */
+  cardsVersion?: string;
 }
 
 export function buildPrompt(input: PromptInput): Prompt {
-  return { system: SYSTEM, user: userMessage(input), version: SYSTEM_VERSION };
+  const cards = input.deckCards && Object.keys(input.deckCards).length > 0 ? cardBlock(input.turnStart, input.deckCards) : undefined;
+  return {
+    system: SYSTEM,
+    ...(cards ? { cards, cardsVersion: fnv1a(cards) } : {}),
+    user: userMessage(input),
+    version: SYSTEM_VERSION,
+  };
 }
 
 const SYSTEM = `You keep the record for an in-person game of Magic: The Gathering Commander. Players hold a button and say what they do at the table. You read everything said this turn and return what happened, as an ordered list of literal GameActions, each placed in the Step where it happened.
@@ -80,12 +98,15 @@ function fnv1a(text: string): string {
 
 const SYSTEM_VERSION = fnv1a(SYSTEM);
 
-function userMessage({ turnStart, statements, currentStep, oracleText, pinned, openQuestions }: PromptInput): string {
+function userMessage({ turnStart, statements, currentStep, deckCards, pinned, openQuestions }: PromptInput): string {
+  const others = Object.keys(turnStart.cards).filter((name) => !deckCards?.[name]);
   const sections = [
     `Turn ${turnStart.turn.number}. Active player: ${turnStart.turn.activePlayerId}. The table is now in: ${currentStep}.`,
     `Seats, in turn order:\n${turnStart.turnOrder.map((id) => seat(turnStart, id)).join('\n')}`,
     `Board when the turn began:\n${board(turnStart)}`,
-    `Cards in this game:\n${cardList(turnStart, oracleText)}`,
+    deckCards
+      ? `Other cards in this game, not on any Deck (tokens):\n${others.length ? cardList(turnStart, others) : '(none)'}`
+      : `Cards in this game:\n${cardList(turnStart, others)}`,
     `What players said this turn, in order:\n${transcript(turnStart, statements)}`,
   ];
   if (openQuestions?.length) sections.push(`Questions you asked last time, still open (a later statement may answer one):\n${asked(turnStart, openQuestions)}`);
@@ -130,17 +151,30 @@ function board(state: GameState): string {
   return lines.join('\n');
 }
 
-function cardList(state: GameState, oracleText: PromptInput['oracleText']): string {
-  const names = Object.keys(state.cards).sort();
+function cardList(state: GameState, names: CardName[]): string {
   if (names.length === 0) return '(none known; use the names players say)';
-  return names
+  return [...names]
+    .sort()
     .map((name) => {
       const c = state.cards[name];
       const typeLine = c ? [c.types.join(' '), c.power !== undefined ? `${c.power}/${c.toughness}` : null, c.keywords?.length ? c.keywords.join(', ') : null].filter(Boolean).join('; ') : '';
-      const text = oracleText?.(name);
-      return `- ${name}: ${typeLine}${text ? `\n    ${text.replace(/\n/g, '\n    ')}` : ''}`;
+      return `- ${name}: ${typeLine}`;
     })
     .join('\n');
+}
+
+/** Every card in the game's Decks in full, sorted by name: what a card does, when players name it (ADR 0121). */
+function cardBlock(state: GameState, deckCards: Record<CardName, DeckCardText>): string {
+  const lines = Object.keys(deckCards)
+    .sort()
+    .map((name) => {
+      const { typeLine, oracleText } = deckCards[name]!;
+      const c = state.cards[name];
+      const stats = c?.ptVaries ? 'power/toughness varies' : c?.power !== undefined ? `${c.power}/${c.toughness}` : null;
+      const head = [name, typeLine, stats].filter(Boolean).join(' — ');
+      return oracleText ? `- ${head}\n    ${oracleText.replace(/\n/g, '\n    ')}` : `- ${head}`;
+    });
+  return `Every card in this game's Decks. Use these exact names. A player may name either face of a card with two.\n\n${lines.join('\n')}`;
 }
 
 function transcript(state: GameState, statements: PlayerStatement[]): string {
