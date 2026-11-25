@@ -17,7 +17,7 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/api/health') {
-      return Response.json({ ok: true });
+      return Response.json({ ok: true, testPhase: env.TEST_PHASE === 'true' });
     }
 
     if (url.pathname === '/api/games' && request.method === 'POST') {

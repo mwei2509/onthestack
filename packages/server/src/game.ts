@@ -1,6 +1,7 @@
 import { DurableObject } from 'cloudflare:workers';
 import { createGame, replayTurn, sealTurn, STEPS, stepsAhead, tableView, type GameState, type PlayerStatement, type ReplayResult, type RulesWarning, type SealedTurn, type Step, type TableView, type TimelineEntry } from '@onthestack/engine';
 import { buildPrompt, claudeProvider, interpretPrompt, LlmOutputError, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
+import { replaySummary } from './log.js';
 import { libraryDecks, type Deck, type DeckSource } from './decks.js';
 import { claimJoinCode, retireJoinCode, touchJoinCode } from './joinCodes.js';
 import { DeviceMessage, type GameSummary, type Ended, type InterpretationRecord, type ServerMessage, type StatementStatus, type TurnLog } from './protocol.js';
@@ -142,12 +143,17 @@ export class Game extends DurableObject<Env> {
     }
     const parsed = DeviceMessage.safeParse(json);
     if (!parsed.success) {
+      this.logEvent('message-invalid', { seat: attachment(ws).seatId, issue: parsed.error.issues[0]?.message });
       return send(ws, { type: 'error', message: parsed.error.issues[0]?.message ?? 'Unknown message' });
     }
+    this.logEvent('message', { seat: attachment(ws).seatId, ...parsed.data });
     try {
       await this.handle(ws, parsed.data);
     } catch (e) {
-      if (e instanceof Rejected) return send(ws, { type: 'error', message: e.message });
+      if (e instanceof Rejected) {
+        this.logEvent('message-rejected', { seat: attachment(ws).seatId, type: parsed.data.type, reason: e.message });
+        return send(ws, { type: 'error', message: e.message });
+      }
       throw e;
     }
     if (parsed.data.type === 'debugLog') return;
@@ -279,6 +285,7 @@ export class Game extends DurableObject<Env> {
   private async sealTurn(turn: Turn): Promise<void> {
     const { sealed, nextTurnStart, warnings } = sealTurn(turn.turnStart, this.resolved.timeline);
     await this.storeSealed(sealed, turn, warnings);
+    this.logEvent('turn-sealed', { sealed: sealed.turn, warnings: warnings.map((w) => `${w.code}: ${w.message}`) });
     this.turn = newTurn(nextTurnStart);
   }
 
@@ -291,6 +298,7 @@ export class Game extends DurableObject<Env> {
     this.turn = null;
     this.endedBoard = { state: sealed.finalBoard, events: [], tableEvents: [], warnings };
     setup.ended = { at: new Date().toISOString(), turn: sealed.turn, by };
+    this.logEvent('game-ended', { sealed: sealed.turn, by });
     const joinCode = setup.joinCode;
     setup.joinCode = null;
     await this.save();
@@ -399,6 +407,13 @@ export class Game extends DurableObject<Env> {
     }
     this.resolved = resolveTurn(turn);
     this.board = replayTurn(turn.turnStart, this.resolved.timeline, { currentStep: turn.currentStep });
+    this.logEvent('replayed', replaySummary(this.resolved, this.board));
+  }
+
+  /** One JSON line per event while the test phase is on (ADR 0116); Workers Logs indexes the fields. */
+  private logEvent(event: string, fields: Record<string, unknown> = {}): void {
+    if (this.env.TEST_PHASE !== 'true') return;
+    console.log({ message: event, game: this.setup?.code, turn: this.turn?.turnStart.turn.number, step: this.turn?.currentStep, ...fields });
   }
 
   /**

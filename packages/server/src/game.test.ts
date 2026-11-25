@@ -103,7 +103,7 @@ describe('Join codes (ADR 0095)', () => {
 describe('Worker', () => {
   it('answers health checks', async () => {
     const res = await exports.default.fetch('http://test/api/health');
-    expect(await res.json()).toEqual({ ok: true });
+    expect(await res.json()).toEqual({ ok: true, testPhase: false });
   });
 
   it('creates games with readable codes', async () => {

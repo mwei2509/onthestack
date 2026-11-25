@@ -32,6 +32,7 @@
   ],
   // Previews don't inherit production bindings; repeat each one here.
   "previews": {
+    "vars": { "TEST_PHASE": "true" },
     "durable_objects": {
       "bindings": [{ "name": "GAME", "class_name": "Game" }]
     },
@@ -48,6 +49,8 @@
       { "name": "AUTH_LIMITER", "namespace_id": "1002", "simple": { "limit": 10, "period": 60 } }
     ]
   },
+  // On while we're testing: every event is logged and players see "Something's wrong?" (ADR 0116, 0118).
+  "vars": { "TEST_PHASE": "true" },
   // Workers Logs: each interpretation's log line (ADR 0108). Free within the Workers Free plan's daily allowance.
   "observability": { "enabled": true },
   "dev": { "port": 8790 }
