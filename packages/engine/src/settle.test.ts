@@ -52,7 +52,7 @@ describe('stats', () => {
       [{ type: 'modify', permanentId: 'p1', power: 3, toughness: 3, keywords: ['Trample'], until: 'endOfTurn' }, 'theo'],
       [{ type: 'counters', target: { permanentId: 'p1' }, kind: '+1/+1', delta: 2 }, 'theo'],
     ]);
-    expect(stats(state.permanents.p1!, state)).toEqual({ isCreature: true, power: 7, toughness: 7, keywords: ['Trample'] });
+    expect(stats(state.permanents.p1!, state)).toEqual({ isCreature: true, types: ['Creature'], ptVaries: false, power: 7, toughness: 7, keywords: ['Trample'] });
   });
 
   it('applies "becomes X/Y" before modifiers, latest timestamp winning, and switches last', () => {

@@ -25,6 +25,8 @@ const cards: Record<string, CardDefinition> = {
   'Colossal Dreadmaw': creature('Colossal Dreadmaw', 6, 6, ['Trample']),
   'Vampire Nighthawk': creature('Vampire Nighthawk', 2, 3, ['Deathtouch', 'Flying', 'Lifelink']),
   'Teysa Karlov': { ...creature('Teysa Karlov', 2, 4), legendary: true },
+  // Printed */1+*: the engine knows only the 1 and that the rest varies (ADR 0120).
+  Tarmogoyf: { ...creature('Tarmogoyf', 0, 1), ptVaries: true },
 };
 
 /** A board where every creature has been under its controller's control since an earlier turn. */
@@ -280,7 +282,7 @@ describe('combat damage', () => {
   });
 });
 
-const names = Object.keys(cards).filter((n) => n !== 'Teysa Karlov');
+const names = Object.keys(cards).filter((n) => n !== 'Teysa Karlov' && n !== 'Tarmogoyf');
 const scenario = fc.record({
   attackers: fc.array(fc.constantFrom(...names), { minLength: 1, maxLength: 4 }),
   blockers: fc.array(fc.constantFrom(...names), { maxLength: 4 }),
@@ -309,5 +311,46 @@ describe('combat damage properties', () => {
         if (card) expect(total).toBeLessThanOrEqual(cards[card]!.power!);
       }
     }
+  });
+});
+
+describe('power or toughness printed with * (ADR 0120)', () => {
+  const codes = (warnings: { code: string }[]) => warnings.map((w) => w.code);
+
+  it("isn't killed by toughness 0, and a lone blocker takes all the damage without dying from it", () => {
+    const s = board([['Hill Giant', 'theo'], ['Tarmogoyf', 'michael']]);
+    expect(s.permanents.p2).toMatchObject({ card: 'Tarmogoyf' });
+    const declared = act(s, [
+      [{ type: 'attack', attacks: [{ attackerId: 'p1', target: 'michael' }] }, 'theo'],
+      [{ type: 'block', blocks: [{ blockerId: 'p2', attackerId: 'p1' }] }, 'michael'],
+    ]).state;
+    const { state, warnings } = damage(declared);
+    expect(state.permanents.p2).toMatchObject({ damage: 3 });
+    expect(state.permanents.p1).toMatchObject({ damage: 0 });
+    expect(codes(warnings)).toEqual(['variablePowerToughness']);
+  });
+
+  it('an attacker whose power varies deals only the damage players said', () => {
+    const s = board([['Tarmogoyf', 'theo']]);
+    const declared = act(s, [[{ type: 'attack', attacks: [{ attackerId: 'p1', target: 'michael' }] }, 'theo']]).state;
+    const silent = damage(declared);
+    expect(life(silent.state).michael).toBe(40);
+    expect(codes(silent.warnings)).toEqual(['variablePowerToughness']);
+
+    const said = damage(act(declared, [[{ type: 'divideDamage', attackerId: 'p1', split: { michael: 4 } }, 'theo']]).state);
+    expect(life(said.state).michael).toBe(36);
+    expect(codes(said.warnings)).toEqual([]);
+  });
+
+  it("doesn't split an attacker's damage by a varying toughness", () => {
+    const s = board([['Colossal Dreadmaw', 'theo'], ['Tarmogoyf', 'michael']]);
+    const declared = act(s, [
+      [{ type: 'attack', attacks: [{ attackerId: 'p1', target: 'michael' }] }, 'theo'],
+      [{ type: 'block', blocks: [{ blockerId: 'p2', attackerId: 'p1' }] }, 'michael'],
+    ]).state;
+    const { state, warnings } = damage(declared);
+    expect(life(state).michael).toBe(40);
+    expect(state.permanents.p2).toMatchObject({ damage: 0 });
+    expect(codes(warnings)).toEqual(['variablePowerToughness', 'variablePowerToughness']);
   });
 });
