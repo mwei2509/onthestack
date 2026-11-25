@@ -2516,10 +2516,38 @@ h1.title {
   gap: 8px;
 }
 
-.debug-header h2 {
+.debug-tabs {
   flex-grow: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.debug-tabs button {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.debug-tabs button.on {
+  background: var(--raised);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+.debug-json {
   margin: 0;
-  font-size: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--field);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .debug-entry {

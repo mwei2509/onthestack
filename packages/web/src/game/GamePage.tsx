@@ -30,7 +30,7 @@ function GameSession({ code }: { code: string }) {
   return (
     <>
       <Screen code={code} game={game} />
-      {debug && <DebugPanel game={game} />}
+      {debug && <DebugPanel code={code} game={game} />}
       <Toast message={game.error} />
     </>
   );
