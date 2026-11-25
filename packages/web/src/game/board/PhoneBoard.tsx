@@ -9,6 +9,8 @@ import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
 import { LogStatus, QuestionTray, SayBar, ThisTurn } from '../log/TurnLog.js';
 import { clockTime, Crest, EndedPill, HitChips, NextStepCompact, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
+import { FieldScreen } from '../field/FieldScreen.js';
+import { useGameDecks } from '../field/gameDecks.js';
 
 export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { you: string; view: TableView }) {
   const { ended } = update;
@@ -19,6 +21,8 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
   const online = game.connection === 'open' || ended !== null;
   const myTurn = active.id === you;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [fieldOf, setFieldOf] = useState<string | null>(null);
+  const decks = useGameDecks(code);
 
   return (
     <div className="phone board">
@@ -54,7 +58,7 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
 
       <div className="board-body" style={{ opacity: online ? 1 : 0.6 }}>
         {!ended && <StepCard view={view} />}
-        {me && <YourSeat me={me} players={byId} game={game} disabled={!online} readOnly={ended !== null} large={players.length <= 2} />}
+        {me && <YourSeat me={me} players={byId} game={game} disabled={!online} readOnly={ended !== null} large={players.length <= 2} onOpenField={() => setFieldOf(you)} />}
         <ul aria-label="Other players" className="others">
           {players
             .filter((p) => p.id !== you)
@@ -102,12 +106,29 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
         )}
       </footer>
 
+      {fieldOf && <FieldScreen view={view} players={players} you={you} start={fieldOf} decks={decks} game={online && !ended ? game : undefined} onClose={() => setFieldOf(null)} />}
       {menuOpen && !ended && <StepMenu view={view} game={game} confirmFirst={!myTurn} onClose={() => setMenuOpen(false)} />}
     </div>
   );
 }
 
-function YourSeat({ me, players, game, disabled, readOnly, large }: { me: BoardPlayer; players: Record<string, BoardPlayer>; game: ScreenProps['game']; disabled: boolean; readOnly: boolean; large: boolean }) {
+function YourSeat({
+  me,
+  players,
+  game,
+  disabled,
+  readOnly,
+  large,
+  onOpenField,
+}: {
+  me: BoardPlayer;
+  players: Record<string, BoardPlayer>;
+  game: ScreenProps['game'];
+  disabled: boolean;
+  readOnly: boolean;
+  large: boolean;
+  onOpenField: () => void;
+}) {
   const [pending, setPending] = useState(0);
   const { send } = game;
   const [taps] = useState(() => createTapCombiner((delta) => send({ type: 'adjustLife', delta }), setPending));
@@ -164,6 +185,9 @@ function YourSeat({ me, players, game, disabled, readOnly, large }: { me: BoardP
             <HitChips hits={me.hits} players={players} />
           </div>
         )}
+        <button className="btn my-field" onClick={onOpenField}>
+          My field
+        </button>
       </div>
     </section>
   );
