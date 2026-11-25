@@ -2,6 +2,10 @@ import type { GameState, Permanent } from './state.js';
 
 export interface Stats {
   isCreature: boolean;
+  /** The card's types, so screens can tell creatures from lands (ADR 0120). */
+  types: string[];
+  /** Printed with `*`: the power and toughness here are only what effects and counters add (ADR 0120). */
+  ptVaries: boolean;
   power: number;
   toughness: number;
   keywords: string[];
@@ -37,7 +41,14 @@ export function stats(permanent: Permanent, state: GameState): Stats {
   toughness += plus - minus;
   if (byTime.filter((e) => e.kind === 'switch').length % 2 === 1) [power, toughness] = [toughness, power];
 
-  return { isCreature: def?.types.includes('Creature') ?? false, power, toughness, keywords: [...keywords].sort() };
+  return {
+    isCreature: def?.types.includes('Creature') ?? false,
+    types: def?.types ?? [],
+    ptVaries: def?.ptVaries ?? false,
+    power,
+    toughness,
+    keywords: [...keywords].sort(),
+  };
 }
 
 export const hasKeyword = (permanent: Permanent, state: GameState, keyword: string): boolean =>

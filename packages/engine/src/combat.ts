@@ -128,6 +128,12 @@ function dealsDamageIn(step: DamageStep, p: Permanent, state: GameState, dealtFi
  * blocker in turn with the rest to the last blocker (or through, with trample). An attacker whose blockers are all
  * gone stays blocked and deals no damage unless it has trample.
  */
+const varyingWarning = (p: Permanent): RulesWarning => ({
+  code: 'variablePowerToughness',
+  message: `${p.card}'s power or toughness depends on the game, so its combat damage isn't dealt automatically. Say how much it deals.`,
+  objectIds: [p.id],
+});
+
 export function dealCombatDamage(state: GameState, step: DamageStep): CombatResult {
   const draft = clone(state);
   const dealtFirstStrike = step === 'combatDamage' ? dealtFirstStrikeDamage(draft) : new Set<string>();
@@ -152,19 +158,27 @@ export function dealCombatDamage(state: GameState, step: DamageStep): CombatResu
       .map((b) => draft.permanents[b.blockerId])
       .filter((p): p is Permanent => p !== undefined);
     const trample = has(attacker, draft, 'Trample');
+    const stated = combat.divisions[attacker.id];
+    // Never guess a `*` (ADR 0120): an attacker whose power varies, or whose damage would be split by a blocker's
+    // varying toughness, deals only what players said.
+    const powerVaries = stats(attacker, draft).ptVaries;
+    const splitsByVaryingToughness = (trample || blockers.length > 1) && blockers.some((b) => stats(b, draft).ptVaries);
+    if (!stated && (powerVaries || splitsByVaryingToughness)) {
+      warnings.push(varyingWarning(attacker));
+      continue;
+    }
 
-    if (!wasBlocked) {
+    if (!wasBlocked && !(stated && powerVaries)) {
       add(attacker, { playerId: attack.target }, power);
       continue;
     }
-    if (blockers.length === 0) {
+    if (blockers.length === 0 && !(stated && powerVaries)) {
       if (trample) add(attacker, { playerId: attack.target }, power);
       continue;
     }
-    const stated = combat.divisions[attacker.id];
     if (stated) {
       const total = Object.values(stated).reduce((n, x) => n + x, 0);
-      if (total !== power) warnings.push({ code: 'divisionMismatch', message: `The damage stated for ${attacker.card} adds up to ${total}, but its power is ${power}.`, objectIds: [attacker.id] });
+      if (total !== power && !powerVaries) warnings.push({ code: 'divisionMismatch', message: `The damage stated for ${attacker.card} adds up to ${total}, but its power is ${power}.`, objectIds: [attacker.id] });
       for (const [to, amount] of Object.entries(stated)) add(attacker, draft.players[to] ? { playerId: to } : { permanentId: to }, amount);
       continue;
     }
@@ -184,6 +198,10 @@ export function dealCombatDamage(state: GameState, step: DamageStep): CombatResu
     const blocker = draft.permanents[block.blockerId];
     const attacker = draft.permanents[block.attackerId];
     if (!blocker || !attacker || !dealsDamageIn(step, blocker, draft, dealtFirstStrike)) continue;
+    if (stats(blocker, draft).ptVaries) {
+      warnings.push(varyingWarning(blocker));
+      continue;
+    }
     add(blocker, { permanentId: attacker.id }, Math.max(0, stats(blocker, draft).power));
   }
 

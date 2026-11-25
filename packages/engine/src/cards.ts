@@ -6,13 +6,31 @@ export interface CardDefinition {
   name: CardName;
   cost?: string;
   types: string[];
+  subtypes?: string[];
   legendary?: boolean;
   power?: number;
   toughness?: number;
+  /**
+   * Power or toughness printed with `*` (ADR 0120). The table says the number: such a creature isn't killed by
+   * toughness 0 and deals no combat damage automatically.
+   */
+  ptVaries?: boolean;
   keywords?: string[];
   manaValue?: number;
+  /** In WUBRG order. */
+  colorIdentity?: string[];
+  /** A double-faced, split or adventure card's faces; the card's own fields are its front face's (ADR 0120). */
+  faces?: CardFace[];
   /** The card's Translation. Empty until milestone 3; players state effects in M1. */
   abilities: AbilityDefinition[];
+}
+
+export interface CardFace {
+  name: CardName;
+  types: string[];
+  subtypes?: string[];
+  power?: number;
+  toughness?: number;
 }
 
 export type AbilityDefinition =

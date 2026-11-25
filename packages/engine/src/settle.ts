@@ -121,7 +121,11 @@ function stateBasedActions(state: GameState): Found[] {
     const s = stats(p, state);
     if (s.isCreature) {
       const indestructible = s.keywords.includes('Indestructible');
-      const dies = s.toughness <= 0 || (!indestructible && ((s.toughness > 0 && p.damage >= s.toughness) || (p.deathtouchDamage && p.damage > 0)));
+      const byDeathtouch = !indestructible && p.deathtouchDamage === true && p.damage > 0;
+      // A varying toughness (ADR 0120) is the table's to work out, so only deathtouch kills it automatically.
+      const dies = s.ptVaries
+        ? byDeathtouch
+        : s.toughness <= 0 || byDeathtouch || (!indestructible && s.toughness > 0 && p.damage >= s.toughness);
       if (dies) {
         const after = lastTouching(p.id);
         found.push({ body: { type: 'ZoneChanged', from: 'battlefield', to: 'graveyard', how: 'stateBased', moves: [{ objectId: p.id, card: p.card, ownerId: p.ownerId, isToken: p.isToken, ...(after ? { after } : {}) }] } });
