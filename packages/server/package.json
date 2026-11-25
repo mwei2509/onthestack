@@ -10,7 +10,7 @@
     "./decks/parse": "./src/decks/parse.ts"
   },
   "scripts": {
-    "dev": "wrangler d1 migrations apply DB --local -y && wrangler dev",
+    "dev": "wrangler d1 migrations apply DB --local -y && wrangler dev --var LOCAL_DEV:true",
     "db:migrate": "wrangler d1 migrations apply DB --local -y",
     "typegen": "wrangler types",
     "typecheck": "wrangler types && tsc --noEmit",

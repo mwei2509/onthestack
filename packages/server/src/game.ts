@@ -120,6 +120,30 @@ export class Game extends DurableObject<Env> {
     return { status: 'lobby', turn: null };
   }
 
+  /** Everything about the game, for `GET /api/games/<code>/debug` (ADR 0117); null if there's no game. */
+  async debugDump(): Promise<Record<string, unknown> | null> {
+    if (!this.setup) return null;
+    const sealed = await this.ctx.storage.list<StoredSealedTurn>({ prefix: 'sealed:' });
+    const turns = [...sealed.values()].sort((a, b) => a.turn - b.turn);
+    const turn = this.turn;
+    return {
+      setup: this.setup,
+      version: this.version,
+      sealedTurns: turns,
+      currentTurn: turn && {
+        number: turn.turnStart.turn.number,
+        currentStep: turn.currentStep,
+        turnStart: turn.turnStart,
+        statements: turn.statements,
+        pinned: turn.pinned,
+        reading: turn.reading ?? null,
+        resolved: this.resolved,
+        board: this.board && { ...this.board, summary: replaySummary(this.resolved, this.board) },
+      },
+      interpretations: (await this.ctx.storage.get<InterpretationRecord[]>(INTERPRETATIONS)) ?? [],
+    };
+  }
+
   async fetch(request: Request): Promise<Response> {
     if (request.headers.get('Upgrade') !== 'websocket') {
       return new Response('Expected a WebSocket upgrade', { status: 426 });
