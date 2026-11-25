@@ -1,6 +1,6 @@
 # A seat's detail view shows its history and its battlefield
 
-Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42).
+Status: Accepted (decided with Melissa, 2026-11-23, in the planning session for #42). The battlefield moves to its own screens: amended by ADR 0126.
 
 Tapping a seat, on a phone or a Shared screen, opens what the app thinks that player's state is and why, so players can check the app against their cards and their memory:
 
