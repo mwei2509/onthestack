@@ -21,9 +21,10 @@ interface Selected {
 }
 
 /**
- * A player's battlefield, graveyard and exile on a phone (ADR 0126). Seat coins switch players; any phone can look at
- * any player's cards. Hands and libraries are never shown. `game` is absent once the game has ended or offline, which
- * hides "Not right?" (ADR 0128).
+ * A player's battlefield, graveyard and exile (ADR 0126). Seat coins switch players; any device can look at any
+ * player's cards. Hands and libraries are never shown. `game` is absent once the game has ended or offline, which
+ * hides "Not right?" (ADR 0128). `you` is null on a Shared screen, which speaks for the field's player instead and
+ * lays the screen out wide.
  */
 export function FieldScreen({
   view,
@@ -36,7 +37,7 @@ export function FieldScreen({
 }: {
   view: TableView;
   players: BoardPlayer[];
-  you: string;
+  you: string | null;
   start: string;
   decks: GameDecks | null;
   game?: ScreenProps['game'];
@@ -72,7 +73,7 @@ export function FieldScreen({
   const deck = decks?.decks.find((d) => d.seatId === player.id);
 
   return (
-    <div className="field-screen" role="dialog" aria-modal="true" aria-label={title}>
+    <div className={`field-screen${you === null ? ' wide' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
       <header className="field-header">
         <button className="icon-btn" aria-label="Back to the board" onClick={onClose}>
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -201,7 +202,7 @@ export function FieldScreen({
           )}
         </section>
       )}
-      {fixing && game && <Compose game={game} onClose={() => setFixing(false)} />}
+      {fixing && game && <Compose game={game} as={you === null ? { id: player.id, name: player.name } : undefined} onClose={() => setFixing(false)} />}
       {deckOpen && deck && <GameDeckView deck={deck} whose={player.id === you ? 'Your Deck' : `${player.name}'s Deck`} onClose={() => setDeckOpen(false)} />}
     </div>
   );

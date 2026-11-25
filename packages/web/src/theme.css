@@ -3022,3 +3022,7 @@ h1.title {
 .game-deck .field-body > * {
   flex-shrink: 0;
 }
+
+.field-screen.wide {
+  padding-inline: max(16px, calc((100vw - 1120px) / 2));
+}
