@@ -11,7 +11,8 @@ export type RulesWarningCode = 'unknownCard' | 'notALand' | 'notOnBattlefield' |
   | 'cantBlockFlyer'
   | 'menace'
   | 'divisionMismatch'
-  | 'variablePowerToughness';
+  | 'variablePowerToughness'
+  | 'outsideColourIdentity';
 
 /** Flags something that looks wrong. The engine never refuses a GameAction because of one (principle 3). */
 export interface RulesWarning {

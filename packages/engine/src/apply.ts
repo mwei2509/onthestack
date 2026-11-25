@@ -5,6 +5,7 @@ import { clone } from './clone.js';
 import { reduceInto } from './reduce.js';
 import { hasKeyword } from './stats.js';
 import { entersTappedBecause } from './triggers.js';
+import { colourWarning } from './colour.js';
 import { attackWarnings, blockWarnings } from './combat.js';
 import type { GameState, Permanent } from './state.js';
 import type { RulesWarning } from './warnings.js';
@@ -52,9 +53,13 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
   switch (action.type) {
     case 'playLand': {
       const def = draft.cards[action.card];
-      if (def && !def.types.includes('Land')) {
+      if (!def) {
+        warnings.push({ code: 'unknownCard', message: `${action.card} isn't in this game's card list. Check the card.` });
+      } else if (!def.types.includes('Land')) {
         warnings.push({ code: 'notALand', message: `${action.card} isn't a land.` });
       }
+      const offColour = colourWarning(draft, action.card, ctx.playerId);
+      if (offColour) warnings.push(offColour);
       const because = entersTappedBecause(draft, action.card, ctx.playerId);
       emit({
         type: 'ZoneChanged',
@@ -75,6 +80,8 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
       if (!draft.cards[action.card]) {
         warnings.push({ code: 'unknownCard', message: `${action.card} isn't in this game's card list. Check the card.` });
       }
+      const offColour = colourWarning(draft, action.card, ctx.playerId);
+      if (offColour) warnings.push(offColour);
       break;
     }
 
