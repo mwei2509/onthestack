@@ -40,6 +40,8 @@ export const DeviceMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('retryInterpretation') }),
   /** The `?debug` panel asking for the game's last interpretations (ADR 0109). Any device can ask. */
   z.object({ type: z.literal('debugLog') }),
+  /** "Something's wrong?": what the player expected, saved with the game as it is now (ADR 0118). */
+  z.object({ type: z.literal('report'), text: z.string().trim().min(1, 'Say what you expected').max(2000, 'Reports are at most 2000 characters') }),
 ]);
 export type DeviceMessage = z.infer<typeof DeviceMessage>;
 
@@ -83,7 +85,8 @@ export type ServerMessage =
       log: TurnLog | null;
     }
   | { type: 'error'; message: string }
-  | { type: 'debugLog'; interpretations: InterpretationRecord[] };
+  | { type: 'debugLog'; interpretations: InterpretationRecord[] }
+  | { type: 'reported'; id: string };
 
 /** One interpretation as ADR 0108 logs it and ADR 0109's panel shows it. */
 export interface InterpretationRecord {
