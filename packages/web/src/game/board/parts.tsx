@@ -12,17 +12,25 @@ import { nextPlayerId, STEP_NAMES, stepTrack } from './steps.js';
 export function useStepNudge(view: TableView): boolean {
   const step = view.turn.step;
   const undone = view.playerTasks.some((t) => !t.doneBy);
+  const undoneNow = useRef(undone);
   const last = useRef(step);
-  const [nudge, setNudge] = useState(false);
+  const [until, setUntil] = useState(0);
+  useEffect(() => {
+    undoneNow.current = undone;
+  }, [undone]);
+  // Only a Step change starts the pulse; tasks being done during it mustn't cancel the timer that ends it.
   useEffect(() => {
     if (last.current === step) return;
     last.current = step;
-    if (!undone) return;
-    setNudge(true);
-    const timer = setTimeout(() => setNudge(false), 2400);
+    if (undoneNow.current) setUntil(Date.now() + 2400);
+  }, [step]);
+  // Re-armed from the end time whenever this runs again, so the pulse always ends.
+  useEffect(() => {
+    if (until === 0) return;
+    const timer = setTimeout(() => setUntil(0), Math.max(0, until - Date.now()));
     return () => clearTimeout(timer);
-  }, [step, undone]);
-  return nudge;
+  }, [until]);
+  return until !== 0;
 }
 
 export function StepCard({ view }: { view: TableView }) {
