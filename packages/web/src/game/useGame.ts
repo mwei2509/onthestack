@@ -20,6 +20,8 @@ export interface GameConnection {
   updatedAt: Date | null;
   /** The game's last interpretations, newest first, once the debug panel has asked (ADR 0109). */
   debugLog: InterpretationRecord[] | null;
+  /** The id of the last report this device saved (ADR 0118). */
+  reportedId: string | null;
 }
 
 const RETRY_MS = [500, 1000, 2000, 4000, 8000];
@@ -32,6 +34,7 @@ export function useGame(code: string): GameConnection {
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [debugLog, setDebugLog] = useState<InterpretationRecord[] | null>(null);
+  const [reportedId, setReportedId] = useState<string | null>(null);
   const socket = useRef<WebSocket | null>(null);
   const retryNow = useRef<() => void>(() => undefined);
   const memoryRef = useRef(memory);
@@ -89,7 +92,7 @@ export function useGame(code: string): GameConnection {
           return setError(message.message);
         }
         if (message.type === 'debugLog') return setDebugLog(message.interpretations);
-        if (message.type === 'reported') return;
+        if (message.type === 'reported') return setReportedId(message.id);
         if (message.version < version) return;
         version = message.version;
         if (message.you) claiming = false;
@@ -139,7 +142,7 @@ export function useGame(code: string): GameConnection {
 
   const retry = useCallback(() => retryNow.current(), []);
 
-  return { connection, update, memory, error, send, watch, stopWatching, retry, updatedAt, debugLog };
+  return { connection, update, memory, error, send, watch, stopWatching, retry, updatedAt, debugLog, reportedId };
 }
 
 export interface ScreenProps {

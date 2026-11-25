@@ -1,30 +1,98 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { More } from '../../icons.js';
 import { Sheet } from '../../decks/parts.js';
+import { useTestPhase } from '../testPhase.js';
 import type { ScreenProps } from '../useGame.js';
 
-/** The board's Game menu (ADR 0102): End game, with its confirm in the same sheet. */
+type Showing = 'menu' | 'confirm' | 'report' | 'reported';
+
+/** The board's Game menu (ADR 0102): End game with its confirm, and during the test phase "Something's wrong?" (ADR 0118). */
 export function GameMenuButton({ game }: { game: ScreenProps['game'] }) {
-  const [open, setOpen] = useState(false);
-  const [confirming, setConfirming] = useState(false);
+  const [showing, setShowing] = useState<Showing | null>(null);
+  const [report, setReport] = useState('');
+  const testPhase = useTestPhase();
   const online = game.connection === 'open';
+  const sentFrom = useRef<string | null>(null);
+  const open = showing !== null;
+  const confirming = showing === 'confirm';
   const close = () => {
-    setOpen(false);
-    setConfirming(false);
+    sentFrom.current = null;
+    setShowing(null);
+  };
+
+  useEffect(() => {
+    if (showing === 'report' && sentFrom.current !== null && game.reportedId !== sentFrom.current) {
+      sentFrom.current = null;
+      setReport('');
+      setShowing('reported');
+    }
+  }, [game.reportedId, showing]);
+
+  /** Opening the form forgets any earlier send, so only a reply to this one shows "Thanks". */
+  const openReport = () => {
+    sentFrom.current = null;
+    setShowing('report');
   };
 
   return (
     <>
-      <button className="icon-btn" aria-label="Game menu" onClick={() => setOpen(true)}>
+      <button className="icon-btn" aria-label="Game menu" onClick={() => setShowing('menu')}>
         <More />
       </button>
-      {open && !confirming && (
+      {showing === 'menu' && (
         <Sheet title="Game" onClose={close}>
           <div className="menu-list">
-            <button className="btn danger" disabled={!online} onClick={() => setConfirming(true)}>
+            {testPhase && (
+              <button className="btn" onClick={openReport}>
+                Something's wrong?
+              </button>
+            )}
+            <button className="btn danger" disabled={!online} onClick={() => setShowing('confirm')}>
               End game
             </button>
           </div>
+        </Sheet>
+      )}
+      {showing === 'report' && (
+        <Sheet title="Something's wrong?" onClose={close}>
+          <form
+            style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!report.trim()) return;
+              sentFrom.current = game.reportedId ?? '';
+              game.send({ type: 'report', text: report.trim() });
+            }}
+          >
+            <label className="field">
+              What did you expect to happen?
+              <textarea
+                className="report-text"
+                value={report}
+                maxLength={2000}
+                rows={4}
+                autoFocus
+                placeholder="I would have expected Hinterland Sanctifier to gain me life"
+                onChange={(e) => setReport(e.target.value)}
+              />
+            </label>
+            <p className="hint" style={{ margin: 0 }}>
+              It's saved with the game as it is right now, so it can be looked into later. It doesn't change the game.
+            </p>
+            <button className="btn btn-primary" type="submit" disabled={!online || !report.trim()}>
+              Send report
+            </button>
+          </form>
+        </Sheet>
+      )}
+      {showing === 'reported' && (
+        <Sheet title="Thanks, it's saved" onClose={close}>
+          <p className="muted" style={{ margin: 0, fontSize: 15, lineHeight: 1.45 }}>
+            Your report and this game's state were saved. Reference <span className="count">{game.reportedId?.slice(0, 8)}</span>.
+          </p>
+          <button className="btn" style={{ height: 52 }} onClick={close}>
+            Back to the game
+          </button>
         </Sheet>
       )}
       {open && confirming && (
