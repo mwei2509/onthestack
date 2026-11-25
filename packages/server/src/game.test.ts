@@ -951,13 +951,14 @@ describe("A game knows its Decks' cards (ADR 0119, 0120)", () => {
   });
 
   it("sends every Deck card to the interpreter as the cached block, and logs only its fingerprint (ADR 0121)", async () => {
-    const { code, call, say } = await interpreting();
+    const { code, devices, call, say } = await interpreting();
     await say(1, 'I cast Sol Ring');
     const first = await call(0);
     expect(first.context).toContain('- Sol Ring — Artifact\n    {T}: Add {C}{C}.');
     expect(first.context).toContain('- Vona, Butcher of Magan — Legendary Creature — Vampire Knight — 4/4');
     expect(first.user).not.toContain('Sol Ring — Artifact');
     first.answer(castSolRing);
+    await everyone(devices);
     await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
       const [record] = (await state.storage.get('interpretations')) as { cardsVersion?: string; user: string }[];
       expect(record!.cardsVersion).toMatch(/^[0-9a-f]{8}$/);
