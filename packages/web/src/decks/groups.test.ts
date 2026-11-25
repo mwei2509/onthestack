@@ -5,6 +5,7 @@ import { groupCards } from './groups.js';
 const card = (name: string, group: DeckCard['group'], quantity = 1, commander = false): DeckCard => ({
   name,
   group,
+  colorIdentity: [],
   quantity,
   commander,
   oracleId: name,

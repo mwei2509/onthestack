@@ -6,6 +6,7 @@ import { filterCards, inShownOrder, stepFrom } from './viewer.js';
 const card = (name: string, group: DeckCard['group'], oracleText = '', commander = false): DeckCard => ({
   name,
   group,
+  colorIdentity: [],
   oracleText,
   commander,
   quantity: 1,

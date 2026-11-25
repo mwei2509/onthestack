@@ -9,7 +9,7 @@ import { createDeckStore } from './decks/store.js';
 
 export { Game } from './game.js';
 
-const GAME = /^\/api\/games\/([A-Za-z0-9-]{1,32})(\/ws|\/debug)?$/;
+const GAME = /^\/api\/games\/([A-Za-z0-9-]{1,32})(\/ws|\/debug|\/cards)?$/;
 const JOIN_PATH = /^\/api\/join\/(\d{1,12})$/;
 
 export default {
@@ -74,6 +74,11 @@ export default {
         if (refused) return refused;
         const dump = await game.debugDump();
         return dump ? Response.json(Object.assign({ code }, dump)) : Response.json({ error: 'No game with that code' }, { status: 404 });
+      }
+      if (match[2] === '/cards') {
+        if (request.method !== 'GET') return new Response('Not found', { status: 404 });
+        const decks = await game.gameDecks();
+        return decks ? Response.json({ decks }) : Response.json({ error: 'No game with that code' }, { status: 404 });
       }
       if (match[2]) return game.fetch(request);
       if (request.method === 'GET') {

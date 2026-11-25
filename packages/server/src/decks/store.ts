@@ -68,6 +68,9 @@ interface CardRow {
   mana_value: number | null;
   oracle_text: string | null;
   face_texts: string | null;
+  power: string | null;
+  toughness: string | null;
+  loyalty: string | null;
 }
 
 interface SummaryRow {
@@ -129,6 +132,47 @@ const TYPE_LINE = "coalesce(c.data ->> '$.card_faces[0].type_line', c.data ->> '
 const MANA_COST = "coalesce(c.data ->> '$.mana_cost', c.data ->> '$.card_faces[0].mana_cost')";
 const FACE_TEXTS = "(SELECT json_group_array(f.value ->> '$.oracle_text') FROM json_each(c.data, '$.card_faces') f)";
 
+const SELECT_CARD_ROWS = `
+  SELECT dc.oracle_id, dc.scryfall_id, c.name, dc.quantity, dc.commander,
+    ${TYPE_LINE} AS type_line, c.data -> '$.color_identity' AS color_identity,
+    coalesce(p.back_image_url, '') != '' AS double_faced,
+    ${MANA_COST} AS mana_cost, c.data ->> '$.cmc' AS mana_value,
+    c.data ->> '$.oracle_text' AS oracle_text, ${FACE_TEXTS} AS face_texts,
+    coalesce(c.data ->> '$.power', c.data ->> '$.card_faces[0].power') AS power,
+    coalesce(c.data ->> '$.toughness', c.data ->> '$.card_faces[0].toughness') AS toughness,
+    coalesce(c.data ->> '$.loyalty', c.data ->> '$.card_faces[0].loyalty') AS loyalty
+  FROM deck_version_cards dc
+  JOIN cards c ON c.oracle_id = dc.oracle_id
+  LEFT JOIN printings p ON p.scryfall_id = dc.scryfall_id`;
+
+function deckCard(r: CardRow): DeckCard {
+  return {
+    oracleId: r.oracle_id,
+    scryfallId: r.scryfall_id,
+    name: r.name,
+    quantity: r.quantity,
+    commander: r.commander === 1,
+    group: groupOf(r.type_line ?? ''),
+    legendary: isLegendary(r.type_line ?? ''),
+    doubleFaced: r.double_faced === 1,
+    typeLine: r.type_line ?? '',
+    manaCost: r.mana_cost ?? '',
+    manaValue: r.mana_value ?? 0,
+    oracleText: r.oracle_text ?? (JSON.parse(r.face_texts ?? '[]') as (string | null)[]).filter(Boolean).join('\n\n'),
+    colorIdentity: JSON.parse(r.color_identity ?? '[]') as string[],
+    ...(r.power !== null ? { power: r.power } : {}),
+    ...(r.toughness !== null ? { toughness: r.toughness } : {}),
+    ...(r.loyalty !== null ? { loyalty: r.loyalty } : {}),
+    known: false,
+  };
+}
+
+/** One Deck version's cards, in list order (ADR 0119). A game reads the versions its seats brought, even of deleted Decks. */
+export async function versionCards(db: D1Database, versionId: string): Promise<DeckCard[]> {
+  const { results } = await db.prepare(`${SELECT_CARD_ROWS} WHERE dc.version_id = ? ORDER BY dc.position`).bind(versionId).all<CardRow>();
+  return results.map(deckCard);
+}
+
 const SELECT_SUMMARIES = `
   SELECT d.id, d.name, d.unmatched, d.archidekt_id, d.imported_at,
     (SELECT json_group_array(c.name) FROM deck_version_cards dc JOIN cards c ON c.oracle_id = dc.oracle_id
@@ -143,17 +187,7 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
     const [decks, rows] = await db.batch([
       db.prepare('SELECT id, name, archidekt_id, unmatched, imported_at FROM decks WHERE id = ?').bind(id),
       db
-        .prepare(
-          `SELECT dc.oracle_id, dc.scryfall_id, c.name, dc.quantity, dc.commander,
-             ${TYPE_LINE} AS type_line, c.data -> '$.color_identity' AS color_identity,
-             coalesce(p.back_image_url, '') != '' AS double_faced,
-             ${MANA_COST} AS mana_cost, c.data ->> '$.cmc' AS mana_value,
-             c.data ->> '$.oracle_text' AS oracle_text, ${FACE_TEXTS} AS face_texts
-           FROM decks d JOIN deck_version_cards dc ON dc.version_id = ${CURRENT}
-           JOIN cards c ON c.oracle_id = dc.oracle_id
-           LEFT JOIN printings p ON p.scryfall_id = dc.scryfall_id
-           WHERE d.id = ? ORDER BY dc.position`,
-        )
+        .prepare(`${SELECT_CARD_ROWS} WHERE dc.version_id = (SELECT ${CURRENT} FROM decks d WHERE d.id = ?) ORDER BY dc.position`)
         .bind(id),
     ]);
     const deck = (decks!.results as DeckRow[])[0];
@@ -163,21 +197,7 @@ export function createDeckStore({ db, cards, now, newId }: DeckStoreDeps): DeckS
       id: deck.id,
       name: deck.name,
       archidektId: deck.archidekt_id,
-      cards: cardRows.map((r) => ({
-        oracleId: r.oracle_id,
-        scryfallId: r.scryfall_id,
-        name: r.name,
-        quantity: r.quantity,
-        commander: r.commander === 1,
-        group: groupOf(r.type_line ?? ''),
-        legendary: isLegendary(r.type_line ?? ''),
-        doubleFaced: r.double_faced === 1,
-        typeLine: r.type_line ?? '',
-        manaCost: r.mana_cost ?? '',
-        manaValue: r.mana_value ?? 0,
-        oracleText: r.oracle_text ?? (JSON.parse(r.face_texts ?? '[]') as (string | null)[]).filter(Boolean).join('\n\n'),
-        known: false,
-      })),
+      cards: cardRows.map(deckCard),
       unmatched: JSON.parse(deck.unmatched) as UnmatchedLine[],
       importedAt: deck.imported_at,
       colorIdentity: colorIdentityOf(

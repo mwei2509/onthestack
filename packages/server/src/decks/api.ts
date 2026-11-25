@@ -24,6 +24,12 @@ export interface DeckCard {
   manaValue: number;
   /** Every face's Oracle text, front first, separated by a blank line. */
   oracleText: string;
+  /** The card's own colour identity, in Scryfall's letters. */
+  colorIdentity: string[];
+  /** Printed, as Scryfall writes them (`*`, `1+*`); the front face's for a double-faced card. */
+  power?: string;
+  toughness?: string;
+  loyalty?: string;
   /** Whether the app has a Translation for it (ADR 0098). None does until card knowledge reaches games. */
   known: boolean;
 }
@@ -49,4 +55,13 @@ export interface DeckSummary {
   problems: number;
   source: 'archidekt' | 'pasted';
   importedAt: string;
+}
+
+/** `GET /api/games/<code>/cards`: each seat's Deck as the version it brought to the game (ADR 0119, 0129). */
+export interface GameDeck {
+  seatId: string;
+  deckId: string;
+  name: string;
+  colorIdentity: string[];
+  cards: DeckCard[];
 }

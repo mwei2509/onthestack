@@ -53,6 +53,7 @@ describe('importing a pasted list', () => {
         manaCost: '{1}',
         manaValue: 1,
         oracleText: '{T}: Add {C}{C}.',
+        colorIdentity: [],
         known: false,
       },
       expect.objectContaining({
