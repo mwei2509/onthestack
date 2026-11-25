@@ -7,6 +7,7 @@ import type { BoardPlayer } from '../board/model.js';
 import type { ScreenProps } from '../useGame.js';
 import { cardFacts, pileOf } from './facts.js';
 import { FieldZones } from './FieldCards.js';
+import { GameDeckView } from './GameDeckView.js';
 import type { GameDecks } from './gameDecks.js';
 import { fieldZones } from './layout.js';
 
@@ -45,11 +46,13 @@ export function FieldScreen({
   const [tab, setTab] = useState<Tab>('field');
   const [selected, setSelected] = useState<{ key: string; card: Selected } | null>(null);
   const [fixing, setFixing] = useState(false);
+  const [deckOpen, setDeckOpen] = useState(false);
   useEffect(() => {
+    if (deckOpen || fixing) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, deckOpen, fixing]);
 
   const player = players.find((p) => p.id === who) ?? players[0]!;
   const info = (name: string) => decks?.cards.get(name);
@@ -66,6 +69,7 @@ export function FieldScreen({
     setSelected(null);
   };
   const title = player.id === you ? 'Your field' : `${player.name}'s field`;
+  const deck = decks?.decks.find((d) => d.seatId === player.id);
 
   return (
     <div className="field-screen" role="dialog" aria-modal="true" aria-label={title}>
@@ -81,6 +85,11 @@ export function FieldScreen({
           </span>
           {player.commander && <span className="seat-sub" style={{ fontSize: 12 }}>{player.commander}</span>}
         </div>
+        {deck && (
+          <button className="btn" style={{ height: 40, padding: '0 12px' }} onClick={() => setDeckOpen(true)}>
+            Deck
+          </button>
+        )}
         <span className="field-life">
           <span className="muted" style={{ fontSize: 10, letterSpacing: '0.1em' }}>
             LIFE
@@ -193,6 +202,7 @@ export function FieldScreen({
         </section>
       )}
       {fixing && game && <Compose game={game} onClose={() => setFixing(false)} />}
+      {deckOpen && deck && <GameDeckView deck={deck} whose={player.id === you ? 'Your Deck' : `${player.name}'s Deck`} onClose={() => setDeckOpen(false)} />}
     </div>
   );
 }

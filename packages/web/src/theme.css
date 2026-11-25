@@ -3018,3 +3018,7 @@ h1.title {
   height: 44px;
   padding: 0 14px;
 }
+
+.game-deck .field-body > * {
+  flex-shrink: 0;
+}
