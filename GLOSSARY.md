@@ -138,7 +138,7 @@ A notice that an ongoing effect is in play and may matter this turn ("Each oppon
 _Avoid_: notification, alert
 
 **Readback note**:
-A short note saying what the app just applied on its own, such as a triggered ability ("Blood Artist (Priya): Ana loses 1 life, Priya gains 1"). It never waits for confirmation, and "Not right" takes that change back.
+A short note saying what the app just applied on its own: combat damage, a resolved spell or ability, or a trigger, with what followed from it ("Blood Artist (Priya): Ana loses 1 life, Priya gains 1"). One per cause, built by the engine from GameEvents. It never waits for confirmation, and "Not right" takes that change back.
 _Avoid_: toast, notification, confirmation
 
 **Seat detail**:
