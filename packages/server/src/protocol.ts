@@ -36,6 +36,8 @@ export const DeviceMessage = z.discriminatedUnion('type', [
   }),
   /** Ends the game for everyone, after the device's confirm (ADR 0092, 0101). */
   z.object({ type: z.literal('end') }),
+  /** Back to the lobby with the same seats and Decks, clearing every turn, after the device's confirm (ADR 0145). */
+  z.object({ type: z.literal('restart') }),
   /** "Do it anyway" on a RulesWarning, identified by its code, the statements that raised it and the objects it's about (ADR 0123). */
   z.object({ type: z.literal('doItAnyway'), code: z.string().min(1).max(40), from: z.array(z.string().min(1).max(16)).min(1).max(64), objectIds: z.array(z.string().min(1).max(16)).max(64) }),
   /** Done on a PlayerTask, identified by its player, text and the statements that set it off (ADR 0125). */

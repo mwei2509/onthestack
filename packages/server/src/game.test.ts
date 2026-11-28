@@ -749,6 +749,57 @@ describe('Ending a game (ADR 0100, 0101)', () => {
   });
 });
 
+describe('Restarting a game (ADR 0145)', () => {
+  it('goes back to the lobby with the same seats, Decks and join code, clearing every turn', async () => {
+    const { code, devices } = await interpreting();
+    const joinCode = (await (await connect(code)).update()).joinCode;
+    devices[1]!.send({ type: 'jumpToStep', from: 'upkeep', to: 'endTurn' });
+    await everyone(devices);
+
+    devices[2]!.send({ type: 'restart' });
+    const updates = await Promise.all(devices.map((d) => d.update()));
+    expect(updates[0]).toMatchObject({ started: false, ended: null, view: null, log: null, joinCode });
+    expect(updates[0]!.seats.map((s) => [s.name, s.deck?.id])).toEqual([['Theo', VONA_DECK], ['Elena', VONA_DECK], ['Michael', VONA_DECK]]);
+    await runInDurableObject(env.GAME.getByName(code), async (_game, state) => {
+      expect([...(await state.storage.list()).keys()].sort()).toEqual(['setup', 'turn', 'version']);
+      expect(await state.storage.get('turn')).toBeNull();
+    });
+
+    devices[0]!.send({ type: 'start', firstSeatId: 'p3' });
+    expect((await everyone(devices)).turn).toEqual({ number: 1, activePlayerId: 'p3', step: 'upkeep' });
+  });
+
+  it('drops a reading still in flight, so it never lands on the restarted game', async () => {
+    const { devices, call, say } = await interpreting();
+    await say(0, 'Elena loses 3 life');
+    const inFlight = await call(0);
+    devices[0]!.send({ type: 'restart' });
+    await Promise.all(devices.map((d) => d.update()));
+    devices[0]!.send({ type: 'start', firstSeatId: 'p2' });
+    await everyone(devices);
+    await say(0, 'Theo gains 1 life');
+    const fresh = await call(1);
+
+    inFlight.answer(reading('s1'));
+    await new Promise((r) => setTimeout(r, 50));
+    fresh.answer({ entries: [{ step: 'upkeep', player: 'p1', action: { type: 'life', player: 'p1', delta: 1 }, from: ['s1'] }], questions: [] });
+    const view = await everyone(devices);
+    expect([view.players.p1!.life, view.players.p2!.life]).toEqual([41, 40]);
+  });
+
+  it('refuses a game in the lobby or one that has ended', async () => {
+    const { devices } = await lobby('Theo');
+    devices[0]!.send({ type: 'restart' });
+    expect(await devices[0]!.next()).toEqual({ type: 'error', message: "The game hasn't started yet" });
+
+    const game = await started();
+    game.devices[0]!.send({ type: 'end' });
+    await Promise.all(game.devices.map((d) => d.update()));
+    game.devices[0]!.send({ type: 'restart' });
+    expect(await game.devices[0]!.next()).toEqual({ type: 'error', message: 'This game has ended.' });
+  });
+});
+
 describe('The reading becomes the board', () => {
   const lifeIn = (step: string, player: string, delta: number, ...from: string[]) => ({ step, player: 'p1', action: { type: 'life', player, delta }, from });
 
