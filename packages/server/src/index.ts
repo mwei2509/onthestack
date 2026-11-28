@@ -6,6 +6,7 @@ import { GAME_CODE, newGameCode } from './codes.js';
 import { findGameByJoinCode, JOIN_CODE } from './joinCodes.js';
 import { DECKS_PATH, handleDecks } from './decks/routes.js';
 import { createDeckStore } from './decks/store.js';
+import { handleSeed, SEED_PATH } from './seed.js';
 
 export { Game } from './game.js';
 
@@ -62,6 +63,8 @@ export default {
       const lineIndex = decks[2] === undefined ? undefined : Number(decks[2]);
       return handleDecks(request, decks[1], lineIndex, { store, fetch });
     }
+
+    if (url.pathname === SEED_PATH) return handleSeed(request, env);
 
     const match = GAME.exec(url.pathname);
     if (match?.[1]) {
