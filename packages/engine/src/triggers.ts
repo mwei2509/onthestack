@@ -341,13 +341,13 @@ export function toStackItem(state: GameState, trigger: PendingTrigger, id: strin
 export function entersTappedBecause(state: GameState, card: CardName, controllerId: PlayerId, tokenTypes?: string[], paidLife = false): AbilityId | undefined {
   if (tokenTypes && !state.cards[card]) state = { ...state, cards: { ...state.cards, [card]: { name: card, types: tokenTypes, abilities: [] } } };
   for (const a of state.cards[card]?.abilities ?? []) {
-    if (a.kind !== 'static' || a.effect.entersTapped !== 'self') continue;
+    if (a.kind !== 'static' || !('entersTapped' in a.effect) || a.effect.entersTapped !== 'self') continue;
     if (a.effect.unless && entersUntapped(state, a.effect.unless, controllerId, paidLife)) continue;
     return a.id;
   }
   for (const p of Object.values(state.permanents)) {
     for (const a of state.cards[p.card]?.abilities ?? []) {
-      if (a.kind !== 'static' || a.effect.entersTapped === 'self' || (a.zone ?? 'battlefield') !== 'battlefield') continue;
+      if (a.kind !== 'static' || !('entersTapped' in a.effect) || a.effect.entersTapped === 'self' || (a.zone ?? 'battlefield') !== 'battlefield') continue;
       if (filterMatches(a.effect.entersTapped, { id: '', card, controllerId }, p.controllerId, state)) return a.id;
     }
   }
@@ -357,7 +357,7 @@ export function entersTappedBecause(state: GameState, card: CardName, controller
 /** The life a land asks to be paid to enter untapped, if it asks for any. */
 export function lifeToEnterUntapped(state: GameState, card: CardName): number | undefined {
   for (const a of state.cards[card]?.abilities ?? []) {
-    if (a.kind === 'static' && a.effect.entersTapped === 'self' && a.effect.unless?.payLife !== undefined) return a.effect.unless.payLife;
+    if (a.kind === 'static' && 'entersTapped' in a.effect && a.effect.entersTapped === 'self' && a.effect.unless?.payLife !== undefined) return a.effect.unless.payLife;
   }
   return undefined;
 }

@@ -179,7 +179,7 @@ An object filter (`object`, `entersTapped`, `youControl`) can ask for types, sub
 
 The kinds are:
 - `triggered` (with `when` and an optional `if`)
-- `static`
+- `static`: entering tapped, or an always-on effect kept as its Oracle reminder, with a `when` for the GameEvents it applies to (ADR 0139)
 - `castOption` (warp and similar)
 - `spell` (instants and sorceries)
 - `mana` (not tracked)

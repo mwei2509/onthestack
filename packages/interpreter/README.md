@@ -28,4 +28,16 @@ Options:
 
 Results, failures and recordings go to `eval-results/` (git-ignored).
 
-The **Interpreter evals** GitHub workflow runs the same thing on demand (Actions → Interpreter evals → Run workflow), reading the keys from repository secrets of the same names, and uploads `eval-results/` as an artifact.
+## Drafting Translations
+
+`src/translate/` drafts a card's Translation from its Oracle text (ADR 0131, 0132): a prompt with worked examples, a Zod schema for the answer, and code that numbers the abilities and turns anything that fails a check into `unmodeled`. To try it on real cards (text from Scryfall, Claude by default, keys as for the evals):
+
+```sh
+CARDS="Blood Artist|Godless Shrine" pnpm --filter @onthestack/interpreter draft
+```
+
+`EVAL_PROVIDERS=gemini` drafts with another provider. Each card prints its Translation, any problems, and the tokens and cost of the call.
+
+## Eval workflow
+
+The **Interpreter evals** GitHub workflow runs the live evals on demand (Actions → Interpreter evals → Run workflow), reading the keys from repository secrets of the same names, and uploads `eval-results/` as an artifact.
