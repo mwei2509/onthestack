@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { GameAction } from './actions.js';
 import { applyAction } from './apply.js';
-import type { CardDefinition } from './cards.js';
+import type { CardDefinition, TriggerCondition } from './cards.js';
 import { clone } from './clone.js';
 import { emit } from './emit.js';
 import type { GameEventBody, TableEventDraft } from './events.js';
@@ -9,7 +9,7 @@ import { createGame } from './game.js';
 import { settle } from './settle.js';
 import type { GameState } from './state.js';
 
-const entersUnderYou = { event: 'ZoneChanged', to: 'battlefield', object: { types: ['Creature'], controller: 'you' } } as const;
+const entersUnderYou: TriggerCondition = { event: 'ZoneChanged', to: 'battlefield', object: { types: ['Creature'], controller: 'you' } };
 
 const cards: Record<string, CardDefinition> = {
   'Blood Artist': {
@@ -32,7 +32,7 @@ const cards: Record<string, CardDefinition> = {
   'Siege-Gang Commander': {
     name: 'Siege-Gang Commander', types: ['Creature'], power: 2, toughness: 2,
     abilities: [{ id: 'siege-gang-commander#1', kind: 'triggered', when: { event: 'ZoneChanged', to: 'battlefield', object: 'self' },
-      effect: [{ gameAction: 'createToken', token: 'Goblin', definition: { types: ['Creature'], subtypes: ['Goblin'], power: 1, toughness: 1 }, count: 3 }] }],
+      effect: [{ gameAction: 'createToken', token: 'Goblin', definition: { types: ['Creature'], power: 1, toughness: 1 }, count: 3 }] }],
   },
   'Coastal Piracy': {
     name: 'Coastal Piracy', types: ['Enchantment'],
@@ -97,7 +97,7 @@ describe('Translation v2 effects', () => {
   });
 
   it('Impact Tremors deals 1 damage to each opponent still in the game, from itself', () => {
-    let state = act(newGame(), [[{ type: 'cast', card: 'Impact Tremors' }, 'theo']]).state;
+    const state = act(newGame(), [[{ type: 'cast', card: 'Impact Tremors' }, 'theo']]).state;
     state.players.elena!.out = true;
     const s = settle(applyAction(state, { type: 'cast', card: 'Savannah Lions' }, { playerId: 'theo', cause: { playerStatement: 's2' } }).state);
     expect(lifeOf(s.state)).toEqual({ theo: 40, michael: 39, elena: 40 });
