@@ -1,11 +1,36 @@
 import type { GameAction } from './actions.js';
-import type { AbilityDefinition, EffectTemplate, InterveningIf, ObjectFilter, TriggerCondition, TriggeredAbility } from './cards.js';
+import type { AbilityDefinition, AbilityZone, Condition, EffectTemplate, ObjectFilter, Range, TriggerCondition, TriggeredAbility } from './cards.js';
 import type { GameEvent } from './events.js';
-import type { AbilityId, CardName, ObjectId, PlayerId } from './ids.js';
+import type { AbilityId, CardName, ObjectId, PermanentId, PlayerId } from './ids.js';
 import type { GameState, PendingTrigger, Permanent, StackItem } from './state.js';
+import { stats } from './stats.js';
 
 const triggered = (abilities: AbilityDefinition[] | undefined): TriggeredAbility[] =>
   (abilities ?? []).filter((a): a is TriggeredAbility => a.kind === 'triggered');
+
+/** A card whose abilities might trigger: a permanent, or a card in a graveyard or the command zone. */
+interface Source {
+  card: CardName;
+  controllerId: PlayerId;
+  zone: AbilityZone;
+  permanent?: Permanent;
+}
+
+/** An object a filter is checked against. */
+interface Candidate {
+  id: ObjectId;
+  card: CardName;
+  controllerId: PlayerId;
+  permanent?: Permanent;
+  isToken?: boolean;
+}
+
+function sources(state: GameState): Source[] {
+  const found: Source[] = Object.values(state.permanents).map((p) => ({ card: p.card, controllerId: p.controllerId, zone: 'battlefield', permanent: p }));
+  for (const [ownerId, cards] of Object.entries(state.graveyards)) for (const card of cards) found.push({ card, controllerId: ownerId, zone: 'graveyard' });
+  for (const [ownerId, cz] of Object.entries(state.commandZone)) if (cz?.inZone) found.push({ card: cz.card, controllerId: ownerId, zone: 'command' });
+  return found;
+}
 
 /**
  * Finds every triggered ability that matches a GameEvent. Called with the state before the event for things leaving
@@ -13,15 +38,22 @@ const triggered = (abilities: AbilityDefinition[] | undefined): TriggeredAbility
  */
 export function scanTriggers(state: GameState, event: GameEvent): PendingTrigger[] {
   const found: PendingTrigger[] = [];
-  for (const source of Object.values(state.permanents)) {
-    const def = state.cards[source.card];
-    for (const ability of triggered(def?.abilities)) {
+  for (const source of sources(state)) {
+    for (const ability of triggered(state.cards[source.card]?.abilities)) {
+      if ((ability.zone ?? 'battlefield') !== source.zone) continue;
       if (ability.if && !conditionHolds(state, ability.if, source.controllerId)) continue;
-      for (const matched of matches(ability.when, event, source, state)) {
+      if (ability.condition && !conditionHolds(state, ability.condition, source.controllerId)) continue;
+      const whens = Array.isArray(ability.when) ? ability.when : [ability.when];
+      for (const matched of whens.flatMap((when) => matches(when, event, source, state))) {
+        if (ability.limit && timesTriggeredThisTurn(state, found, ability.id, source) >= ability.limit.perTurn) break;
         found.push({
           ability: ability.id,
           controllerId: source.controllerId,
-          source: { card: source.card, permanentId: source.id, lastKnown: { card: source.card, controllerId: source.controllerId } },
+          source: {
+            card: source.card,
+            ...(source.permanent ? { permanentId: source.permanent.id } : {}),
+            lastKnown: { card: source.card, controllerId: source.controllerId },
+          },
           triggeredBy: event.id,
           matched,
         });
@@ -31,14 +63,25 @@ export function scanTriggers(state: GameState, event: GameEvent): PendingTrigger
   return found;
 }
 
+function timesTriggeredThisTurn(state: GameState, found: PendingTrigger[], ability: AbilityId, source: Source): number {
+  const same = (t: { ability?: AbilityId; source: { card: CardName; permanentId?: PermanentId } }) =>
+    t.ability === ability && t.source.card === source.card && t.source.permanentId === source.permanent?.id;
+  const stacked = state.gameEventsThisTurn.filter((e) => e.type === 'AbilityTriggered' && same(e.stackItem)).length;
+  return stacked + state.pendingTriggers.filter(same).length + found.filter(same).length;
+}
+
 /** Whether the GameEvent leaves the battlefield, so its trigger scan must look at the state before it. */
 export const looksBack = (event: GameEvent): boolean => event.type === 'ZoneChanged' && event.from === 'battlefield';
 
-function matches(when: TriggerCondition, event: GameEvent, source: Permanent, state: GameState): Record<string, ObjectId | PlayerId>[] {
+function matches(when: TriggerCondition, event: GameEvent, source: Source, state: GameState): Record<string, ObjectId | PlayerId>[] {
   if (when.event !== event.type) return [];
   const you = source.controllerId;
   const relation = (playerId: PlayerId, rel: 'you' | 'opponent' | 'any' | undefined) =>
     rel === undefined || rel === 'any' || (rel === 'you' ? playerId === you : playerId !== you);
+  const onBattlefield = (id: ObjectId): Candidate | undefined => {
+    const p = state.permanents[id];
+    return p && { id, card: p.card, controllerId: p.controllerId, permanent: p, isToken: p.isToken };
+  };
 
   switch (event.type) {
     case 'ZoneChanged': {
@@ -47,8 +90,10 @@ function matches(when: TriggerCondition, event: GameEvent, source: Permanent, st
       return event.moves
         .filter((m) => {
           if (!m.objectId) return false;
-          const controllerId = state.permanents[m.objectId]?.controllerId ?? m.controllerId ?? m.ownerId;
-          return objectMatches(when.object, m.objectId, m.card, controllerId, source, state);
+          const permanent = state.permanents[m.objectId];
+          const controllerId = permanent?.controllerId ?? m.controllerId ?? m.ownerId;
+          const isToken = m.isToken ?? permanent?.isToken;
+          return objectMatches(when.object, { id: m.objectId, card: m.card, controllerId, ...(permanent ? { permanent } : {}), ...(isToken !== undefined ? { isToken } : {}) }, source, state);
         })
         .map((m) => ({ object: m.objectId! }));
     }
@@ -57,7 +102,11 @@ function matches(when: TriggerCondition, event: GameEvent, source: Permanent, st
       return relation(event.activePlayerId, when.whose) ? [{}] : [];
     case 'AttackersDeclared':
       return event.attacks
-        .filter((a) => (when.includes === 'self' ? a.attackerId === source.id : true))
+        .filter((a) => {
+          if (when.object === undefined) return true;
+          const attacker = onBattlefield(a.attackerId);
+          return attacker !== undefined && objectMatches(when.object, attacker, source, state);
+        })
         .map((a) => ({ attacker: a.attackerId, defendingPlayer: a.target }));
     case 'LifeChanged':
       if (when.gained && event.delta <= 0) return [];
@@ -69,9 +118,9 @@ function matches(when: TriggerCondition, event: GameEvent, source: Permanent, st
       for (const d of event.damage) {
         if (!('playerId' in d.recipient) || d.amount <= 0 || (when.combat && !d.combat)) continue;
         const playerId = d.recipient.playerId;
-        const dealer = state.permanents[d.sourceId];
+        const dealer = onBattlefield(d.sourceId);
         if (!dealer || !relation(playerId, when.player)) continue;
-        if (!objectMatches(when.object, dealer.id, dealer.card, dealer.controllerId, source, state)) continue;
+        if (!objectMatches(when.object, dealer, source, state)) continue;
         const key = `${dealer.id}>${playerId}`;
         if (seen.has(key)) continue;
         seen.add(key);
@@ -81,44 +130,63 @@ function matches(when: TriggerCondition, event: GameEvent, source: Permanent, st
     }
     case 'SpellCast':
       if (!relation(event.casterId, when.player)) return [];
-      return objectMatches(when.object, event.stackItemId, event.card, event.casterId, source, state) ? [{ spell: event.stackItemId }] : [];
+      return objectMatches(when.object, { id: event.stackItemId, card: event.card, controllerId: event.casterId }, source, state) ? [{ spell: event.stackItemId }] : [];
     default:
       return [];
   }
 }
 
-function objectMatches(
-  filter: TriggerCondition['object'],
-  objectId: ObjectId,
-  card: CardName,
-  controllerId: PlayerId,
-  source: Permanent,
-  state: GameState,
-): boolean {
+/** A permanent is itself by ID; a card in a graveyard or the command zone is itself by name. */
+const isSelf = (object: Candidate, source: Source) => (source.permanent ? object.id === source.permanent.id : object.card === source.card);
+
+function objectMatches(filter: TriggerCondition['object'], object: Candidate, source: Source, state: GameState): boolean {
   if (filter === undefined) return true;
-  if (filter === 'self') return objectId === source.id;
-  if ('selfOr' in filter) return objectId === source.id || filterMatches(filter.selfOr, objectId, card, controllerId, source.controllerId, state);
-  if (filter.other && objectId === source.id) return false;
-  return filterMatches(filter, objectId, card, controllerId, source.controllerId, state);
+  if (filter === 'self') return isSelf(object, source);
+  if ('selfOr' in filter) return isSelf(object, source) || filterMatches(filter.selfOr, object, source.controllerId, state);
+  if (filter.other && isSelf(object, source)) return false;
+  return filterMatches(filter, object, source.controllerId, state);
 }
 
-function filterMatches(filter: ObjectFilter, _objectId: ObjectId, card: CardName, controllerId: PlayerId, you: PlayerId, state: GameState): boolean {
-  const def = state.cards[card];
-  if (filter.types && !filter.types.some((t) => def?.types.includes(t))) return false;
-  if (filter.controller === 'you' && controllerId !== you) return false;
-  if (filter.controller === 'opponent' && controllerId === you) return false;
-  if (filter.manaValue?.atMost !== undefined && (def?.manaValue ?? 0) > filter.manaValue.atMost) return false;
-  if (filter.manaValue?.atLeast !== undefined && (def?.manaValue ?? 0) < filter.manaValue.atLeast) return false;
+const inRange = (n: number, range: Range | undefined) =>
+  range === undefined || ((range.atLeast === undefined || n >= range.atLeast) && (range.atMost === undefined || n <= range.atMost));
+
+function filterMatches(filter: ObjectFilter, object: Candidate, you: PlayerId, state: GameState): boolean {
+  const def = state.cards[object.card];
+  const anyOf = (wanted: string[] | undefined, has: string[] | undefined) => !wanted || wanted.some((w) => has?.includes(w));
+  if (!anyOf(filter.types, def?.types)) return false;
+  if (!anyOf(filter.subtypes, def?.subtypes)) return false;
+  if (!anyOf(filter.colors, def?.colors)) return false;
+  if (filter.name !== undefined && object.card !== filter.name) return false;
+  if (filter.legendary !== undefined && (def?.legendary ?? false) !== filter.legendary) return false;
+  if (filter.token !== undefined && (object.isToken ?? false) !== filter.token) return false;
+  if (filter.controller === 'you' && object.controllerId !== you) return false;
+  if (filter.controller === 'opponent' && object.controllerId === you) return false;
+  if (!inRange(def?.manaValue ?? 0, filter.manaValue)) return false;
+  if (filter.power || filter.toughness) {
+    const s = object.permanent ? stats(object.permanent, state) : undefined;
+    if (s?.ptVaries || (!s && def?.ptVaries)) return false;
+    if (!inRange(s?.power ?? def?.power ?? 0, filter.power)) return false;
+    if (!inRange(s?.toughness ?? def?.toughness ?? 0, filter.toughness)) return false;
+  }
+  if (filter.tapped !== undefined && (object.permanent?.tapped ?? false) !== filter.tapped) return false;
+  if (filter.attacking !== undefined && (state.combat?.attacks.some((a) => a.attackerId === object.id) ?? false) !== filter.attacking) return false;
   return true;
 }
 
-/** Intervening-if conditions are checked when an ability triggers and again when it resolves (CR 603.4). */
-export function conditionHolds(state: GameState, condition: InterveningIf, controllerId: PlayerId): boolean {
+/** Checks a Condition for the ability's controller. Intervening-ifs are checked again on resolution (CR 603.4). */
+export function conditionHolds(state: GameState, condition: Condition, controllerId: PlayerId): boolean {
   if (condition.lifeGainedThisTurn) {
     const gained = state.gameEventsThisTurn
       .filter((e) => e.type === 'LifeChanged' && e.playerId === controllerId && e.delta > 0)
       .reduce((n, e) => n + (e.type === 'LifeChanged' ? e.delta : 0), 0);
     if (gained < condition.lifeGainedThisTurn.atLeast) return false;
+  }
+  if (condition.youControl) {
+    const { filter, ...range } = condition.youControl;
+    const count = Object.values(state.permanents).filter(
+      (p) => p.controllerId === controllerId && filterMatches(filter, { id: p.id, card: p.card, controllerId: p.controllerId, permanent: p, isToken: p.isToken }, controllerId, state),
+    ).length;
+    if (!inRange(count, range)) return false;
   }
   return true;
 }
@@ -196,8 +264,8 @@ export function entersTappedBecause(state: GameState, card: CardName, controller
   }
   for (const p of Object.values(state.permanents)) {
     for (const a of state.cards[p.card]?.abilities ?? []) {
-      if (a.kind !== 'static' || a.effect.entersTapped === 'self') continue;
-      if (filterMatches(a.effect.entersTapped, '', card, controllerId, p.controllerId, state)) return a.id;
+      if (a.kind !== 'static' || a.effect.entersTapped === 'self' || (a.zone ?? 'battlefield') !== 'battlefield') continue;
+      if (filterMatches(a.effect.entersTapped, { id: '', card, controllerId }, p.controllerId, state)) return a.id;
     }
   }
   return undefined;

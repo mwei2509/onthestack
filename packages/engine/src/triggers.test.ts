@@ -48,7 +48,7 @@ const cards: Record<string, CardDefinition> = {
   },
   'Goblin Guide': {
     name: 'Goblin Guide', types: ['Creature'], power: 2, toughness: 2, keywords: ['Haste'],
-    abilities: [{ id: 'goblin-guide#1', kind: 'triggered', when: { event: 'AttackersDeclared', includes: 'self' },
+    abilities: [{ id: 'goblin-guide#1', kind: 'triggered', when: { event: 'AttackersDeclared', object: 'self' },
       effect: [{ playerTask: "Reveal the top card of your library. If it's a land, put it into your hand.", who: 'defendingPlayer' }] }],
   },
   'Scoured Barrens': {

@@ -1,6 +1,6 @@
 # How a Scryfall card becomes a game's card
 
-Status: Accepted (decided with Melissa, 2026-11-24, in the session that planned #45)
+Status: Accepted (decided with Melissa, 2026-11-24, in the session that planned #45). Amended by ADR 0131: colours are now given, because object filters read them.
 
 The game's cards (ADR 0119) turn each stored Scryfall card into the engine's card definition with a pure function (ADR 0070).
 

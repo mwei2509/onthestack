@@ -129,7 +129,7 @@ State-based actions for M1:
 
 ## 7. Cards and Ability definitions
 
-The card catalog is built from the game's Deck versions (ADR 0119), loaded when the game wakes and never stored in saved turns; each Scryfall card becomes a `CardDefinition` as ADR 0120 describes, with Oracle text kept beside the catalog rather than in it. Each card's `abilities` is its Translation (M3; empty in M1, where players say the effects). The trigger scan reads these as data; the engine has no card-specific code.
+The card catalog is built from the game's Deck versions (ADR 0119), loaded when the game wakes and never stored in saved turns; each Scryfall card becomes a `CardDefinition` as ADR 0120 describes, with Oracle text kept beside the catalog rather than in it. Each card's `abilities` is its Translation, in schema v2 (ADR 0131), drafted from Oracle text by the interpreter package (ADR 0132); a card without one has none, and players say its effects. The trigger scan reads these as data; the engine has no card-specific code.
 
 ```js
 "Authority of the Consuls": { cost: "{W}", types: ["Enchantment"],
@@ -168,6 +168,14 @@ The card catalog is built from the game's Deck versions (ADR 0119), loaded when 
 ```
 
 A `DamageDealt` trigger matches only damage to a player: `object` filters the source, `player` is who was dealt damage relative to the ability's controller, and `combat` keeps it to combat damage. The damaged player is the trigger's `defendingPlayer`, so "that player" templates name them. Each damage step is its own batch, so double strike that connects twice triggers twice.
+
+A triggered ability can also have:
+- several `when`s (a list), for "enters or attacks": any one triggers it.
+- `zone`: where it works from, the battlefield by default. The scan also looks at graveyards and commanders in the command zone. Hands aren't tracked, so an ability that works from a hand never triggers on its own.
+- `limit: { perTurn: n }`, for "triggers only once each turn": the scan counts this source's triggers already on the Stack this turn, waiting, and found in the same scan.
+- `if`, an intervening-if checked when it triggers and again on resolution (CR 603.4), and `condition`, checked only when it triggers. A condition is life gained this turn, or how many permanents matching a filter you control (`youControl`).
+
+An object filter (`object`, `entersTapped`, `youControl`) can ask for types, subtypes, colours, name, legendary, token, controller, `other`, mana value, power and toughness ranges, tapped and attacking. Every field given must hold; a list matches when any of its items does. A power or toughness filter never matches a creature whose power or toughness varies (ADR 0120). For AttackersDeclared, `object` filters the attacker, so Goblin Guide's "whenever this attacks" is `object: "self"`.
 
 The kinds are:
 - `triggered` (with `when` and an optional `if`)
