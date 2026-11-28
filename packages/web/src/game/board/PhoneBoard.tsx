@@ -7,6 +7,7 @@ import { createTapCombiner } from './lifeTaps.js';
 import { GameMenuButton } from './GameMenu.js';
 import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
 import { LogStatus, QuestionTray, SayBar, ThisTurn } from '../log/TurnLog.js';
+import { useNoteTray } from '../log/useNoteTray.js';
 import { clockTime, Crest, EndedPill, HitChips, NextStepCompact, StepCard, StepMenuButton, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
 import { FieldScreen } from '../field/FieldScreen.js';
@@ -23,6 +24,7 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
   const [menuOpen, setMenuOpen] = useState(false);
   const [fieldOf, setFieldOf] = useState<string | null>(null);
   const decks = useGameDecks(code);
+  const notes = useNoteTray(update.log, view.turn.number);
 
   return (
     <div className="phone board">
@@ -58,18 +60,18 @@ export function PhoneBoard({ code, game, update, you, view }: ScreenProps & { yo
 
       <div className="board-body" style={{ opacity: online ? 1 : 0.6 }}>
         {!ended && <StepCard view={view} />}
-        {me && <YourSeat me={me} players={byId} game={game} disabled={!online} readOnly={ended !== null} large={players.length <= 2} onOpenField={() => setFieldOf(you)} />}
+        {me && <YourSeat me={me} players={byId} game={game} disabled={!online} readOnly={ended !== null} large={players.length <= 2} noteDelta={notes.net[you]} onOpenField={() => setFieldOf(you)} />}
         <ul aria-label="Other players" className="others">
           {players
             .filter((p) => p.id !== you)
             .map((p) => (
-              <OtherPlayer key={p.id} player={p} />
+              <OtherPlayer key={p.id} player={p} noteDelta={notes.net[p.id]} />
             ))}
         </ul>
         {update.log && <ThisTurn log={update.log} view={view} game={game} />}
       </div>
 
-      {online && !ended && <QuestionTray log={update.log} view={view} you={you} game={game} />}
+      {online && !ended && <QuestionTray log={update.log} view={view} you={you} game={game} notes={notes} />}
       {online && !ended && <LogStatus log={update.log} game={game} />}
       <footer className="board-dock">
         {ended ? (
@@ -119,6 +121,7 @@ function YourSeat({
   disabled,
   readOnly,
   large,
+  noteDelta,
   onOpenField,
 }: {
   me: BoardPlayer;
@@ -127,6 +130,8 @@ function YourSeat({
   disabled: boolean;
   readOnly: boolean;
   large: boolean;
+  /** The net life change from this device's open readback notes (ADR 0136). */
+  noteDelta?: number;
   onOpenField: () => void;
 }) {
   const [pending, setPending] = useState(0);
@@ -165,9 +170,10 @@ function YourSeat({
             <Crest life={life} size={large ? 156 : 128} out={me.out} />
             {pending !== 0 && (
               <span className="num" style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 15, marginTop: -6 }}>
-                {pending > 0 ? `+${pending}` : `−${-pending}`}
+                {signed(pending)}
               </span>
             )}
+            {pending === 0 && noteDelta !== undefined && <NoteDelta delta={noteDelta} />}
           </div>
           {!readOnly && (
             <button className="life-btn" aria-label="Gain 1 life" disabled={disabled} onClick={() => taps.tap(1)}>
@@ -193,7 +199,18 @@ function YourSeat({
   );
 }
 
-function OtherPlayer({ player }: { player: BoardPlayer }) {
+const signed = (n: number) => (n > 0 ? `+${n}` : `−${-n}`);
+
+/** A life change the app applied on its own, beside the total while its note is open (ADR 0057, 0136). */
+function NoteDelta({ delta }: { delta: number }) {
+  return (
+    <span className="num note-delta" aria-label={`${signed(delta)} from the app's notes`}>
+      {signed(delta)}
+    </span>
+  );
+}
+
+function OtherPlayer({ player, noteDelta }: { player: BoardPlayer; noteDelta?: number }) {
   const hit = worstHit(player.hits);
   const sub = player.out ? ['Fallen', hit].filter(Boolean).join(' · ') : [player.commander, hit].filter(Boolean).join(' · ');
   return (
@@ -213,6 +230,7 @@ function OtherPlayer({ player }: { player: BoardPlayer }) {
           </span>
         )}
       </div>
+      {noteDelta !== undefined && <NoteDelta delta={noteDelta} />}
       <span className="num" style={{ fontSize: 34, fontWeight: 700, lineHeight: 1, ...(player.out ? { textDecoration: 'line-through' } : {}) }}>
         {player.life}
       </span>

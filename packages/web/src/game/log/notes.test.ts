@@ -1,7 +1,7 @@
 import type { ReadbackNote } from '@onthestack/engine';
 import { describe, expect, it } from 'vitest';
 import type { Names } from './describe.js';
-import { describeNote, placeNotes } from './notes.js';
+import { describeNote, netLife, newNoteKeys, placeNotes } from './notes.js';
 
 const names: Names = { player: (id) => ({ m: 'melissa', t: 'tester', a: 'Ana', p: 'Priya' })[id] ?? id, object: () => 'a card that left' };
 
@@ -76,5 +76,37 @@ describe('placeNotes (ADR 0136)', () => {
     const upkeep = note({ step: 'upkeep' });
     const gone = note({ playerStatement: 's9' });
     expect(placeNotes([upkeep, gone], [], ['s1']).top).toEqual([upkeep, gone]);
+  });
+});
+
+describe('newNoteKeys (ADR 0136)', () => {
+  const bolt = (to: string, amount: number, stackItem = 'k1'): ReadbackNote => ({
+    cause: { stackItem, kind: 'spell', card: 'Lightning Bolt', controllerId: 'a', status: 'resolved' },
+    entry: { playerStatement: 's1' },
+    effects: [{ type: 'damage', source: { objectId: stackItem, card: 'Lightning Bolt' }, to: { objectId: 'p1', card: to }, amount }],
+  });
+
+  it('leaves out a note that only changed ids on a re-read', () => {
+    expect(newNoteKeys([bolt('Grizzly Bears', 3)], [bolt('Grizzly Bears', 3, 'k4')])).toEqual([]);
+  });
+
+  it('counts a note whose outcome changed as new', () => {
+    expect(newNoteKeys([bolt('Grizzly Bears', 3)], [bolt('Grizzly Bears', 1)])).toHaveLength(1);
+  });
+
+  it('tells identical notes apart by their order', () => {
+    expect(newNoteKeys([bolt('Grizzly Bears', 3)], [bolt('Grizzly Bears', 3), bolt('Grizzly Bears', 3)])).toHaveLength(1);
+  });
+});
+
+describe('netLife', () => {
+  it("adds up each player's life changes and drops players who net zero", () => {
+    const note = (effects: ReadbackNote['effects']): ReadbackNote => ({ cause: { followsFrom: 'statement' }, entry: { playerStatement: 's1' }, effects });
+    expect(
+      netLife([
+        note([{ type: 'life', playerId: 'a', delta: -1, reason: 'loss' }, { type: 'life', playerId: 'p', delta: 1, reason: 'gain' }]),
+        note([{ type: 'life', playerId: 'a', delta: -2, reason: 'damage' }, { type: 'life', playerId: 'p', delta: -1, reason: 'loss' }]),
+      ]),
+    ).toEqual({ a: -3 });
   });
 });

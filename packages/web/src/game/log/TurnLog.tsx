@@ -7,6 +7,7 @@ import { Sheet } from '../../decks/parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { describeEntry, namesFor } from './describe.js';
 import { describeNote, noteStep, placeNotes } from './notes.js';
+import type { NoteTray } from './useNoteTray.js';
 import { openWarnings, placeTasks, placeWarnings, undoneTasks } from './warnings.js';
 
 const STATUS_TEXT = { interpreting: 'Interpreting…', failed: "Couldn't interpret" } as const;
@@ -76,18 +77,68 @@ function TaskCard({ task, game }: { task: TableView['playerTasks'][number]; game
   );
 }
 
-/** The phone's tray above the dock: the reading's open questions and this player's PlayerTasks (ADR 0057, 0068, 0125). */
-export function QuestionTray({ log, view, you, game }: { log: TurnLog | null; view: TableView; you: string; game: ScreenProps['game'] }) {
+/** An open readback note in the tray, with "Not right" and dismiss (ADR 0136, 0137). */
+function NoteCard({ note, view, game, onDismiss }: { note: ReadbackNote; view: TableView; game: ScreenProps['game']; onDismiss: () => void }) {
+  const [saying, setSaying] = useState(false);
+  return (
+    <section className="note-card" aria-label="The app applied">
+      <div className="note-card-lines">
+        {describeNote(note, namesFor(view)).map((l, i) => (
+          <span key={i}>{l}</span>
+        ))}
+      </div>
+      <div className="note-card-actions">
+        <button className="btn btn-text" onClick={() => setSaying(true)}>
+          Not right
+        </button>
+        <button className="btn btn-text note-dismiss" aria-label="Dismiss" onClick={onDismiss}>
+          <svg width="16" height="16" viewBox="0 0 20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+            <path d="M5 5l10 10M15 5L5 15" />
+          </svg>
+        </button>
+      </div>
+      {saying && <Compose game={game} onClose={() => setSaying(false)} />}
+    </section>
+  );
+}
+
+/** How many open notes the tray shows before "+N more" (ADR 0136). */
+const TRAY_NOTES = 2;
+
+/**
+ * The phone's tray above the dock: the newest readback notes, the reading's open questions and this player's
+ * PlayerTasks (ADR 0057, 0068, 0125, 0136).
+ */
+export function QuestionTray({ log, view, you, game, notes }: { log: TurnLog | null; view: TableView; you: string; game: ScreenProps['game']; notes?: NoteTray }) {
+  const [logOpen, setLogOpen] = useState(false);
   const tasks = undoneTasks(view.playerTasks).filter((t) => t.playerId === you);
-  if (!log?.questions.length && tasks.length === 0) return null;
+  const open = notes?.open ?? [];
+  const shown = open.slice(-TRAY_NOTES);
+  const more = open.length - shown.length;
+  if (!log?.questions.length && tasks.length === 0 && open.length === 0) return null;
   return (
     <div className="question-tray" aria-live="polite">
+      {more > 0 && (
+        <button className="btn btn-text note-more" onClick={() => setLogOpen(true)}>
+          +{more} more
+        </button>
+      )}
+      {shown.map((n) => (
+        <NoteCard key={open.indexOf(n)} note={n} view={view} game={game} onDismiss={() => notes!.dismiss(n)} />
+      ))}
       {log?.questions.map((q) => (
         <QuestionCard key={`${q.kind}:${q.askPlayer}:${q.about.join(',')}`} q={q} view={view} you={you} game={game} />
       ))}
       {tasks.map((t) => (
         <TaskCard key={t.id} task={t} game={game} />
       ))}
+      {logOpen && log && (
+        <Sheet title="This turn" onClose={() => setLogOpen(false)}>
+          <div style={{ maxHeight: '60dvh', overflowY: 'auto' }}>
+            <TurnLogList log={log} view={view} game={game} override />
+          </div>
+        </Sheet>
+      )}
     </div>
   );
 }
@@ -106,7 +157,8 @@ function TaskNote({ task, view }: { task: TableView['playerTasks'][number]; view
 }
 
 /** What the app applied on its own, under the line that led to it (ADR 0134, 0136). */
-function NoteLine({ note, view }: { note: ReadbackNote; view: TableView }) {
+function NoteLine({ note, view, game }: { note: ReadbackNote; view: TableView; game?: ScreenProps['game'] }) {
+  const [saying, setSaying] = useState(false);
   const lines = describeNote(note, namesFor(view));
   const step = noteStep(note);
   if (lines.length === 0) return null;
@@ -116,6 +168,12 @@ function NoteLine({ note, view }: { note: ReadbackNote; view: TableView }) {
       {lines.map((l, i) => (
         <span key={i}>{l}</span>
       ))}
+      {game && (
+        <button className="btn btn-text log-note-action" onClick={() => setSaying(true)}>
+          Not right
+        </button>
+      )}
+      {saying && game && <Compose game={game} onClose={() => setSaying(false)} />}
     </div>
   );
 }
@@ -173,7 +231,7 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
         <TaskNote key={t.id} task={t} view={view} />
       ))}
       {noted.top.map((n, i) => (
-        <NoteLine key={`note${i}`} note={n} view={view} />
+        <NoteLine key={`note${i}`} note={n} view={view} game={game} />
       ))}
       {log.statements.length > 0 && (
         <ol className="log-statements">
@@ -210,7 +268,7 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
                   <WarningNote key={i} w={w} view={view} game={overrideWith} />
                 ))}
                 {noted.byStatement.get(s.id)?.map((n, i) => (
-                  <NoteLine key={`note${i}`} note={n} view={view} />
+                  <NoteLine key={`note${i}`} note={n} view={view} game={game} />
                 ))}
                 {tasked.byStatement.get(s.id)?.map((t) => (
                   <TaskNote key={t.id} task={t} view={view} />
