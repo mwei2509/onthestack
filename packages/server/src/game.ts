@@ -92,6 +92,8 @@ export class Game extends DurableObject<Env> {
   /** Between a statement and the request it leads to (ADR 0017's short wait). */
   private interpretWaiting = false;
   private interpretTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Rises on every restart, so a reading still in flight can't land on the restarted game (ADR 0145). */
+  private restarts = 0;
 
   /** The Decks' cards, loaded from D1 when the game wakes and never stored here (ADR 0119). */
   private cards: GameCards = NO_CARDS;
@@ -375,6 +377,8 @@ export class Game extends DurableObject<Env> {
       case 'end':
         if (setup.ended) throw new Rejected('The game has already ended');
         return this.end(this.inGame(), attachment(ws).seatId);
+      case 'restart':
+        return this.restart(this.inGame(), attachment(ws).seatId);
     }
   }
 
@@ -402,6 +406,22 @@ export class Game extends DurableObject<Env> {
     if (joinCode) await retireJoinCode(this.env.DB, joinCode, setup.code).catch((e: unknown) => console.error('Retiring the join code failed', e));
   }
 
+  /** Back to the lobby with the same seats, Decks and join code; every turn and interpretation is cleared (ADR 0145). */
+  private async restart(turn: Turn, by: string | null): Promise<void> {
+    const setup = this.setup!;
+    this.logEvent('game-restarted', { turn: turn.turnStart.turn.number, by });
+    clearTimeout(this.interpretTimer);
+    this.interpretWaiting = false;
+    this.interpreting = false;
+    this.restarts++;
+    this.turn = null;
+    setup.started = false;
+    delete setup.firstSeatId;
+    delete setup.decks;
+    const sealed = await this.ctx.storage.list({ prefix: 'sealed:' });
+    await this.ctx.storage.delete([...sealed.keys(), INTERPRETATIONS]);
+  }
+
   private async storeSealed(sealed: SealedTurn, turn: Turn, warnings: RulesWarning[]): Promise<void> {
     const stored: StoredSealedTurn = { ...sealed, finalBoard: withoutDeckCards(sealed.finalBoard, this.cards), statements: turn.statements, warnings };
     await this.ctx.storage.put(`sealed:${sealed.turn}`, stored);
@@ -422,7 +442,7 @@ export class Game extends DurableObject<Env> {
   private async interpret(): Promise<void> {
     const turn = this.turn;
     if (!turn || this.interpreting) return;
-    const asked = { turn: turn.turnStart.turn.number, transcriptVersion: turn.transcriptVersion };
+    const asked = { turn: turn.turnStart.turn.number, transcriptVersion: turn.transcriptVersion, restarts: this.restarts };
     this.interpreting = true;
     const prompt = buildPrompt({
       turnStart: turn.turnStart,
@@ -449,7 +469,7 @@ export class Game extends DurableObject<Env> {
         result = await interpretPrompt(provider, prompt);
       } catch (e) {
         const id = provider?.id ?? 'none';
-        await this.record({ ...record, provider: id, model: id, error: String(e), ...(e instanceof LlmOutputError ? { answer: e.raw } : {}), latencyMs: Date.now() - started });
+        await this.record({ ...record, provider: id, model: id, error: String(e), ...(e instanceof LlmOutputError ? { answer: e.raw } : {}), latencyMs: Date.now() - started }, asked.restarts);
         throw e;
       }
       const { output } = result;
@@ -463,9 +483,9 @@ export class Game extends DurableObject<Env> {
         ...(result.usage.cacheReadTokens !== undefined ? { cacheReadTokens: result.usage.cacheReadTokens } : {}),
         ...(result.usage.cacheWriteTokens !== undefined ? { cacheWriteTokens: result.usage.cacheWriteTokens } : {}),
         latencyMs: result.latencyMs,
-      });
+      }, asked.restarts);
       const current = this.turn;
-      const stale = !current || current.turnStart.turn.number !== asked.turn || (current.reading?.transcriptVersion ?? 0) >= asked.transcriptVersion;
+      const stale = !current || asked.restarts !== this.restarts || current.turnStart.turn.number !== asked.turn || (current.reading?.transcriptVersion ?? 0) >= asked.transcriptVersion;
       if (!stale) {
         current.reading = { timeline: output, transcriptVersion: asked.transcriptVersion };
         this.advanceStep(current);
@@ -473,20 +493,22 @@ export class Game extends DurableObject<Env> {
       }
     } catch (e) {
       console.error('Interpretation failed', e);
+      if (asked.restarts !== this.restarts) return;
       this.interpreting = false;
       await this.changed();
     } finally {
-      this.interpreting = false;
+      if (asked.restarts === this.restarts) this.interpreting = false;
     }
     const now = this.turn;
-    if (now && (now.turnStart.turn.number !== asked.turn || now.transcriptVersion !== asked.transcriptVersion) && now.statements.length > 0) {
+    if (now && asked.restarts === this.restarts && (now.turnStart.turn.number !== asked.turn || now.transcriptVersion !== asked.transcriptVersion) && now.statements.length > 0) {
       await this.interpret();
     }
   }
 
   /** Logs one interpretation to Workers Logs (ADR 0108) and keeps the last few for the debug panel (ADR 0109). */
-  private async record(interpretation: InterpretationRecord): Promise<void> {
+  private async record(interpretation: InterpretationRecord, restarts = this.restarts): Promise<void> {
     console.log({ message: 'interpretation', game: this.setup?.code, ...interpretation });
+    if (restarts !== this.restarts) return;
     const kept = (await this.ctx.storage.get<InterpretationRecord[]>(INTERPRETATIONS)) ?? [];
     await this.ctx.storage.put(INTERPRETATIONS, [...kept, interpretation].slice(-KEPT_INTERPRETATIONS));
   }
