@@ -55,6 +55,10 @@ export interface StackItem {
   matched?: Record<string, ObjectId | PlayerId>;
   targets: ObjectId[];
   gameActions: GameAction[];
+  /** "You may": applied unless a player says otherwise (ADR 0139). */
+  optional?: true;
+  /** The Oracle sentences for what the engine doesn't apply itself, shown on this item's readback note (ADR 0140). */
+  reminders?: string[];
   status: 'pending' | 'resolved' | 'countered' | 'fizzled' | 'conditionNotMet';
 }
 

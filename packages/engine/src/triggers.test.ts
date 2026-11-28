@@ -17,14 +17,14 @@ const cards: Record<string, CardDefinition> = {
     name: 'Hinterland Sanctifier', types: ['Creature'], power: 1, toughness: 2,
     abilities: [{ id: 'hinterland-sanctifier#1', kind: 'triggered',
       when: { event: 'ZoneChanged', to: 'battlefield', object: { types: ['Creature'], controller: 'you', other: true } },
-      effect: [{ gameAction: 'life', who: 'you', delta: 1 }] }],
+      effect: [{ gameAction: 'life', who: 'you', amount: 1 }] }],
   },
   'Haliya, Guided by Light': {
     name: 'Haliya, Guided by Light', types: ['Creature'], legendary: true, power: 3, toughness: 3,
     abilities: [
       { id: 'haliya-guided-by-light#1', kind: 'triggered',
         when: { event: 'ZoneChanged', to: 'battlefield', object: { selfOr: { types: ['Creature', 'Artifact'], controller: 'you' } } },
-        effect: [{ gameAction: 'life', who: 'you', delta: 1 }] },
+        effect: [{ gameAction: 'life', who: 'you', amount: 1 }] },
       { id: 'haliya-guided-by-light#2', kind: 'triggered',
         when: { event: 'PhaseStarted', step: 'end', whose: 'you' },
         if: { lifeGainedThisTurn: { who: 'you', atLeast: 3 } },
@@ -37,14 +37,14 @@ const cards: Record<string, CardDefinition> = {
       { id: 'authority-of-the-consuls#1', kind: 'static', effect: { entersTapped: { types: ['Creature'], controller: 'opponent' } } },
       { id: 'authority-of-the-consuls#2', kind: 'triggered',
         when: { event: 'ZoneChanged', to: 'battlefield', object: { types: ['Creature'], controller: 'opponent' } },
-        effect: [{ gameAction: 'life', who: 'you', delta: 1 }] },
+        effect: [{ gameAction: 'life', who: 'you', amount: 1 }] },
     ],
   },
   'Case of the Uneaten Feast': {
     name: 'Case of the Uneaten Feast', types: ['Enchantment'],
     abilities: [{ id: 'case-of-the-uneaten-feast#1', kind: 'triggered',
       when: { event: 'ZoneChanged', to: 'battlefield', object: { types: ['Creature'], controller: 'you' } },
-      effect: [{ gameAction: 'life', who: 'you', delta: 1 }] }],
+      effect: [{ gameAction: 'life', who: 'you', amount: 1 }] }],
   },
   'Goblin Guide': {
     name: 'Goblin Guide', types: ['Creature'], power: 2, toughness: 2, keywords: ['Haste'],
@@ -55,7 +55,7 @@ const cards: Record<string, CardDefinition> = {
     name: 'Scoured Barrens', types: ['Land'],
     abilities: [
       { id: 'scoured-barrens#1', kind: 'static', effect: { entersTapped: 'self' } },
-      { id: 'scoured-barrens#2', kind: 'triggered', when: { event: 'ZoneChanged', to: 'battlefield', object: 'self' }, effect: [{ gameAction: 'life', who: 'you', delta: 1 }] },
+      { id: 'scoured-barrens#2', kind: 'triggered', when: { event: 'ZoneChanged', to: 'battlefield', object: 'self' }, effect: [{ gameAction: 'life', who: 'you', amount: 1 }] },
     ],
   },
   'Starting Town': {
@@ -65,7 +65,7 @@ const cards: Record<string, CardDefinition> = {
   // A test fixture, not a real card: exercises a creature's own "dies" trigger.
   'Dies Trigger Fixture': {
     name: 'Dies Trigger Fixture', types: ['Creature'], power: 1, toughness: 1,
-    abilities: [{ id: 'dies-fixture#1', kind: 'triggered', when: { event: 'ZoneChanged', from: 'battlefield', to: 'graveyard', object: 'self' }, effect: [{ gameAction: 'life', who: 'you', delta: 5 }] }],
+    abilities: [{ id: 'dies-fixture#1', kind: 'triggered', when: { event: 'ZoneChanged', from: 'battlefield', to: 'graveyard', object: 'self' }, effect: [{ gameAction: 'life', who: 'you', amount: 5 }] }],
   },
   'Savannah Lions': { name: 'Savannah Lions', types: ['Creature'], power: 2, toughness: 1, abilities: [] },
   'Fatal Push': { name: 'Fatal Push', types: ['Instant'], abilities: [] },

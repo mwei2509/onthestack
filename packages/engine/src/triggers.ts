@@ -1,5 +1,5 @@
 import type { GameAction } from './actions.js';
-import type { AbilityDefinition, AbilityZone, Condition, EffectTemplate, ObjectFilter, Range, TriggerCondition, TriggeredAbility } from './cards.js';
+import type { AbilityDefinition, AbilityZone, Amount, Condition, EffectTemplate, ObjectFilter, ObjectRef, PlayerRef, Range, TriggerCondition, TriggeredAbility } from './cards.js';
 import type { GameEvent } from './events.js';
 import type { AbilityId, CardName, ObjectId, PermanentId, PlayerId } from './ids.js';
 import type { GameState, PendingTrigger, Permanent, StackItem } from './state.js';
@@ -203,42 +203,117 @@ export function apnapOrder(state: GameState, pending: PendingTrigger[]): Pending
   return pending.map((t, i) => ({ t, i })).sort((a, b) => rank(a.t.controllerId) - rank(b.t.controllerId) || a.i - b.i).map(({ t }) => t);
 }
 
-/** Fills an ability's effect templates with real players and objects: "you", the source, the defending player. */
-export function fillTemplates(state: GameState, trigger: PendingTrigger, templates: EffectTemplate[]): GameAction[] {
-  const you = trigger.controllerId;
-  const sourceId = trigger.source.permanentId;
-  const actions: GameAction[] = [];
+/** What an ability's effect templates need to be filled: who controls it, its source and what its trigger matched. */
+type Filling = Pick<PendingTrigger, 'controllerId' | 'source' | 'matched'>;
+
+/**
+ * Fills an ability's effect templates with real players, objects and numbers. A blank the engine can't fill (a target
+ * nobody has named, an amount it can't count) becomes a PlayerTask asking the controller (ADR 0138). Oracle reminders
+ * are collected beside the GameActions.
+ */
+export function fillTemplates(state: GameState, item: Filling, templates: EffectTemplate[]): { gameActions: GameAction[]; reminders: string[] } {
+  const you = item.controllerId;
+  const card = item.source.card;
+  const ask = (text: string): GameAction => ({ type: 'playerTask', playerId: you, text: `${card}: ${text}` });
+  const live = (p: PlayerId) => state.players[p] && !state.players[p].out;
+
+  const players = (ref: PlayerRef): PlayerId[] | undefined => {
+    if (ref === 'you') return [you];
+    if (ref === 'eachOpponent') return state.turnOrder.filter((p) => p !== you && live(p));
+    if (ref === 'eachPlayer') return state.turnOrder.filter(live);
+    if (ref === 'defendingPlayer') return item.matched.defendingPlayer !== undefined ? [String(item.matched.defendingPlayer)] : undefined;
+    return undefined;
+  };
+  const object = (ref: ObjectRef): ObjectId | undefined => {
+    if (ref === 'self') return item.source.permanentId;
+    if (ref === 'matched') return item.matched.object ?? item.matched.attacker ?? item.matched.source ?? item.matched.spell;
+    return undefined;
+  };
+  const amount = (a: Amount): number | undefined => {
+    if (typeof a === 'number') return a;
+    if ('count' in a) {
+      return Object.values(state.permanents).filter((p) => filterMatches(a.count, { id: p.id, card: p.card, controllerId: p.controllerId, permanent: p, isToken: p.isToken }, you, state)).length;
+    }
+    if ('powerOf' in a && a.powerOf !== 'target') {
+      const id = object(a.powerOf);
+      const p = id ? state.permanents[id] : undefined;
+      if (!p) return undefined;
+      const s = stats(p, state);
+      return s.ptVaries ? undefined : s.power;
+    }
+    return undefined;
+  };
+
+  const gameActions: GameAction[] = [];
+  const reminders: string[] = [];
   for (const t of templates) {
+    if ('oracle' in t) {
+      reminders.push(t.oracle);
+      continue;
+    }
     if ('playerTask' in t) {
-      const playerId = t.who === 'defendingPlayer' ? String(trigger.matched.defendingPlayer ?? you) : you;
-      actions.push({ type: 'playerTask', playerId, text: `${trigger.source.card}: ${t.playerTask}` });
+      const who = players(t.who);
+      if (who) for (const playerId of who) gameActions.push({ type: 'playerTask', playerId, text: `${card}: ${t.playerTask}` });
+      else gameActions.push(ask(`${t.playerTask} Say who.`));
       continue;
     }
     switch (t.gameAction) {
-      case 'life':
-        if (t.who === 'you') actions.push({ type: 'life', playerId: you, delta: t.delta });
-        else if (t.who === 'eachOpponent') {
-          for (const p of state.turnOrder) if (p !== you && !state.players[p]?.out) actions.push({ type: 'life', playerId: p, delta: t.delta });
-        } else {
-          actions.push({ type: 'playerTask', playerId: you, text: `${trigger.source.card}: choose a player to ${t.delta > 0 ? 'gain' : 'lose'} ${Math.abs(t.delta)} life, and say who.` });
-        }
+      case 'life': {
+        const n = amount(t.amount);
+        const who = players(t.who);
+        const verb = t.lose ? 'lose' : 'gain';
+        if (n === undefined) gameActions.push(ask(`say how much life ${who ? 'is' : 'and who is'} ${t.lose ? 'lost' : 'gained'}.`));
+        else if (!who) gameActions.push(ask(`choose a player to ${verb} ${n} life, and say who.`));
+        else for (const playerId of who) gameActions.push({ type: 'life', playerId, delta: t.lose ? -n : n });
         break;
-      case 'move':
-        if (t.object === 'self' && sourceId) actions.push({ type: 'move', objectId: sourceId, to: t.to, how: t.how });
-        else actions.push({ type: 'playerTask', playerId: you, text: `${trigger.source.card}: choose what to move to ${t.to}, and say which.` });
+      }
+      case 'damage': {
+        const n = amount(t.amount);
+        const sourceId = item.source.permanentId ?? card;
+        const isPlayerRef = typeof t.to === 'string' ? t.to !== 'self' && t.to !== 'matched' : false;
+        const who = isPlayerRef ? players(t.to as PlayerRef) : undefined;
+        const obj = !isPlayerRef && typeof t.to === 'string' ? object(t.to as ObjectRef) : undefined;
+        if (n === undefined) gameActions.push(ask('say how much damage is dealt, and to what.'));
+        else if (who) for (const playerId of who) gameActions.push({ type: 'damage', sourceId, recipient: { playerId }, amount: n });
+        else if (obj) gameActions.push({ type: 'damage', sourceId, recipient: { permanentId: obj }, amount: n });
+        else gameActions.push(ask(`choose what is dealt ${n} damage, and say which.`));
         break;
-      case 'counters':
-        if (t.object === 'self' && sourceId) actions.push({ type: 'counters', target: { permanentId: sourceId }, kind: t.kind, delta: t.delta });
-        else actions.push({ type: 'playerTask', playerId: you, text: `${trigger.source.card}: choose what gets ${t.delta} ${t.kind} counter(s), and say which.` });
+      }
+      case 'counters': {
+        const n = amount(t.amount);
+        const id = object(t.object);
+        if (n === undefined) gameActions.push(ask(`say how many ${t.kind} counters, and on what.`));
+        else if (id) gameActions.push({ type: 'counters', target: { permanentId: id }, kind: t.kind, delta: n });
+        else gameActions.push(ask(`choose what gets ${n} ${t.kind} counter(s), and say which.`));
         break;
+      }
+      case 'createToken': {
+        const n = amount(t.count);
+        if (n === undefined) gameActions.push(ask(`say how many ${t.token} tokens are created.`));
+        else if (n > 0) gameActions.push({ type: 'createToken', token: t.token, count: n, definition: t.definition });
+        break;
+      }
+      case 'modify': {
+        const id = object(t.object);
+        if (id) gameActions.push({ type: 'modify', permanentId: id, power: t.power, toughness: t.toughness, ...(t.keywords ? { keywords: t.keywords } : {}), until: 'endOfTurn' });
+        else gameActions.push(ask(`choose what gets +${t.power}/+${t.toughness} until end of turn, and say which.`));
+        break;
+      }
+      case 'move': {
+        const id = object(t.object);
+        if (id) gameActions.push({ type: 'move', objectId: id, to: t.to, ...(t.how ? { how: t.how } : {}) });
+        else gameActions.push(ask(`choose what to move to ${t.to}, and say which.`));
+        break;
+      }
     }
   }
-  return actions;
+  return { gameActions, reminders };
 }
 
 export function toStackItem(state: GameState, trigger: PendingTrigger, id: string): StackItem {
   const ability = findAbility(state, trigger.source.card, trigger.ability);
-  const templates = ability && 'effect' in ability && Array.isArray(ability.effect) ? ability.effect : [];
+  const triggeredAbility = ability?.kind === 'triggered' ? ability : undefined;
+  const { gameActions, reminders } = fillTemplates(state, trigger, triggeredAbility?.effect ?? []);
   return {
     id,
     kind: 'trigger',
@@ -248,7 +323,9 @@ export function toStackItem(state: GameState, trigger: PendingTrigger, id: strin
     triggeredBy: trigger.triggeredBy,
     matched: trigger.matched,
     targets: [],
-    gameActions: fillTemplates(state, trigger, templates),
+    gameActions,
+    ...(triggeredAbility?.optional ? { optional: true as const } : {}),
+    ...(reminders.length > 0 ? { reminders } : {}),
     status: 'pending',
   };
 }

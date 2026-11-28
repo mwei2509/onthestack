@@ -138,13 +138,13 @@ The card catalog is built from the game's Deck versions (ADR 0119), loaded when 
       effect: { entersTapped: { types: ["Creature"], controller: "opponent" } } },
     { id: "authority-of-the-consuls#2", kind: "triggered",
       when:   { event: "ZoneChanged", to: "battlefield", object: { types: ["Creature"], controller: "opponent" } },
-      effect: [{ gameAction: "life", who: "you", delta: +1 }] } ] },
+      effect: [{ gameAction: "life", who: "you", amount: 1 }] } ] },
 
 "Haliya, Guided by Light": { cost: "{2}{W}", types: ["Creature"], legendary: true, power: 3, toughness: 3,
   abilities: [
     { id: "haliya-guided-by-light#1", kind: "triggered",
       when:   { event: "ZoneChanged", to: "battlefield", object: { selfOr: { types: ["Creature", "Artifact"], controller: "you" } } },
-      effect: [{ gameAction: "life", who: "you", delta: +1 }] },
+      effect: [{ gameAction: "life", who: "you", amount: 1 }] },
     { id: "haliya-guided-by-light#2", kind: "triggered",
       when:   { event: "PhaseStarted", step: "end", whose: "you" },
       if:     { lifeGainedThisTurn: { who: "you", atLeast: 3 } },
@@ -157,7 +157,7 @@ The card catalog is built from the game's Deck versions (ADR 0119), loaded when 
   abilities: [
     { id: "case-of-the-uneaten-feast#1", kind: "triggered",
       when:   { event: "ZoneChanged", to: "battlefield", object: { types: ["Creature"], controller: "you" } },
-      effect: [{ gameAction: "life", who: "you", delta: +1 }] },
+      effect: [{ gameAction: "life", who: "you", amount: 1 }] },
     { id: "case-of-the-uneaten-feast#2", kind: "unmodeled", text: "To solve — ... Solved — ..." } ] },
 
 "Coastal Piracy": { cost: "{2}{U}{U}", types: ["Enchantment"],
@@ -185,7 +185,14 @@ The kinds are:
 - `mana` (not tracked)
 - `unmodeled`, which becomes a "check this card" PlayerTask
 
-Effects are either a `gameAction` or a `playerTask`, the latter for anything that touches a hand or library.
+Effects are a `gameAction`, a `playerTask` (for anything that touches a hand or library) or an Oracle reminder (`oracle`, the sentence for whatever the engine doesn't apply, ADR 0131). The `gameAction`s are the five effects ADR 0031 applies, plus moving an object:
+- `life` (gain, or lose with `lose: true`)
+- `damage` to players or an object
+- `counters`
+- `createToken`
+- `modify`: a pump until end of turn
+
+Each acts on a player (`you`, `eachOpponent`, `eachPlayer`, `defendingPlayer`) or an object (`self`, `matched`: what the trigger matched), or on one of the ability's `targets` by id (`{ target: "t1" }`). An amount is a number, a count of matching permanents, `x`, or the power of `self`, `matched` or the target. The engine fills these in when the ability triggers and again as it resolves (CR 608.2h), so a count is taken on resolution. A blank it can't fill (a target nobody has named, an X, the power of something gone) becomes a PlayerTask asking the controller (ADR 0138); it never guesses. Oracle reminders go onto the Stack item as `reminders`, for its readback note (ADR 0141). An `optional` ("you may") trigger applies unless a player says otherwise (ADR 0140).
 
 ## 8. Data structures
 

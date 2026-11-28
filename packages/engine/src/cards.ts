@@ -1,3 +1,4 @@
+import type { TokenDefinition } from './actions.js';
 import type { AbilityId, CardName } from './ids.js';
 import type { GameEventType } from './events.js';
 import type { Step, Zone } from './steps.js';
@@ -59,8 +60,28 @@ export interface TriggeredAbility {
   if?: Condition;
   /** Checked only when it triggers. */
   condition?: Condition;
+  /** "You may": applied unless a player says otherwise (ADR 0139). */
+  optional?: boolean;
+  targets?: TargetSpec[];
   effect: EffectTemplate[];
 }
+
+/** A target an ability names. The conversation chooses it; until then an effect that needs it becomes a PlayerTask (ADR 0138). */
+export interface TargetSpec {
+  id: string;
+  kind: 'player' | 'permanent' | 'cardInGraveyard' | 'spell';
+  /** For a player target, relative to the ability's controller. */
+  player?: 'you' | 'opponent' | 'any';
+  filter?: ObjectFilter;
+  min?: number;
+  max?: number;
+}
+
+/**
+ * How many. A count is of permanents you'd see on the battlefield; `powerOf` reads the object's current power, and
+ * `matched` is the object the trigger matched. `x` is the spell's X, which a trigger never has.
+ */
+export type Amount = number | { count: ObjectFilter } | { x: true } | { powerOf: 'self' | 'matched' | 'target' };
 
 export interface StaticAbility {
   id: AbilityId;
@@ -72,7 +93,7 @@ export interface StaticAbility {
 export interface SpellAbility {
   id: AbilityId;
   kind: 'spell';
-  targets?: ObjectFilter[];
+  targets?: TargetSpec[];
   effect: EffectTemplate[];
 }
 
@@ -129,9 +150,22 @@ export interface Condition {
   youControl?: { filter: ObjectFilter } & Range;
 }
 
-/** A GameAction with blanks ("you", "target", "self") that the engine fills in when a Stack item is created. */
+/** An object an effect acts on: the ability's source, the object its trigger matched, or one of its targets by id. */
+export type ObjectRef = 'self' | 'matched' | { target: string };
+
+/** A player an effect acts on, relative to the ability's controller. */
+export type PlayerRef = 'you' | 'eachOpponent' | 'eachPlayer' | 'defendingPlayer' | { target: string };
+
+/**
+ * A GameAction with blanks that the engine fills in when the ability triggers and again when it resolves, or an
+ * Oracle reminder: the sentence for whatever the engine doesn't apply itself (ADR 0131, 0140).
+ */
 export type EffectTemplate =
-  | { gameAction: 'life'; who: 'you' | 'target' | 'eachOpponent'; delta: number }
-  | { gameAction: 'move'; object: 'self' | 'target'; to: Zone; how?: 'destroy' | 'sacrifice' | 'exile'; note?: string }
-  | { gameAction: 'counters'; object: 'self' | 'target'; kind: string; delta: number }
-  | { playerTask: string; who: 'you' | 'defendingPlayer' | 'target' };
+  | { gameAction: 'life'; who: PlayerRef; amount: Amount; lose?: true }
+  | { gameAction: 'damage'; to: PlayerRef | ObjectRef; amount: Amount }
+  | { gameAction: 'counters'; object: ObjectRef; kind: string; amount: Amount }
+  | { gameAction: 'createToken'; token: CardName; definition: TokenDefinition; count: Amount }
+  | { gameAction: 'modify'; object: ObjectRef; power: number; toughness: number; keywords?: string[] }
+  | { gameAction: 'move'; object: ObjectRef; to: Zone; how?: 'destroy' | 'sacrifice' | 'exile'; note?: string }
+  | { playerTask: string; who: PlayerRef }
+  | { oracle: string };
