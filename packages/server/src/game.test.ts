@@ -898,6 +898,16 @@ describe("The turn's log (ADR 0106)", () => {
     expect((await logOf(game.devices)).entries).toEqual([{ step: 'upkeep', playerId: 'p2', gameAction: { type: 'life', playerId: 'p2', delta: -2 }, from: [] }]);
   });
 
+  it('carries what the engine applied on its own, under the statement that led to it (ADR 0134, 0135)', async () => {
+    const game = await interpreting();
+    game.devices[0]!.send({ type: 'statement', text: 'Elena loses 40 life' });
+    await logOf(game.devices);
+    (await game.call(0)).answer({ entries: [{ step: 'upkeep', player: 'p1', action: { type: 'life', player: 'p2', delta: -40 }, from: ['s1'] }], questions: [] });
+    expect((await logOf(game.devices)).readbackNotes).toEqual([
+      { cause: { followsFrom: 'statement' }, entry: { playerStatement: 's1' }, effects: [{ type: 'lost', playerId: 'p2', reason: 'life' }] },
+    ]);
+  });
+
   it('refuses Try again before anything was said', async () => {
     const game = await interpreting();
     game.devices[0]!.send({ type: 'retryInterpretation' });
