@@ -175,6 +175,10 @@ _Avoid_: template, parse, tagging
 One ability of a card, as part of its Translation: for a triggered ability, the GameEvent it waits for (and any condition), and the GameActions it performs; for a static ability, what it changes while the card is in play.
 _Avoid_: template, rule, script
 
+**Oracle reminder**:
+The part of an Ability definition the engine doesn't apply itself, kept as the Oracle sentence it stands for. It shows when the ability resolves, and the interpreter fills in what players say happened (ADR 0131). Unlike a PlayerTask, nobody has to mark it done.
+_Avoid_: reminder text, note
+
 **Unmodeled**:
 A card, or part of a card, whose effect the app cannot express. It becomes a PlayerTask asking players to check the card, never a guess.
 _Avoid_: unsupported, unknown
