@@ -140,3 +140,13 @@ export function netLife(notes: ReadbackNote[]): Record<string, number> {
   for (const [id, delta] of Object.entries(net)) if (delta === 0) delete net[id];
   return net;
 }
+
+/**
+ * Who a Shared screen speaks for from a note's "Not right" (ADR 0142): a spell's or ability's controller, else who
+ * said the statement it sits under, else the active player.
+ */
+export function noteSpeaker(note: ReadbackNote, statements: { id: string; playerId: string }[], activePlayerId: string): string {
+  if ('stackItem' in note.cause && note.cause.controllerId) return note.cause.controllerId;
+  const first = 'playerStatement' in note.entry ? note.entry.playerStatement : undefined;
+  return statements.find((s) => s.id === first)?.playerId ?? activePlayerId;
+}

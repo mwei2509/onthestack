@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Sheet } from '../../decks/parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { describeEntry, namesFor } from './describe.js';
-import { describeNote, noteStep, placeNotes } from './notes.js';
+import { describeNote, noteSpeaker, noteStep, placeNotes } from './notes.js';
 import type { NoteTray } from './useNoteTray.js';
 import { openWarnings, placeTasks, placeWarnings, undoneTasks } from './warnings.js';
 
@@ -78,7 +78,7 @@ function TaskCard({ task, game }: { task: TableView['playerTasks'][number]; game
 }
 
 /** An open readback note in the tray, with "Not right" and dismiss (ADR 0136, 0137). */
-function NoteCard({ note, view, game, onDismiss }: { note: ReadbackNote; view: TableView; game: ScreenProps['game']; onDismiss: () => void }) {
+export function NoteCard({ note, view, game, onDismiss, speakAs }: { note: ReadbackNote; view: TableView; game?: ScreenProps['game']; onDismiss: () => void; speakAs?: { id: string; name: string } }) {
   const [saying, setSaying] = useState(false);
   return (
     <section className="note-card" aria-label="The app applied">
@@ -88,16 +88,18 @@ function NoteCard({ note, view, game, onDismiss }: { note: ReadbackNote; view: T
         ))}
       </div>
       <div className="note-card-actions">
-        <button className="btn btn-text" onClick={() => setSaying(true)}>
-          Not right
-        </button>
+        {game && (
+          <button className="btn btn-text" onClick={() => setSaying(true)}>
+            Not right
+          </button>
+        )}
         <button className="btn btn-text note-dismiss" aria-label="Dismiss" onClick={onDismiss}>
           <svg width="16" height="16" viewBox="0 0 20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
             <path d="M5 5l10 10M15 5L5 15" />
           </svg>
         </button>
       </div>
-      {saying && <Compose game={game} onClose={() => setSaying(false)} />}
+      {saying && game && <Compose game={game} as={speakAs} onClose={() => setSaying(false)} />}
     </section>
   );
 }
@@ -157,7 +159,7 @@ function TaskNote({ task, view }: { task: TableView['playerTasks'][number]; view
 }
 
 /** What the app applied on its own, under the line that led to it (ADR 0134, 0136). */
-function NoteLine({ note, view, game }: { note: ReadbackNote; view: TableView; game?: ScreenProps['game'] }) {
+function NoteLine({ note, view, game, speakAs }: { note: ReadbackNote; view: TableView; game?: ScreenProps['game']; speakAs?: { id: string; name: string } }) {
   const [saying, setSaying] = useState(false);
   const lines = describeNote(note, namesFor(view));
   const step = noteStep(note);
@@ -173,7 +175,7 @@ function NoteLine({ note, view, game }: { note: ReadbackNote; view: TableView; g
           Not right
         </button>
       )}
-      {saying && game && <Compose game={game} onClose={() => setSaying(false)} />}
+      {saying && game && <Compose game={game} as={speakAs} onClose={() => setSaying(false)} />}
     </div>
   );
 }
@@ -211,6 +213,12 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
   const warned = placeWarnings(view.warnings, log.statements.map((s) => s.id));
   const tasked = placeTasks(view.playerTasks, log.statements.map((s) => s.id));
   const noted = placeNotes(log.readbackNotes, log.entries, log.statements.map((s) => s.id));
+  /** A Shared screen speaks for the note's player (ADR 0142); a phone speaks for itself. */
+  const speakAs = (n: ReadbackNote) => {
+    if (!answerQuestions) return undefined;
+    const id = noteSpeaker(n, log.statements, view.turn.activePlayerId);
+    return { id, name: names.player(id) };
+  };
   const overrideWith = override ? game : undefined;
   if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0 && view.warnings.length === 0 && view.playerTasks.length === 0 && log.readbackNotes.length === 0) {
     return <p className="faint" style={{ margin: 0, fontSize: 14 }}>Nothing yet this turn.</p>;
@@ -231,7 +239,7 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
         <TaskNote key={t.id} task={t} view={view} />
       ))}
       {noted.top.map((n, i) => (
-        <NoteLine key={`note${i}`} note={n} view={view} game={game} />
+        <NoteLine key={`note${i}`} note={n} view={view} game={game} speakAs={speakAs(n)} />
       ))}
       {log.statements.length > 0 && (
         <ol className="log-statements">
@@ -268,7 +276,7 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
                   <WarningNote key={i} w={w} view={view} game={overrideWith} />
                 ))}
                 {noted.byStatement.get(s.id)?.map((n, i) => (
-                  <NoteLine key={`note${i}`} note={n} view={view} game={game} />
+                  <NoteLine key={`note${i}`} note={n} view={view} game={game} speakAs={speakAs(n)} />
                 ))}
                 {tasked.byStatement.get(s.id)?.map((t) => (
                   <TaskNote key={t.id} task={t} view={view} />

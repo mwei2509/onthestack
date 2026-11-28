@@ -10,7 +10,9 @@ import { boardPlayers, endedLine, type BoardPlayer } from './model.js';
 import { clockTime, cue, EndedPill, NextStepButton, StepMenuButton, StepStrip, Tag, worstHit } from './parts.js';
 import { StepMenu } from './StepMenu.js';
 import { STEP_NAMES } from './steps.js';
-import { SayFor, TurnLogList } from '../log/TurnLog.js';
+import { NoteCard, SayFor, TurnLogList } from '../log/TurnLog.js';
+import { noteSpeaker } from '../log/notes.js';
+import { useNoteTray } from '../log/useNoteTray.js';
 import { FieldScreen } from '../field/FieldScreen.js';
 import { useGameDecks, type GameDecks } from '../field/gameDecks.js';
 import { GameDeckView } from '../field/GameDeckView.js';
@@ -32,6 +34,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
   const [deckOf, setDeckOf] = useState<string | null>(null);
   const decks = useGameDecks(code);
   const open = { field: setFieldOf, deck: setDeckOf, decks };
+  const notes = useNoteTray(update.log, view.turn.number);
 
   const deckView = (seatId: string) => {
     const deck = decks?.decks.find((d) => d.seatId === seatId);
@@ -75,7 +78,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
         <div className="shared-table-col">
           <div className="shared-seats" style={rowStyle}>
             {top.map((p) => (
-              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} open={open} />
+              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} open={open} noteDelta={notes.net[p.id]} />
             ))}
           </div>
 
@@ -111,7 +114,7 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
 
           <div className="shared-seats" style={rowStyle}>
             {bottom.map((p) => (
-              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} open={open} />
+              <SeatCard key={p.id} player={p} players={byId} game={ended ? undefined : game} disabled={!online} open={open} noteDelta={notes.net[p.id]} />
             ))}
           </div>
         </div>
@@ -120,6 +123,11 @@ export function SharedBoard({ code, game, update, view }: ScreenProps & { view: 
             <h2 className="section-label" style={{ fontSize: 12 }}>
               This turn
             </h2>
+            {!ended &&
+              notes.open.map((n, i) => {
+                const speaker = noteSpeaker(n, update.log!.statements, view.turn.activePlayerId);
+                return <NoteCard key={i} note={n} view={view} game={game} speakAs={{ id: speaker, name: byId[speaker]?.name ?? speaker }} onDismiss={() => notes.dismiss(n)} />;
+              })}
             <TurnLogList log={update.log} view={view} game={ended ? undefined : game} answerQuestions={!ended} />
           </aside>
         )}
@@ -139,7 +147,22 @@ interface SeatOpeners {
   decks: GameDecks | null;
 }
 
-function SeatCard({ player, players, game, disabled, open }: { player: BoardPlayer; players: Record<string, BoardPlayer>; game?: ScreenProps['game']; disabled?: boolean; open: SeatOpeners }) {
+function SeatCard({
+  player,
+  players,
+  game,
+  disabled,
+  open,
+  noteDelta,
+}: {
+  player: BoardPlayer;
+  players: Record<string, BoardPlayer>;
+  game?: ScreenProps['game'];
+  disabled?: boolean;
+  open: SeatOpeners;
+  /** The net life change from the open readback notes (ADR 0136). */
+  noteDelta?: number;
+}) {
   const hit = worstHit(player.hits);
   return (
     <section aria-label={player.name} className={`seat-card${player.active ? ' glowing' : ''}${player.out ? ' out' : ''}`}>
@@ -168,6 +191,11 @@ function SeatCard({ player, players, game, disabled, open }: { player: BoardPlay
         <span className="num seat-life" style={player.out ? { textDecoration: 'line-through', textDecorationThickness: 6 } : undefined}>
           {player.life}
         </span>
+        {noteDelta !== undefined && (
+          <span className="num note-delta" style={{ fontSize: 22 }} aria-label={`${noteDelta > 0 ? '+' : '−'}${Math.abs(noteDelta)} from the app's notes`}>
+            {noteDelta > 0 ? `+${noteDelta}` : `−${-noteDelta}`}
+          </span>
+        )}
         {player.out && (
           <span className="display" style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--danger)', textTransform: 'uppercase' }}>
             {['Fallen', hit].filter(Boolean).join(' · ')}
