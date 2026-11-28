@@ -87,7 +87,7 @@ export interface StaticAbility {
   id: AbilityId;
   kind: 'static';
   zone?: AbilityZone;
-  effect: { entersTapped: ObjectFilter | 'self'; unless?: { yourTurnOfGame: { atMost: number } } };
+  effect: { entersTapped: ObjectFilter | 'self'; unless?: EntersUntappedIf };
 }
 
 export interface SpellAbility {
@@ -148,7 +148,15 @@ export interface ObjectFilter {
 export interface Condition {
   lifeGainedThisTurn?: { who: 'you'; atLeast: number };
   youControl?: { filter: ObjectFilter } & Range;
+  /** How many opponents are still in the game. */
+  opponents?: Range;
 }
+
+/**
+ * What lets a land that enters tapped enter untapped instead (check lands, fast lands, shock lands). Every field given
+ * must hold. `payLife` holds only when its controller said they paid it (ADR 0133); the engine never pays on a guess.
+ */
+export type EntersUntappedIf = Condition & { yourTurnOfGame?: Range; payLife?: number };
 
 /** An object an effect acts on: the ability's source, the object its trigger matched, or one of its targets by id. */
 export type ObjectRef = 'self' | 'matched' | { target: string };

@@ -31,7 +31,8 @@ export type GameAction =
       effects?: GameAction[];
     }
   | { type: 'counter'; stackItemId: StackItemId }
-  | { type: 'playLand'; card: CardName }
+  /** `payLife`: they said they paid life so it enters untapped, as a shock land asks (ADR 0133). */
+  | { type: 'playLand'; card: CardName; payLife?: true }
   | { type: 'move'; objectId: PermanentId; to: Zone; how?: Extract<ZoneMoveReason, 'destroy' | 'sacrifice' | 'exile' | 'return' | 'put' | 'mill' | 'surveil' | 'warp' | 'draw'> }
   | { type: 'tap' | 'untap'; permanentId: PermanentId }
   | { type: 'gainControl'; permanentId: PermanentId; until?: 'endOfTurn' }

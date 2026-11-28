@@ -1,5 +1,5 @@
 import type { GameAction } from './actions.js';
-import type { AbilityDefinition, AbilityZone, Amount, Condition, EffectTemplate, ObjectFilter, ObjectRef, PlayerRef, Range, TriggerCondition, TriggeredAbility } from './cards.js';
+import type { AbilityDefinition, AbilityZone, Amount, Condition, EffectTemplate, EntersUntappedIf, ObjectFilter, ObjectRef, PlayerRef, Range, TriggerCondition, TriggeredAbility } from './cards.js';
 import type { GameEvent } from './events.js';
 import type { AbilityId, CardName, ObjectId, PermanentId, PlayerId } from './ids.js';
 import type { GameState, PendingTrigger, Permanent, StackItem } from './state.js';
@@ -188,6 +188,10 @@ export function conditionHolds(state: GameState, condition: Condition, controlle
     ).length;
     if (!inRange(count, range)) return false;
   }
+  if (condition.opponents) {
+    const opponents = state.turnOrder.filter((p) => p !== controllerId && state.players[p] && !state.players[p].out).length;
+    if (!inRange(opponents, condition.opponents)) return false;
+  }
   return true;
 }
 
@@ -330,13 +334,15 @@ export function toStackItem(state: GameState, trigger: PendingTrigger, id: strin
   };
 }
 
-/** The static ability, if any, that makes a permanent enter tapped: its own, or another permanent's (Authority of the Consuls). */
-export function entersTappedBecause(state: GameState, card: CardName, controllerId: PlayerId, tokenTypes?: string[]): AbilityId | undefined {
+/**
+ * The static ability, if any, that makes a permanent enter tapped: its own, unless what it asks for holds, or another
+ * permanent's (Authority of the Consuls). `paidLife` says its controller paid what a shock land asks.
+ */
+export function entersTappedBecause(state: GameState, card: CardName, controllerId: PlayerId, tokenTypes?: string[], paidLife = false): AbilityId | undefined {
   if (tokenTypes && !state.cards[card]) state = { ...state, cards: { ...state.cards, [card]: { name: card, types: tokenTypes, abilities: [] } } };
   for (const a of state.cards[card]?.abilities ?? []) {
     if (a.kind !== 'static' || a.effect.entersTapped !== 'self') continue;
-    const limit = a.effect.unless?.yourTurnOfGame.atMost;
-    if (limit !== undefined && turnsTaken(state, controllerId) <= limit) continue;
+    if (a.effect.unless && entersUntapped(state, a.effect.unless, controllerId, paidLife)) continue;
     return a.id;
   }
   for (const p of Object.values(state.permanents)) {
@@ -346,6 +352,20 @@ export function entersTappedBecause(state: GameState, card: CardName, controller
     }
   }
   return undefined;
+}
+
+/** The life a land asks to be paid to enter untapped, if it asks for any. */
+export function lifeToEnterUntapped(state: GameState, card: CardName): number | undefined {
+  for (const a of state.cards[card]?.abilities ?? []) {
+    if (a.kind === 'static' && a.effect.entersTapped === 'self' && a.effect.unless?.payLife !== undefined) return a.effect.unless.payLife;
+  }
+  return undefined;
+}
+
+function entersUntapped(state: GameState, unless: EntersUntappedIf, controllerId: PlayerId, paidLife: boolean): boolean {
+  if (unless.yourTurnOfGame && !inRange(turnsTaken(state, controllerId), unless.yourTurnOfGame)) return false;
+  if (unless.payLife !== undefined && !paidLife) return false;
+  return conditionHolds(state, unless, controllerId);
 }
 
 /** How many turns this player has started, counting the current one. */
