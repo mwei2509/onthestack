@@ -1,0 +1,3944 @@
+{
+ "format": 1,
+ "tables": {
+  "cards": [
+   {
+    "oracle_id": "0056fc91-4398-471c-b561-7ff99750ac8a",
+    "name": "Escape Tunnel",
+    "data": "{\"name\":\"Escape Tunnel\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.\\n{T}, Sacrifice this land: Target creature with power 2 or less can't be blocked this turn.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "02746b0e-3ef9-46c0-9517-6c52c2905d0b",
+    "name": "Game Plan",
+    "data": "{\"name\":\"Game Plan\",\"mana_cost\":\"{5}{U}\",\"cmc\":6,\"type_line\":\"Sorcery\",\"oracle_text\":\"Assist (Another player can pay up to {5} of this spell's cost.)\\nEach player shuffles their hand and graveyard into their library, then draws seven cards. Exile Game Plan.\",\"keywords\":[\"Assist\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "04b7362d-0490-4cb0-b5d7-2a7732f659ce",
+    "name": "Bojuka Bog",
+    "data": "{\"name\":\"Bojuka Bog\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped.\\nWhen this land enters, exile target player's graveyard.\\n{T}: Add {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+    "name": "Command Tower",
+    "data": "{\"name\":\"Command Tower\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add one mana of any color in your commander's color identity.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "08d80efc-9542-4ba2-824c-c8615d8d07f2",
+    "name": "Undercity Sewers",
+    "data": "{\"name\":\"Undercity Sewers\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land — Island Swamp\",\"oracle_text\":\"({T}: Add {U} or {B}.)\\nThis land enters tapped.\\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\",\"keywords\":[\"Surveil\"],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "08e2fead-53e9-445b-8fd1-c108bb09d81c",
+    "name": "Cavalier of Gales",
+    "data": "{\"name\":\"Cavalier of Gales\",\"mana_cost\":\"{2}{U}{U}{U}\",\"cmc\":5,\"type_line\":\"Creature — Elemental Knight\",\"oracle_text\":\"Flying\\nWhen this creature enters, draw three cards, then put two cards from your hand on top of your library in any order.\\nWhen this creature dies, shuffle it into its owner's library, then scry 2. (Look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)\",\"power\":\"5\",\"toughness\":\"5\",\"keywords\":[\"Scry\",\"Flying\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "093f6123-6b1d-456f-a526-8740bc969b4e",
+    "name": "Gilded Scuttler",
+    "data": "{\"name\":\"Gilded Scuttler\",\"mana_cost\":\"{2}{U}\",\"cmc\":3,\"type_line\":\"Artifact Creature — Crab\",\"oracle_text\":\"This creature can't be blocked.\\nWhen this creature enters, tap target creature an opponent controls and put a stun counter on it. (If a permanent with a stun counter would become untapped, remove one from it instead.)\",\"power\":\"1\",\"toughness\":\"3\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+    "name": "Arcane Signet",
+    "data": "{\"name\":\"Arcane Signet\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact\",\"oracle_text\":\"{T}: Add one mana of any color in your commander's color identity.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "0bfa4512-e35a-4c93-b324-80ec659f5a97",
+    "name": "Ulamog, the Ceaseless Hunger",
+    "data": "{\"name\":\"Ulamog, the Ceaseless Hunger\",\"mana_cost\":\"{10}\",\"cmc\":10,\"type_line\":\"Legendary Creature — Eldrazi\",\"oracle_text\":\"When you cast this spell, exile two target permanents.\\nIndestructible\\nWhenever Ulamog attacks, defending player exiles the top twenty cards of their library.\",\"power\":\"10\",\"toughness\":\"10\",\"keywords\":[\"Indestructible\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "0c85b8f7-0bd0-4680-9ec5-d4b110460a54",
+    "name": "Fabled Passage",
+    "data": "{\"name\":\"Fabled Passage\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle. Then if you control four or more lands, untap that land.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "0d4ecdb1-ec90-497f-a7a4-1c68092b8757",
+    "name": "Teferi's Protection",
+    "data": "{\"name\":\"Teferi's Protection\",\"mana_cost\":\"{2}{W}\",\"cmc\":3,\"type_line\":\"Instant\",\"oracle_text\":\"Until your next turn, your life total can't change and you gain protection from everything. All permanents you control phase out. (While they're phased out, they're treated as though they don't exist. They phase in before you untap during your untap step.)\\nExile Teferi's Protection.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "127de52b-df75-4342-95a0-20d84c5bf916",
+    "name": "The Meathook Massacre",
+    "data": "{\"name\":\"The Meathook Massacre\",\"mana_cost\":\"{X}{B}{B}\",\"cmc\":2,\"type_line\":\"Legendary Enchantment\",\"oracle_text\":\"When The Meathook Massacre enters, each creature gets -X/-X until end of turn.\\nWhenever a creature you control dies, each opponent loses 1 life.\\nWhenever a creature an opponent controls dies, you gain 1 life.\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "144119bc-7fd1-45c5-9e29-f742e7c255ac",
+    "name": "Clearwater Pathway // Murkwater Pathway",
+    "data": "{\"name\":\"Clearwater Pathway // Murkwater Pathway\",\"cmc\":0,\"type_line\":\"Land // Land\",\"keywords\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"modal_dfc\",\"card_faces\":[{\"name\":\"Clearwater Pathway\",\"mana_cost\":\"\",\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {U}.\"},{\"name\":\"Murkwater Pathway\",\"mana_cost\":\"\",\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {B}.\"}]}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "14aefe99-fb60-4f1c-a71f-7ffbe94c8b13",
+    "name": "Rune-Scarred Demon",
+    "data": "{\"name\":\"Rune-Scarred Demon\",\"mana_cost\":\"{5}{B}{B}\",\"cmc\":7,\"type_line\":\"Creature — Demon\",\"oracle_text\":\"Flying\\nWhen this creature enters, search your library for a card, put it into your hand, then shuffle.\",\"power\":\"6\",\"toughness\":\"6\",\"keywords\":[\"Flying\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "153376c9-dffd-458c-8ce3-a4c8269bc4e9",
+    "name": "Smothering Tithe",
+    "data": "{\"name\":\"Smothering Tithe\",\"mana_cost\":\"{3}{W}\",\"cmc\":4,\"type_line\":\"Enchantment\",\"oracle_text\":\"Whenever an opponent draws a card, that player may pay {2}. If the player doesn't, you create a Treasure token. (It's an artifact with \\\"{T}, Sacrifice this token: Add one mana of any color.\\\")\",\"keywords\":[\"Treasure\"],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "17b60106-a4c7-410a-8ac3-ec8e74e29a7c",
+    "name": "Mystic Sanctuary",
+    "data": "{\"name\":\"Mystic Sanctuary\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land — Island\",\"oracle_text\":\"({T}: Add {U}.)\\nThis land enters tapped unless you control three or more other Islands.\\nWhen this land enters untapped, you may put target instant or sorcery card from your graveyard on top of your library.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "1915a311-209b-4628-8122-af3055a78fed",
+    "name": "Cliffhaven Vampire",
+    "data": "{\"name\":\"Cliffhaven Vampire\",\"mana_cost\":\"{2}{W}{B}\",\"cmc\":4,\"type_line\":\"Creature — Vampire Warrior Ally\",\"oracle_text\":\"Flying\\nWhenever you gain life, each opponent loses 1 life.\",\"power\":\"2\",\"toughness\":\"4\",\"keywords\":[\"Flying\"],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "19409704-09c4-4a4b-a5a7-f95120b425db",
+    "name": "Artisan of Kozilek",
+    "data": "{\"name\":\"Artisan of Kozilek\",\"mana_cost\":\"{9}\",\"cmc\":9,\"type_line\":\"Creature — Eldrazi\",\"oracle_text\":\"When you cast this spell, you may return target creature card from your graveyard to the battlefield.\\nAnnihilator 2 (Whenever this creature attacks, defending player sacrifices two permanents of their choice.)\",\"power\":\"10\",\"toughness\":\"9\",\"keywords\":[\"Annihilator\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "1a137a67-4156-45c8-aae9-838f688e12bd",
+    "name": "Invisible Stalker",
+    "data": "{\"name\":\"Invisible Stalker\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Creature — Human Rogue\",\"oracle_text\":\"Hexproof (This creature can't be the target of spells or abilities your opponents control.)\\nThis creature can't be blocked.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Hexproof\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "1baec770-0785-4cbc-be18-83572fd8e9c1",
+    "name": "Thalakos Seer",
+    "data": "{\"name\":\"Thalakos Seer\",\"mana_cost\":\"{U}{U}\",\"cmc\":2,\"type_line\":\"Creature — Thalakos Wizard\",\"oracle_text\":\"Shadow (This creature can block or be blocked by only creatures with shadow.)\\nWhen this creature leaves the battlefield, draw a card.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Shadow\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "1c633e02-95ef-445e-b4e0-fbfbc5ed9cc9",
+    "name": "Brightclimb Pathway // Grimclimb Pathway",
+    "data": "{\"name\":\"Brightclimb Pathway // Grimclimb Pathway\",\"cmc\":0,\"type_line\":\"Land // Land\",\"keywords\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"modal_dfc\",\"card_faces\":[{\"name\":\"Brightclimb Pathway\",\"mana_cost\":\"\",\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {W}.\"},{\"name\":\"Grimclimb Pathway\",\"mana_cost\":\"\",\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {B}.\"}]}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "1d1d78af-7982-419d-b9be-2bf4c149d97d",
+    "name": "Illusionist's Bracers",
+    "data": "{\"name\":\"Illusionist's Bracers\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact — Equipment\",\"oracle_text\":\"Whenever an ability of equipped creature is activated, if it isn't a mana ability, copy that ability. You may choose new targets for the copy.\\nEquip {3}\",\"keywords\":[\"Equip\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "1e2ee630-9d37-4396-ae18-697c1a3a4e62",
+    "name": "Pip-Boy 3000",
+    "data": "{\"name\":\"Pip-Boy 3000\",\"mana_cost\":\"{1}\",\"cmc\":1,\"type_line\":\"Artifact — Equipment\",\"oracle_text\":\"Whenever equipped creature attacks, choose one —\\n• Sort Inventory — Draw a card, then discard a card.\\n• Pick a Perk — Put a +1/+1 counter on that creature.\\n• Check Map — Untap up to two target lands.\\nEquip {2}\",\"keywords\":[\"Check Map\",\"Pick a Perk\",\"Equip\",\"Sort Inventory\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "21d700e8-0255-418e-96a0-6fe05b3f836d",
+    "name": "Coldsteel Heart",
+    "data": "{\"name\":\"Coldsteel Heart\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Snow Artifact\",\"oracle_text\":\"This artifact enters tapped.\\nAs this artifact enters, choose a color.\\n{T}: Add one mana of the chosen color.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "250cb58b-2924-4dff-92fe-ac0ebbbeb218",
+    "name": "Creeping Tar Pit",
+    "data": "{\"name\":\"Creeping Tar Pit\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped.\\n{T}: Add {U} or {B}.\\n{1}{U}{B}: Until end of turn, this land becomes a 3/2 blue and black Elemental creature. It's still a land. It can't be blocked this turn.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "29f61caf-1aba-40cd-aff6-c3685a0997d7",
+    "name": "Riddlemaster Sphinx",
+    "data": "{\"name\":\"Riddlemaster Sphinx\",\"mana_cost\":\"{4}{U}{U}\",\"cmc\":6,\"type_line\":\"Creature — Sphinx\",\"oracle_text\":\"Flying (This creature can't be blocked except by creatures with flying or reach.)\\nWhen this creature enters, you may return target creature an opponent controls to its owner's hand.\",\"power\":\"5\",\"toughness\":\"5\",\"keywords\":[\"Flying\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "2afefaab-c614-4fca-afba-d8d206d9a8b9",
+    "name": "Ulamog's Dreadsire",
+    "data": "{\"name\":\"Ulamog's Dreadsire\",\"mana_cost\":\"{10}\",\"cmc\":10,\"type_line\":\"Creature — Eldrazi\",\"oracle_text\":\"Vigilance\\nWard—Sacrifice a permanent with mana value 1 or greater.\\n{T}: Create a 10/10 colorless Eldrazi creature token.\",\"power\":\"10\",\"toughness\":\"10\",\"keywords\":[\"Vigilance\",\"Ward\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "2d899466-b1eb-4901-b626-1f2fb09b786d",
+    "name": "Concealed Courtyard",
+    "data": "{\"name\":\"Concealed Courtyard\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control two or fewer other lands.\\n{T}: Add {W} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "2ff470ee-4532-4ded-a684-a2c0d1253fb3",
+    "name": "Sash and Waistcoat, Unmen",
+    "data": "{\"name\":\"Sash and Waistcoat, Unmen\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Legendary Creature — Insect Rogue\",\"oracle_text\":\"Whenever a face-down creature attacks one of your opponents, it can't be blocked this combat.\\n{3}: Manifest the top card of your library. Any player may activate this ability but only as a sorcery. (To manifest a card, put it onto the battlefield face down as a 2/2 creature. Turn it face up any time for its mana cost if it's a creature card.)\",\"power\":\"2\",\"toughness\":\"2\",\"keywords\":[\"Manifest\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "310f141c-7f37-4729-aed6-dd9c09db448d",
+    "name": "Blood Artist",
+    "data": "{\"name\":\"Blood Artist\",\"mana_cost\":\"{1}{B}\",\"cmc\":2,\"type_line\":\"Creature — Vampire\",\"oracle_text\":\"Whenever this creature or another creature dies, target player loses 1 life and you gain 1 life.\",\"power\":\"0\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "311a449d-dc74-46e6-9a47-6a597931f736",
+    "name": "Consecrated Sphinx",
+    "data": "{\"name\":\"Consecrated Sphinx\",\"mana_cost\":\"{4}{U}{U}\",\"cmc\":6,\"type_line\":\"Creature — Sphinx\",\"oracle_text\":\"Flying\\nWhenever an opponent draws a card, you may draw two cards.\",\"power\":\"4\",\"toughness\":\"6\",\"keywords\":[\"Flying\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "32b03b48-06da-4a74-a7ac-e5ae39a4f428",
+    "name": "Fetid Pools",
+    "data": "{\"name\":\"Fetid Pools\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land — Island Swamp\",\"oracle_text\":\"({T}: Add {U} or {B}.)\\nThis land enters tapped.\\nCycling {2} ({2}, Discard this card: Draw a card.)\",\"keywords\":[\"Cycling\"],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "33de01e9-ce5a-42d4-afcb-343cd54a6d80",
+    "name": "Caves of Koilos",
+    "data": "{\"name\":\"Caves of Koilos\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {C}.\\n{T}: Add {W} or {B}. This land deals 1 damage to you.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "3407fe41-fdd3-4119-8f70-4bc4590a379f",
+    "name": "Negate",
+    "data": "{\"name\":\"Negate\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Instant\",\"oracle_text\":\"Counter target noncreature spell.\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "34f34409-326d-4994-a0ea-1a69aa278f03",
+    "name": "Sheoldred, the Apocalypse",
+    "data": "{\"name\":\"Sheoldred, the Apocalypse\",\"mana_cost\":\"{2}{B}{B}\",\"cmc\":4,\"type_line\":\"Legendary Creature — Phyrexian Praetor\",\"oracle_text\":\"Deathtouch\\nWhenever you draw a card, you gain 2 life.\\nWhenever an opponent draws a card, they lose 2 life.\",\"power\":\"4\",\"toughness\":\"5\",\"keywords\":[\"Deathtouch\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "353dd446-2ea6-41c9-a10f-5a03e4de19b4",
+    "name": "Access Denied",
+    "data": "{\"name\":\"Access Denied\",\"mana_cost\":\"{3}{U}{U}\",\"cmc\":5,\"type_line\":\"Instant\",\"oracle_text\":\"Counter target spell. Create X 1/1 colorless Thopter artifact creature tokens with flying, where X is that spell's mana value.\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "3644f316-f9a3-46c9-9b1e-747f86cf4ead",
+    "name": "Buried Ruin",
+    "data": "{\"name\":\"Buried Ruin\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {C}.\\n{2}, {T}, Sacrifice this land: Return target artifact card from your graveyard to your hand.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "37688720-03de-4eca-a82d-a0afe8d58adc",
+    "name": "Baleful Strix",
+    "data": "{\"name\":\"Baleful Strix\",\"mana_cost\":\"{U}{B}\",\"cmc\":2,\"type_line\":\"Artifact Creature — Bird\",\"oracle_text\":\"Flying, deathtouch\\nWhen this creature enters, draw a card.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Deathtouch\",\"Flying\"],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "379ed4ec-8f2e-448b-9ed2-a3181e2f877e",
+    "name": "Nighthawk Scavenger",
+    "data": "{\"name\":\"Nighthawk Scavenger\",\"mana_cost\":\"{1}{B}{B}\",\"cmc\":3,\"type_line\":\"Creature — Vampire Rogue\",\"oracle_text\":\"Flying, deathtouch, lifelink\\nNighthawk Scavenger's power is equal to 1 plus the number of card types among cards in your opponents' graveyards.\",\"power\":\"1+*\",\"toughness\":\"3\",\"keywords\":[\"Deathtouch\",\"Flying\",\"Lifelink\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "3aa83ed2-f48b-4ce6-a614-2c54ddf50538",
+    "name": "The One Ring",
+    "data": "{\"name\":\"The One Ring\",\"mana_cost\":\"{4}\",\"cmc\":4,\"type_line\":\"Legendary Artifact\",\"oracle_text\":\"Indestructible\\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.\",\"keywords\":[\"Indestructible\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "3dc364f3-3094-4660-80ca-9418588c7fde",
+    "name": "Mithril Coat",
+    "data": "{\"name\":\"Mithril Coat\",\"mana_cost\":\"{3}\",\"cmc\":3,\"type_line\":\"Legendary Artifact — Equipment\",\"oracle_text\":\"Flash\\nIndestructible\\nWhen Mithril Coat enters, attach it to target legendary creature you control.\\nEquipped creature has indestructible.\\nEquip {3}\",\"keywords\":[\"Indestructible\",\"Equip\",\"Flash\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "40c88392-2aa7-4e12-86a4-8d680219e670",
+    "name": "Elspeth Conquers Death",
+    "data": "{\"name\":\"Elspeth Conquers Death\",\"mana_cost\":\"{3}{W}{W}\",\"cmc\":5,\"type_line\":\"Enchantment — Saga\",\"oracle_text\":\"(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\\nI — Exile target permanent an opponent controls with mana value 3 or greater.\\nII — Noncreature spells your opponents cast cost {2} more to cast until your next turn.\\nIII — Return target creature or planeswalker card from your graveyard to the battlefield. Put a +1/+1 counter or a loyalty counter on it.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"saga\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "44f3241f-af82-4f2e-b15d-7f279bf6e816",
+    "name": "Umbral Mantle",
+    "data": "{\"name\":\"Umbral Mantle\",\"mana_cost\":\"{3}\",\"cmc\":3,\"type_line\":\"Artifact — Equipment\",\"oracle_text\":\"Equipped creature has \\\"{3}, {Q}: This creature gets +2/+2 until end of turn.\\\" ({Q} is the untap symbol.)\\nEquip {0}\",\"keywords\":[\"Equip\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "4869a530-757f-4364-8d8e-4dc8001f433c",
+    "name": "Darkwater Catacombs",
+    "data": "{\"name\":\"Darkwater Catacombs\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{1}, {T}: Add {U}{B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "4bf95747-4572-49b8-b892-87fe7f910252",
+    "name": "Pathrazer of Ulamog",
+    "data": "{\"name\":\"Pathrazer of Ulamog\",\"mana_cost\":\"{11}\",\"cmc\":11,\"type_line\":\"Creature — Eldrazi\",\"oracle_text\":\"Annihilator 3 (Whenever this creature attacks, defending player sacrifices three permanents of their choice.)\\nThis creature can't be blocked except by three or more creatures.\",\"power\":\"9\",\"toughness\":\"9\",\"keywords\":[\"Annihilator\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "4dc5726e-2f7e-4c2b-9616-c3301d212f78",
+    "name": "Thousand-Year Elixir",
+    "data": "{\"name\":\"Thousand-Year Elixir\",\"mana_cost\":\"{3}\",\"cmc\":3,\"type_line\":\"Artifact\",\"oracle_text\":\"You may activate abilities of creatures you control as though those creatures had haste.\\n{1}, {T}: Untap target creature.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "4e183439-17d2-47ff-9d99-5e22821d91e3",
+    "name": "Flawless Maneuver",
+    "data": "{\"name\":\"Flawless Maneuver\",\"mana_cost\":\"{2}{W}\",\"cmc\":3,\"type_line\":\"Instant\",\"oracle_text\":\"If you control a commander, you may cast this spell without paying its mana cost.\\nCreatures you control gain indestructible until end of turn.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "4e7a8817-1a66-45c3-ade9-eac79b40b89f",
+    "name": "Emrakul, the Promised End",
+    "data": "{\"name\":\"Emrakul, the Promised End\",\"mana_cost\":\"{13}\",\"cmc\":13,\"type_line\":\"Legendary Creature — Eldrazi\",\"oracle_text\":\"This spell costs {1} less to cast for each card type among cards in your graveyard.\\nWhen you cast this spell, you gain control of target opponent during that player's next turn. After that turn, that player takes an extra turn.\\nFlying, trample, protection from instants\",\"power\":\"13\",\"toughness\":\"13\",\"keywords\":[\"Flying\",\"Protection\",\"Trample\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "4ec85850-f274-4c0c-9a03-0488267caa14",
+    "name": "Giver of Runes",
+    "data": "{\"name\":\"Giver of Runes\",\"mana_cost\":\"{W}\",\"cmc\":1,\"type_line\":\"Creature — Kor Cleric\",\"oracle_text\":\"{T}: Another target creature you control gains protection from colorless or from the color of your choice until end of turn.\",\"power\":\"1\",\"toughness\":\"2\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "4f2d4538-dc1d-4c09-964b-b0d7c240fb7d",
+    "name": "Archangel of Thune",
+    "data": "{\"name\":\"Archangel of Thune\",\"mana_cost\":\"{3}{W}{W}\",\"cmc\":5,\"type_line\":\"Creature — Angel\",\"oracle_text\":\"Flying\\nLifelink (Damage dealt by this creature also causes you to gain that much life.)\\nWhenever you gain life, put a +1/+1 counter on each creature you control.\",\"power\":\"3\",\"toughness\":\"4\",\"keywords\":[\"Flying\",\"Lifelink\"],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "4fc5f871-a809-4a4a-adfb-eb4cd52837c8",
+    "name": "Fallen Shinobi",
+    "data": "{\"name\":\"Fallen Shinobi\",\"mana_cost\":\"{3}{U}{B}\",\"cmc\":5,\"type_line\":\"Creature — Zombie Ninja\",\"oracle_text\":\"Ninjutsu {2}{U}{B} ({2}{U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)\\nWhenever this creature deals combat damage to a player, that player exiles the top two cards of their library. Until end of turn, you may play those cards without paying their mana costs.\",\"power\":\"5\",\"toughness\":\"4\",\"keywords\":[\"Ninjutsu\"],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "516101be-be39-4d84-8fee-d8a79930dd0a",
+    "name": "Sphinx of the Second Sun",
+    "data": "{\"name\":\"Sphinx of the Second Sun\",\"mana_cost\":\"{6}{U}{U}\",\"cmc\":8,\"type_line\":\"Creature — Sphinx\",\"oracle_text\":\"Flying\\nAt the beginning of each of your postcombat main phases, there is an additional beginning phase after this phase. (The beginning phase includes the untap, upkeep, and draw steps.)\",\"power\":\"6\",\"toughness\":\"6\",\"keywords\":[\"Flying\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "55f3c721-e13a-406e-bc8e-d6cdc91ac477",
+    "name": "Authority of the Consuls",
+    "data": "{\"name\":\"Authority of the Consuls\",\"mana_cost\":\"{W}\",\"cmc\":1,\"type_line\":\"Enchantment\",\"oracle_text\":\"Creatures your opponents control enter tapped.\\nWhenever a creature an opponent controls enters, you gain 1 life.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+    "name": "Swamp",
+    "data": "{\"name\":\"Swamp\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Basic Land — Swamp\",\"oracle_text\":\"({T}: Add {B}.)\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "58257464-278e-45fa-8e0b-bcd9a7500bc1",
+    "name": "Ash Barrens",
+    "data": "{\"name\":\"Ash Barrens\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {C}.\\nBasic landcycling {1} ({1}, Discard this card: Search your library for a basic land card, reveal it, put it into your hand, then shuffle.)\",\"keywords\":[\"Landcycling\",\"Basic landcycling\",\"Typecycling\",\"Cycling\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "597bce51-af89-4d13-9a97-667b4f4f4694",
+    "name": "Ulamog's Crusher",
+    "data": "{\"name\":\"Ulamog's Crusher\",\"mana_cost\":\"{8}\",\"cmc\":8,\"type_line\":\"Creature — Eldrazi\",\"oracle_text\":\"Annihilator 2 (Whenever this creature attacks, defending player sacrifices two permanents of their choice.)\\nThis creature attacks each combat if able.\",\"power\":\"8\",\"toughness\":\"8\",\"keywords\":[\"Annihilator\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "59c7496b-19a2-478b-b28f-6f153c2458ae",
+    "name": "Siren Stormtamer",
+    "data": "{\"name\":\"Siren Stormtamer\",\"mana_cost\":\"{U}\",\"cmc\":1,\"type_line\":\"Creature — Siren Pirate Wizard\",\"oracle_text\":\"Flying\\n{U}, Sacrifice this creature: Counter target spell or ability that targets you or a creature you control.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Flying\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "5a55641b-0818-4418-a2e5-44157056353c",
+    "name": "Slither Blade",
+    "data": "{\"name\":\"Slither Blade\",\"mana_cost\":\"{U}\",\"cmc\":1,\"type_line\":\"Creature — Snake Rogue\",\"oracle_text\":\"This creature can't be blocked.\",\"power\":\"1\",\"toughness\":\"2\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "5b8f0cdf-572d-4025-b930-79291f7c35be",
+    "name": "Vanishing Verse",
+    "data": "{\"name\":\"Vanishing Verse\",\"mana_cost\":\"{W}{B}\",\"cmc\":2,\"type_line\":\"Instant\",\"oracle_text\":\"Exile target monocolored permanent.\",\"keywords\":[],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "5f15125e-ae89-471e-b055-226a783bc7c1",
+    "name": "Aetherflux Reservoir",
+    "data": "{\"name\":\"Aetherflux Reservoir\",\"mana_cost\":\"{4}\",\"cmc\":4,\"type_line\":\"Artifact\",\"oracle_text\":\"Whenever you cast a spell, you gain 1 life for each spell you've cast this turn.\\nPay 50 life: This artifact deals 50 damage to any target.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "5f42b67f-87fd-4f98-a0e8-0c8313f4bbc8",
+    "name": "Shipwreck Marsh",
+    "data": "{\"name\":\"Shipwreck Marsh\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control two or more other lands.\\n{T}: Add {U} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "605c1ee0-5e8a-4e0a-a99b-42a38873f822",
+    "name": "Welcoming Vampire",
+    "data": "{\"name\":\"Welcoming Vampire\",\"mana_cost\":\"{2}{W}\",\"cmc\":3,\"type_line\":\"Creature — Vampire\",\"oracle_text\":\"Flying\\nWhenever one or more other creatures you control with power 2 or less enter, draw a card. This ability triggers only once each turn.\",\"power\":\"2\",\"toughness\":\"3\",\"keywords\":[\"Flying\"],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "60ec735d-c9be-4776-beb7-f603ae22edbf",
+    "name": "Silver-Fur Master",
+    "data": "{\"name\":\"Silver-Fur Master\",\"mana_cost\":\"{U}{B}\",\"cmc\":2,\"type_line\":\"Creature — Rat Ninja\",\"oracle_text\":\"Ninjutsu {U}{B} ({U}{B}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)\\nNinjutsu abilities you activate cost {1} less to activate.\\nOther Ninja and Rogue creatures you control get +1/+1.\",\"power\":\"2\",\"toughness\":\"2\",\"keywords\":[\"Ninjutsu\"],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "61cceb14-9568-4a5e-9b56-07afa6407df2",
+    "name": "Inspired Sphinx",
+    "data": "{\"name\":\"Inspired Sphinx\",\"mana_cost\":\"{5}{U}{U}\",\"cmc\":7,\"type_line\":\"Creature — Sphinx\",\"oracle_text\":\"Flying\\nWhen this creature enters, draw cards equal to the number of opponents you have.\\n{3}{U}: Create a 1/1 colorless Thopter artifact creature token with flying.\",\"power\":\"5\",\"toughness\":\"5\",\"keywords\":[\"Flying\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "63e596a2-9126-4af6-8782-c38687d664ad",
+    "name": "Heliod, Sun-Crowned",
+    "data": "{\"name\":\"Heliod, Sun-Crowned\",\"mana_cost\":\"{2}{W}\",\"cmc\":3,\"type_line\":\"Legendary Enchantment Creature — God\",\"oracle_text\":\"Indestructible\\nAs long as your devotion to white is less than five, Heliod isn't a creature.\\nWhenever you gain life, put a +1/+1 counter on target creature or enchantment you control.\\n{1}{W}: Another target creature gains lifelink until end of turn.\",\"power\":\"5\",\"toughness\":\"5\",\"keywords\":[\"Indestructible\"],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "69e1a166-02f7-43f8-b099-dbb01034370c",
+    "name": "Sphinx Ambassador",
+    "data": "{\"name\":\"Sphinx Ambassador\",\"mana_cost\":\"{5}{U}{U}\",\"cmc\":7,\"type_line\":\"Creature — Sphinx\",\"oracle_text\":\"Flying\\nWhenever this creature deals combat damage to a player, search that player's library for a card, then that player chooses a card name. If you searched for a creature card that doesn't have that name, you may put it onto the battlefield under your control. Then that player shuffles.\",\"power\":\"5\",\"toughness\":\"5\",\"keywords\":[\"Flying\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "6ad8011d-3471-4369-9d68-b264cc027487",
+    "name": "Sol Ring",
+    "data": "{\"name\":\"Sol Ring\",\"mana_cost\":\"{1}\",\"cmc\":1,\"type_line\":\"Artifact\",\"oracle_text\":\"{T}: Add {C}{C}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "6aea681e-88d2-48df-a717-3ce0bc95205b",
+    "name": "Silent Hallcreeper",
+    "data": "{\"name\":\"Silent Hallcreeper\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Enchantment Creature — Horror\",\"oracle_text\":\"This creature can't be blocked.\\nWhenever this creature deals combat damage to a player, choose one that hasn't been chosen —\\n• Put two +1/+1 counters on this creature.\\n• Draw a card.\\n• This creature becomes a copy of another target creature you control.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "6c8f276e-4e7b-4974-ab02-9356cc0ffb2b",
+    "name": "Witch's Cottage",
+    "data": "{\"name\":\"Witch's Cottage\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land — Swamp\",\"oracle_text\":\"({T}: Add {B}.)\\nThis land enters tapped unless you control three or more other Swamps.\\nWhen this land enters untapped, you may put target creature card from your graveyard on top of your library.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "6df620b8-1e54-4f63-8556-12c75e5679af",
+    "name": "Countersquall",
+    "data": "{\"name\":\"Countersquall\",\"mana_cost\":\"{U}{B}\",\"cmc\":2,\"type_line\":\"Instant\",\"oracle_text\":\"Counter target noncreature spell. Its controller loses 2 life.\",\"keywords\":[],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "6f498ff7-38c9-44ea-9cb5-994a003825ee",
+    "name": "Ingenious Prodigy",
+    "data": "{\"name\":\"Ingenious Prodigy\",\"mana_cost\":\"{X}{U}\",\"cmc\":1,\"type_line\":\"Creature — Human Wizard\",\"oracle_text\":\"Skulk (This creature can't be blocked by creatures with greater power.)\\nThis creature enters with X +1/+1 counters on it.\\nAt the beginning of your upkeep, if this creature has one or more +1/+1 counters on it, you may remove a +1/+1 counter from it. If you do, draw a card.\",\"power\":\"0\",\"toughness\":\"1\",\"keywords\":[\"Skulk\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "70ac902e-1eb5-4f83-a5a6-00ac89cfe50f",
+    "name": "Void Winnower",
+    "data": "{\"name\":\"Void Winnower\",\"mana_cost\":\"{9}\",\"cmc\":9,\"type_line\":\"Creature — Eldrazi\",\"oracle_text\":\"Your opponents can't cast spells with even mana values. (Zero is even.)\\nYour opponents can't block with creatures with even mana values.\",\"power\":\"11\",\"toughness\":\"9\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "71a60247-17e5-44bd-9fed-f7d550b09ef3",
+    "name": "Triton Shorestalker",
+    "data": "{\"name\":\"Triton Shorestalker\",\"mana_cost\":\"{U}\",\"cmc\":1,\"type_line\":\"Creature — Merfolk Rogue\",\"oracle_text\":\"This creature can't be blocked.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "71d785a9-ddc8-472e-a778-a551b444a4bd",
+    "name": "Selfless Spirit",
+    "data": "{\"name\":\"Selfless Spirit\",\"mana_cost\":\"{1}{W}\",\"cmc\":2,\"type_line\":\"Creature — Spirit Cleric\",\"oracle_text\":\"Flying\\nSacrifice this creature: Creatures you control gain indestructible until end of turn.\",\"power\":\"2\",\"toughness\":\"1\",\"keywords\":[\"Flying\"],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "724f3d2f-0513-4efd-961f-56a7ea7b5731",
+    "name": "Signal Pest",
+    "data": "{\"name\":\"Signal Pest\",\"mana_cost\":\"{1}\",\"cmc\":1,\"type_line\":\"Artifact Creature — Pest\",\"oracle_text\":\"Battle cry (Whenever this creature attacks, each other attacking creature gets +1/+0 until end of turn.)\\nThis creature can't be blocked except by creatures with flying or reach.\",\"power\":\"0\",\"toughness\":\"1\",\"keywords\":[\"Battle Cry\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "73089a39-a2f6-4aa2-a058-e6551475153d",
+    "name": "Sanguine Bond",
+    "data": "{\"name\":\"Sanguine Bond\",\"mana_cost\":\"{3}{B}{B}\",\"cmc\":5,\"type_line\":\"Enchantment\",\"oracle_text\":\"Whenever you gain life, target opponent loses that much life.\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "7336a541-3ae9-4ab2-acb8-f574c0a5b3a9",
+    "name": "Vito, Thorn of the Dusk Rose",
+    "data": "{\"name\":\"Vito, Thorn of the Dusk Rose\",\"mana_cost\":\"{2}{B}\",\"cmc\":3,\"type_line\":\"Legendary Creature — Vampire Cleric\",\"oracle_text\":\"Whenever you gain life, target opponent loses that much life.\\n{3}{B}{B}: Creatures you control gain lifelink until end of turn.\",\"power\":\"1\",\"toughness\":\"3\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "73864fcc-1bde-4bc0-831e-2b93e546e417",
+    "name": "Godless Shrine",
+    "data": "{\"name\":\"Godless Shrine\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land — Plains Swamp\",\"oracle_text\":\"({T}: Add {W} or {B}.)\\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "74255add-2894-4c31-81c1-d38873fa325f",
+    "name": "Mist-Cloaked Herald",
+    "data": "{\"name\":\"Mist-Cloaked Herald\",\"mana_cost\":\"{U}\",\"cmc\":1,\"type_line\":\"Creature — Merfolk Warrior\",\"oracle_text\":\"This creature can't be blocked.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "7685ff3f-6d61-4b1d-a381-49bc6274aa01",
+    "name": "Dimir Keyrune",
+    "data": "{\"name\":\"Dimir Keyrune\",\"mana_cost\":\"{3}\",\"cmc\":3,\"type_line\":\"Artifact\",\"oracle_text\":\"{T}: Add {U} or {B}.\\n{U}{B}: This artifact becomes a 2/2 blue and black Horror artifact creature until end of turn and can't be blocked this turn.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "7b8528b0-71eb-4c9e-bed9-aa2d2e84038f",
+    "name": "Kozilek, Butcher of Truth",
+    "data": "{\"name\":\"Kozilek, Butcher of Truth\",\"mana_cost\":\"{10}\",\"cmc\":10,\"type_line\":\"Legendary Creature — Eldrazi\",\"oracle_text\":\"When you cast this spell, draw four cards.\\nAnnihilator 4 (Whenever this creature attacks, defending player sacrifices four permanents of their choice.)\\nWhen Kozilek is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.\",\"power\":\"12\",\"toughness\":\"12\",\"keywords\":[\"Annihilator\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "7bb51602-60e8-4730-b11c-2870d6b42e20",
+    "name": "Azure Beastbinder",
+    "data": "{\"name\":\"Azure Beastbinder\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Creature — Rat Rogue\",\"oracle_text\":\"Vigilance\\nThis creature can't be blocked by creatures with power 2 or greater.\\nWhenever this creature attacks, up to one target artifact, creature, or planeswalker an opponent controls loses all abilities until your next turn. If it's a creature, it also has base power and toughness 2/2 until your next turn.\",\"power\":\"1\",\"toughness\":\"3\",\"keywords\":[\"Vigilance\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "7d881c57-0bd9-4c57-aa4a-b10808b86143",
+    "name": "Dimir Signet",
+    "data": "{\"name\":\"Dimir Signet\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact\",\"oracle_text\":\"{1}, {T}: Add {U}{B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "7e5d9efe-48a9-434b-bb09-056e0e09cc9a",
+    "name": "Isolated Chapel",
+    "data": "{\"name\":\"Isolated Chapel\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control a Plains or a Swamp.\\n{T}: Add {W} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "819fc966-434e-470f-91e9-a38df974ad17",
+    "name": "Drowned Catacomb",
+    "data": "{\"name\":\"Drowned Catacomb\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control an Island or a Swamp.\\n{T}: Add {U} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "85cbb035-25df-43bb-ae06-ab098f448b02",
+    "name": "Archmage's Charm",
+    "data": "{\"name\":\"Archmage's Charm\",\"mana_cost\":\"{U}{U}{U}\",\"cmc\":3,\"type_line\":\"Instant\",\"oracle_text\":\"Choose one —\\n• Counter target spell.\\n• Target player draws two cards.\\n• Gain control of target nonland permanent with mana value 1 or less.\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "867dbd5a-c3cf-41ce-980b-c9babc6f30f2",
+    "name": "Minas Morgul, Dark Fortress",
+    "data": "{\"name\":\"Minas Morgul, Dark Fortress\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Legendary Land\",\"oracle_text\":\"Minas Morgul enters tapped.\\n{T}: Add {B}.\\n{3}{B}, {T}: Put a shadow counter on target creature. For as long as that creature has a shadow counter on it, it's a Wraith in addition to its other types. (A creature with shadow can block or be blocked by only creatures with shadow.)\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "8a70bde5-c514-4dcf-919a-48bdd1c17768",
+    "name": "Basim Ibn Ishaq",
+    "data": "{\"name\":\"Basim Ibn Ishaq\",\"mana_cost\":\"{U}{B}\",\"cmc\":2,\"type_line\":\"Legendary Creature — Human Assassin\",\"oracle_text\":\"Whenever you cast a historic spell, draw a card. Basim Ibn Ishaq can't be blocked this turn. This ability triggers only once each turn. (Artifacts, legendaries, and Sagas are historic.)\\nWhenever Basim Ibn Ishaq deals combat damage to a player, put a +1/+1 counter on it.\",\"power\":\"2\",\"toughness\":\"2\",\"keywords\":[],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "8b27326f-e7b8-4a4d-b589-df459246d19a",
+    "name": "Shadowspear",
+    "data": "{\"name\":\"Shadowspear\",\"mana_cost\":\"{1}\",\"cmc\":1,\"type_line\":\"Legendary Artifact — Equipment\",\"oracle_text\":\"Equipped creature gets +1/+1 and has trample and lifelink.\\n{1}: Permanents your opponents control lose hexproof and indestructible until end of turn.\\nEquip {2}\",\"keywords\":[\"Equip\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "93cf50cf-0ecc-4d3e-abea-778c1ebacec4",
+    "name": "Massacre Wurm",
+    "data": "{\"name\":\"Massacre Wurm\",\"mana_cost\":\"{3}{B}{B}{B}\",\"cmc\":6,\"type_line\":\"Creature — Phyrexian Wurm\",\"oracle_text\":\"When this creature enters, creatures your opponents control get -2/-2 until end of turn.\\nWhenever a creature an opponent controls dies, that player loses 2 life.\",\"power\":\"6\",\"toughness\":\"5\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "94f0a572-e91c-4b56-a5d1-6cbbeabd210d",
+    "name": "Infernal Grasp",
+    "data": "{\"name\":\"Infernal Grasp\",\"mana_cost\":\"{1}{B}\",\"cmc\":2,\"type_line\":\"Instant\",\"oracle_text\":\"Destroy target creature. You lose 2 life.\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "97836c48-8777-4b4e-98fb-e99204f38bdd",
+    "name": "Ulamog, the Defiler",
+    "data": "{\"name\":\"Ulamog, the Defiler\",\"mana_cost\":\"{10}\",\"cmc\":10,\"type_line\":\"Legendary Creature — Eldrazi\",\"oracle_text\":\"When you cast this spell, target opponent exiles the top half of their library, rounded up.\\nWard—Sacrifice two permanents.\\nUlamog enters with a number of +1/+1 counters on it equal to the greatest mana value among cards in exile.\\nUlamog has annihilator X, where X is the number of +1/+1 counters on it.\",\"power\":\"7\",\"toughness\":\"7\",\"keywords\":[\"Ward\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "a1ac6d5c-b2d0-4ca4-8af8-16fd3dd3b3b5",
+    "name": "Razzle-Dazzler",
+    "data": "{\"name\":\"Razzle-Dazzler\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Creature — Human Wizard\",\"oracle_text\":\"Whenever you cast your second spell each turn, put a +1/+1 counter on this creature. It can't be blocked this turn.\",\"power\":\"1\",\"toughness\":\"2\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "a3afd8b9-d499-40f7-be41-f8fee6636a1d",
+    "name": "Twilight Prophet",
+    "data": "{\"name\":\"Twilight Prophet\",\"mana_cost\":\"{2}{B}{B}\",\"cmc\":4,\"type_line\":\"Creature — Vampire Cleric\",\"oracle_text\":\"Flying\\nAscend (If you control ten or more permanents, you get the city's blessing for the rest of the game.)\\nAt the beginning of your upkeep, if you have the city's blessing, reveal the top card of your library and put it into your hand. Each opponent loses X life and you gain X life, where X is that card's mana value.\",\"power\":\"2\",\"toughness\":\"4\",\"keywords\":[\"Flying\",\"Ascend\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "a3da7d5b-2c2b-45fe-b9c5-413b8c8fc0a2",
+    "name": "Academy Ruins",
+    "data": "{\"name\":\"Academy Ruins\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Legendary Land\",\"oracle_text\":\"{T}: Add {C}.\\n{1}{U}, {T}: Put target artifact card from your graveyard on top of your library.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "a61ef0cc-1da9-49f9-b0dc-01cf9f6205be",
+    "name": "Changeling Outcast",
+    "data": "{\"name\":\"Changeling Outcast\",\"mana_cost\":\"{B}\",\"cmc\":1,\"type_line\":\"Creature — Shapeshifter\",\"oracle_text\":\"Changeling (This card is every creature type.)\\nThis creature can't block and can't be blocked.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Changeling\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "a656ad7f-133f-4d93-919a-43bcf1f815f3",
+    "name": "Profane Procession // Tomb of the Dusk Rose",
+    "data": "{\"name\":\"Profane Procession // Tomb of the Dusk Rose\",\"cmc\":3,\"type_line\":\"Legendary Enchantment // Legendary Land\",\"keywords\":[\"Transform\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"transform\",\"card_faces\":[{\"name\":\"Profane Procession\",\"mana_cost\":\"{1}{W}{B}\",\"type_line\":\"Legendary Enchantment\",\"oracle_text\":\"{3}{W}{B}: Exile target creature. Then if there are three or more cards exiled with Profane Procession, transform it.\"},{\"name\":\"Tomb of the Dusk Rose\",\"mana_cost\":\"\",\"type_line\":\"Legendary Land\",\"oracle_text\":\"(Transforms from Profane Procession.)\\n{T}: Add one mana of any color.\\n{2}{W}{B}, {T}: Put a creature card exiled with this permanent onto the battlefield under your control.\"}]}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "a73d9109-36e0-40ea-ab06-5c5f7eb4ac54",
+    "name": "Bilbo, Luckwearer // Burglar's Plot",
+    "data": "{\"name\":\"Bilbo, Luckwearer // Burglar's Plot\",\"mana_cost\":\"{1}{U} // {4}{U}\",\"cmc\":2,\"type_line\":\"Legendary Creature — Halfling Rogue // Sorcery — Adventure\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"adventure\",\"card_faces\":[{\"name\":\"Bilbo, Luckwearer\",\"mana_cost\":\"{1}{U}\",\"type_line\":\"Legendary Creature — Halfling Rogue\",\"oracle_text\":\"Bilbo can't be blocked.\\nWhenever Bilbo deals combat damage to a player, draw a card, then discard a card.\",\"power\":\"1\",\"toughness\":\"1\"},{\"name\":\"Burglar's Plot\",\"mana_cost\":\"{4}{U}\",\"type_line\":\"Sorcery — Adventure\",\"oracle_text\":\"Exchange control of two target nonland permanents that share a card type. (Then exile this card. You may cast the creature later from exile.)\"}]}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "ab1cc360-b9de-48d9-9983-4dfe4a7d2a37",
+    "name": "Arcane Denial",
+    "data": "{\"name\":\"Arcane Denial\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Instant\",\"oracle_text\":\"Counter target spell. Its controller may draw up to two cards at the beginning of the next turn's upkeep.\\nYou draw a card at the beginning of the next turn's upkeep.\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "ab44c6fe-6a66-42f0-9e75-8b25641e1f13",
+    "name": "Font of Agonies",
+    "data": "{\"name\":\"Font of Agonies\",\"mana_cost\":\"{B}\",\"cmc\":1,\"type_line\":\"Enchantment\",\"oracle_text\":\"Whenever you pay life, put that many blood counters on this enchantment.\\n{1}{B}, Remove four blood counters from this enchantment: Destroy target creature.\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "ad09b3c3-c8e7-481c-8c45-e7f234935117",
+    "name": "Anguished Unmaking",
+    "data": "{\"name\":\"Anguished Unmaking\",\"mana_cost\":\"{1}{W}{B}\",\"cmc\":3,\"type_line\":\"Instant\",\"oracle_text\":\"Exile target nonland permanent. You lose 3 life.\",\"keywords\":[],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "ad95eac2-5b48-4102-9988-a6d7b1ec30e0",
+    "name": "Patriar's Seal",
+    "data": "{\"name\":\"Patriar's Seal\",\"mana_cost\":\"{3}\",\"cmc\":3,\"type_line\":\"Artifact\",\"oracle_text\":\"{T}: Add one mana of any color.\\n{1}, {T}: Untap target legendary creature you control.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "af247e2f-b271-4f5b-ab98-4579d2c17c21",
+    "name": "Archfiend of Depravity",
+    "data": "{\"name\":\"Archfiend of Depravity\",\"mana_cost\":\"{3}{B}{B}\",\"cmc\":5,\"type_line\":\"Creature — Demon\",\"oracle_text\":\"Flying\\nAt the beginning of each opponent's end step, that player chooses up to two creatures they control, then sacrifices the rest.\",\"power\":\"5\",\"toughness\":\"4\",\"keywords\":[\"Flying\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "afaef788-34d1-460b-b884-9d7ae6ddeb18",
+    "name": "Toxic Deluge",
+    "data": "{\"name\":\"Toxic Deluge\",\"mana_cost\":\"{2}{B}\",\"cmc\":3,\"type_line\":\"Sorcery\",\"oracle_text\":\"As an additional cost to cast this spell, pay X life.\\nAll creatures get -X/-X until end of turn.\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "afb71560-0fc9-4ea5-9d52-d93c17d72519",
+    "name": "Sanctum Seeker",
+    "data": "{\"name\":\"Sanctum Seeker\",\"mana_cost\":\"{2}{B}{B}\",\"cmc\":4,\"type_line\":\"Creature — Vampire Knight\",\"oracle_text\":\"Whenever a Vampire you control attacks, each opponent loses 1 life and you gain 1 life.\",\"power\":\"3\",\"toughness\":\"4\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "b0394cf2-12a0-4d4f-87e0-fe8937e6faff",
+    "name": "Well of Lost Dreams",
+    "data": "{\"name\":\"Well of Lost Dreams\",\"mana_cost\":\"{4}\",\"cmc\":4,\"type_line\":\"Artifact\",\"oracle_text\":\"Whenever you gain life, you may pay {X}, where X is less than or equal to the amount of life you gained. If you do, draw X cards.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "b11187ab-f8a8-422b-b550-4495f96de0f2",
+    "name": "It That Betrays",
+    "data": "{\"name\":\"It That Betrays\",\"mana_cost\":\"{12}\",\"cmc\":12,\"type_line\":\"Creature — Eldrazi\",\"oracle_text\":\"Annihilator 2 (Whenever this creature attacks, defending player sacrifices two permanents of their choice.)\\nWhenever an opponent sacrifices a nontoken permanent, put that card onto the battlefield under your control.\",\"power\":\"11\",\"toughness\":\"11\",\"keywords\":[\"Annihilator\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "b1544f21-7e98-461b-aed5-e748b0168c52",
+    "name": "Swords to Plowshares",
+    "data": "{\"name\":\"Swords to Plowshares\",\"mana_cost\":\"{W}\",\"cmc\":1,\"type_line\":\"Instant\",\"oracle_text\":\"Exile target creature. Its controller gains life equal to its power.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "b1c56e23-eae6-47a1-a1cd-3a2d01621768",
+    "name": "Vona, Butcher of Magan",
+    "data": "{\"name\":\"Vona, Butcher of Magan\",\"mana_cost\":\"{3}{W}{B}\",\"cmc\":5,\"type_line\":\"Legendary Creature — Vampire Knight\",\"oracle_text\":\"Vigilance, lifelink\\n{T}, Pay 7 life: Destroy target nonland permanent. Activate only during your turn.\",\"power\":\"4\",\"toughness\":\"4\",\"keywords\":[\"Lifelink\",\"Vigilance\"],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+    "name": "Island",
+    "data": "{\"name\":\"Island\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Basic Land — Island\",\"oracle_text\":\"({T}: Add {U}.)\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "b5b4cf54-ed5e-42d0-9d98-5fec76b0b0b8",
+    "name": "Darksteel Plate",
+    "data": "{\"name\":\"Darksteel Plate\",\"mana_cost\":\"{3}\",\"cmc\":3,\"type_line\":\"Artifact — Equipment\",\"oracle_text\":\"Indestructible\\nEquipped creature has indestructible.\\nEquip {2}\",\"keywords\":[\"Indestructible\",\"Equip\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "b693c3de-2eaf-4850-b405-e79d00adefda",
+    "name": "Talisman of Hierarchy",
+    "data": "{\"name\":\"Talisman of Hierarchy\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact\",\"oracle_text\":\"{T}: Add {C}.\\n{T}: Add {W} or {B}. This artifact deals 1 damage to you.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "b817bc56-9b4d-4c50-bafa-3c652b99578f",
+    "name": "Ulamog, the Infinite Gyre",
+    "data": "{\"name\":\"Ulamog, the Infinite Gyre\",\"mana_cost\":\"{11}\",\"cmc\":11,\"type_line\":\"Legendary Creature — Eldrazi\",\"oracle_text\":\"When you cast this spell, destroy target permanent.\\nIndestructible\\nAnnihilator 4 (Whenever this creature attacks, defending player sacrifices four permanents of their choice.)\\nWhen Ulamog is put into a graveyard from anywhere, its owner shuffles their graveyard into their library.\",\"power\":\"10\",\"toughness\":\"10\",\"keywords\":[\"Indestructible\",\"Annihilator\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "bad2385b-6981-46fa-a012-d3992c3bc118",
+    "name": "Hookblade Veteran",
+    "data": "{\"name\":\"Hookblade Veteran\",\"mana_cost\":\"{U}\",\"cmc\":1,\"type_line\":\"Creature — Human Assassin\",\"oracle_text\":\"During your turn, this creature has flying. (It can't be blocked except by creatures with flying or reach.)\",\"power\":\"1\",\"toughness\":\"2\",\"keywords\":[],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "bb9ce416-eef1-49e8-89a0-2b6837505070",
+    "name": "Realm of Koh",
+    "data": "{\"name\":\"Realm of Koh\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control a basic land.\\n{T}: Add {B}.\\n{3}{B}, {T}: Create a 1/1 colorless Spirit creature token with \\\"This token can't block or be blocked by non-Spirit creatures.\\\"\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "bbf9494c-c4bb-4d36-98fe-8387846b342e",
+    "name": "Rings of Brighthearth",
+    "data": "{\"name\":\"Rings of Brighthearth\",\"mana_cost\":\"{3}\",\"cmc\":3,\"type_line\":\"Artifact\",\"oracle_text\":\"Whenever you activate an ability, if it isn't a mana ability, you may pay {2}. If you do, copy that ability. You may choose new targets for the copy.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "bc08ac66-969c-4905-a2d6-16ff565be475",
+    "name": "Eldrazi Devastator",
+    "data": "{\"name\":\"Eldrazi Devastator\",\"mana_cost\":\"{8}\",\"cmc\":8,\"type_line\":\"Creature — Eldrazi\",\"oracle_text\":\"Trample\",\"power\":\"8\",\"toughness\":\"9\",\"keywords\":[\"Trample\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+    "name": "Plains",
+    "data": "{\"name\":\"Plains\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Basic Land — Plains\",\"oracle_text\":\"({T}: Add {W}.)\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "bc8de6c7-c69d-4add-8f25-825d945874f9",
+    "name": "Kaya's Wrath",
+    "data": "{\"name\":\"Kaya's Wrath\",\"mana_cost\":\"{W}{W}{B}{B}\",\"cmc\":4,\"type_line\":\"Sorcery\",\"oracle_text\":\"Destroy all creatures. You gain life equal to the number of creatures you controlled that were destroyed this way.\",\"keywords\":[],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "bd004c9d-771e-4e63-a97d-a2259c096af8",
+    "name": "Morphic Pool",
+    "data": "{\"name\":\"Morphic Pool\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you have two or more opponents.\\n{T}: Add {U} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "bd16434d-55ea-4c5a-a9ef-752971a4af16",
+    "name": "Despark",
+    "data": "{\"name\":\"Despark\",\"mana_cost\":\"{W}{B}\",\"cmc\":2,\"type_line\":\"Instant\",\"oracle_text\":\"Exile target permanent with mana value 4 or greater.\",\"keywords\":[],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "bd49a05c-ed51-4d69-ab9b-11192442ec17",
+    "name": "Stature, Size Shifter",
+    "data": "{\"name\":\"Stature, Size Shifter\",\"mana_cost\":\"{U}\",\"cmc\":1,\"type_line\":\"Legendary Creature — Human Hero\",\"oracle_text\":\"Stature can't be blocked if her power is 1 or less.\\nPower-up — {X}{U}{U}: Put X +1/+1 counters on Stature. (Activate each power-up ability only once. Reduce the cost by her mana cost if she entered this turn.)\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Power-up\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "bde976c6-afed-44bb-8e3d-4103289dff5e",
+    "name": "Gudul Lurker",
+    "data": "{\"name\":\"Gudul Lurker\",\"mana_cost\":\"{U}\",\"cmc\":1,\"type_line\":\"Creature — Salamander\",\"oracle_text\":\"This creature can't be blocked.\\nMegamorph {U} (You may cast this card face down as a 2/2 creature for {3}. Turn it face up any time for its megamorph cost and put a +1/+1 counter on it.)\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Megamorph\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "bdeb440d-a714-40e8-9038-f651e6ae45fb",
+    "name": "Springleaf Drum",
+    "data": "{\"name\":\"Springleaf Drum\",\"mana_cost\":\"{1}\",\"cmc\":1,\"type_line\":\"Artifact\",\"oracle_text\":\"{T}, Tap an untapped creature you control: Add one mana of any color.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "be811e70-aaaa-41f3-bf9e-5d3f9f719b49",
+    "name": "Castle Locthwain",
+    "data": "{\"name\":\"Castle Locthwain\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control a Swamp.\\n{T}: Add {B}.\\n{1}{B}{B}, {T}: Draw a card, then you lose life equal to the number of cards in your hand.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "c15cad77-e70f-42cc-a9f5-50e1fd8c9c96",
+    "name": "Shoreline Looter",
+    "data": "{\"name\":\"Shoreline Looter\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Creature — Rat Rogue\",\"oracle_text\":\"This creature can't be blocked.\\nThreshold — Whenever this creature deals combat damage to a player, draw a card. Then discard a card unless there are seven or more cards in your graveyard.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Threshold\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "c2dd6c78-e482-4a3c-ad9c-7dd71b3e34d2",
+    "name": "Bishop of Binding",
+    "data": "{\"name\":\"Bishop of Binding\",\"mana_cost\":\"{3}{W}\",\"cmc\":4,\"type_line\":\"Creature — Vampire Cleric\",\"oracle_text\":\"When this creature enters, exile target creature an opponent controls until this creature leaves the battlefield.\\nWhenever this creature attacks, target Vampire gets +X/+X until end of turn, where X is the power of the exiled card.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "c597cfae-3f92-4d31-8bc1-5a2da995f1bf",
+    "name": "Fogwalker",
+    "data": "{\"name\":\"Fogwalker\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Creature — Spirit\",\"oracle_text\":\"Skulk (This creature can't be blocked by creatures with greater power.)\\nWhen this creature enters, target creature an opponent controls doesn't untap during its controller's next untap step.\",\"power\":\"1\",\"toughness\":\"3\",\"keywords\":[\"Skulk\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "c7f33cea-2ec8-4081-9208-a5b1d86721b3",
+    "name": "Bastion of Remembrance",
+    "data": "{\"name\":\"Bastion of Remembrance\",\"mana_cost\":\"{2}{B}\",\"cmc\":3,\"type_line\":\"Enchantment\",\"oracle_text\":\"When this enchantment enters, create a 1/1 white Human Soldier creature token.\\nWhenever a creature you control dies, each opponent loses 1 life and you gain 1 life.\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "c854ecb0-cc60-4c48-a9aa-7f2348a7a8c6",
+    "name": "Shattered Sanctum",
+    "data": "{\"name\":\"Shattered Sanctum\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control two or more other lands.\\n{T}: Add {W} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "c8b143ad-43ec-4e0d-a440-e348daa31391",
+    "name": "Swiftfoot Boots",
+    "data": "{\"name\":\"Swiftfoot Boots\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact — Equipment\",\"oracle_text\":\"Equipped creature has hexproof and haste. (It can't be the target of spells or abilities your opponents control. It can attack and {T} no matter when it came under your control.)\\nEquip {1} ({1}: Attach to target creature you control. Equip only as a sorcery.)\",\"keywords\":[\"Equip\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "c97361b5-af16-4a7b-af85-a429dbaf4ad2",
+    "name": "Mind Stone",
+    "data": "{\"name\":\"Mind Stone\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact\",\"oracle_text\":\"{T}: Add {C}.\\n{1}, {T}, Sacrifice this artifact: Draw a card.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "c9fc13d6-bd10-47bc-b2b6-7f67a1f3371e",
+    "name": "Shineshadow Snarl",
+    "data": "{\"name\":\"Shineshadow Snarl\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"As this land enters, you may reveal a Plains or Swamp card from your hand. If you don't, this land enters tapped.\\n{T}: Add {W} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "ca204b66-8d0c-431a-8d34-282f7c2d17da",
+    "name": "Lightning Greaves",
+    "data": "{\"name\":\"Lightning Greaves\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact — Equipment\",\"oracle_text\":\"Equipped creature has haste and shroud. (It can't be the target of spells or abilities.)\\nEquip {0}\",\"keywords\":[\"Equip\"],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "cd2c90ac-2b04-461c-92f3-939871b6b6a3",
+    "name": "Sunken Hollow",
+    "data": "{\"name\":\"Sunken Hollow\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land — Island Swamp\",\"oracle_text\":\"({T}: Add {U} or {B}.)\\nThis land enters tapped unless you control two or more basic lands.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "ce35f262-b93f-4409-8b33-26a7ed7abac8",
+    "name": "Elenda, the Dusk Rose",
+    "data": "{\"name\":\"Elenda, the Dusk Rose\",\"mana_cost\":\"{2}{W}{B}\",\"cmc\":4,\"type_line\":\"Legendary Creature — Vampire Knight\",\"oracle_text\":\"Lifelink\\nWhenever another creature dies, put a +1/+1 counter on Elenda.\\nWhen Elenda dies, create X 1/1 white Vampire creature tokens with lifelink, where X is Elenda's power.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Lifelink\"],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "cffb615c-2de0-4c65-9d0b-08a649ba0695",
+    "name": "Sorin, Vengeful Bloodlord",
+    "data": "{\"name\":\"Sorin, Vengeful Bloodlord\",\"mana_cost\":\"{2}{W}{B}\",\"cmc\":4,\"type_line\":\"Legendary Planeswalker — Sorin\",\"oracle_text\":\"During your turn, creatures and planeswalkers you control have lifelink.\\n+2: Sorin deals 1 damage to target player or planeswalker.\\n−X: Return target creature card with mana value X from your graveyard to the battlefield. That creature is a Vampire in addition to its other types.\",\"loyalty\":\"4\",\"keywords\":[],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "d215127b-5f1d-4d3c-935b-c228c9c7f874",
+    "name": "Dimir Infiltrator",
+    "data": "{\"name\":\"Dimir Infiltrator\",\"mana_cost\":\"{U}{B}\",\"cmc\":2,\"type_line\":\"Creature — Spirit\",\"oracle_text\":\"This creature can't be blocked.\\nTransmute {1}{U}{B} ({1}{U}{B}, Discard this card: Search your library for a card with the same mana value as this card, reveal it, put it into your hand, then shuffle. Transmute only as a sorcery.)\",\"power\":\"1\",\"toughness\":\"3\",\"keywords\":[\"Transmute\"],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "d2664f28-49e1-46f8-a863-b217e961a57c",
+    "name": "Black Market Connections",
+    "data": "{\"name\":\"Black Market Connections\",\"mana_cost\":\"{2}{B}\",\"cmc\":3,\"type_line\":\"Enchantment\",\"oracle_text\":\"At the beginning of your first main phase, choose one or more —\\n• Sell Contraband — Create a Treasure token. You lose 1 life.\\n• Buy Information — Draw a card. You lose 2 life.\\n• Hire a Mercenary — Create a 3/2 colorless Shapeshifter creature token with changeling. You lose 3 life. (It is every creature type.)\",\"keywords\":[\"Hire a Mercenary\",\"Treasure\",\"Sell Contraband\",\"Buy Information\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "d37f858e-03c8-4594-9b92-cd03699a1591",
+    "name": "Scoured Barrens",
+    "data": "{\"name\":\"Scoured Barrens\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped.\\nWhen this land enters, you gain 1 life.\\n{T}: Add {W} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "d71bda4c-3dee-4398-8fd0-f77d8743b887",
+    "name": "Gloomlake Verge",
+    "data": "{\"name\":\"Gloomlake Verge\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {U}.\\n{T}: Add {B}. Activate only if you control an Island or a Swamp.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "d7a38484-2acc-49a6-b32d-d54dddb14d31",
+    "name": "Dawn of Hope",
+    "data": "{\"name\":\"Dawn of Hope\",\"mana_cost\":\"{1}{W}\",\"cmc\":2,\"type_line\":\"Enchantment\",\"oracle_text\":\"Whenever you gain life, you may pay {2}. If you do, draw a card.\\n{3}{W}: Create a 1/1 white Soldier creature token with lifelink.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "dad4af15-5b26-417d-a41b-29e671e878f4",
+    "name": "Counterpoint",
+    "data": "{\"name\":\"Counterpoint\",\"mana_cost\":\"{3}{U}{B}\",\"cmc\":5,\"type_line\":\"Instant\",\"oracle_text\":\"Counter target spell. You may cast a creature, instant, sorcery, or planeswalker spell from your graveyard with mana value less than or equal to that spell's mana value without paying its mana cost.\",\"keywords\":[],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "de3dcb5d-775a-479f-99f5-d1883ed9b1b5",
+    "name": "Orzhov Signet",
+    "data": "{\"name\":\"Orzhov Signet\",\"mana_cost\":\"{2}\",\"cmc\":2,\"type_line\":\"Artifact\",\"oracle_text\":\"{1}, {T}: Add {W}{B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "e1cfd1cb-44a5-429f-a5c1-e6d29bad1c71",
+    "name": "Kalitas, Traitor of Ghet",
+    "data": "{\"name\":\"Kalitas, Traitor of Ghet\",\"mana_cost\":\"{2}{B}{B}\",\"cmc\":4,\"type_line\":\"Legendary Creature — Vampire Warrior\",\"oracle_text\":\"Lifelink\\nIf a nontoken creature an opponent controls would die, instead exile that card and create a 2/2 black Zombie creature token.\\n{2}{B}, Sacrifice another Vampire or Zombie: Put two +1/+1 counters on Kalitas.\",\"power\":\"3\",\"toughness\":\"4\",\"keywords\":[\"Lifelink\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "e6e6fce8-0f6a-4b84-865e-d4e4a4182f9f",
+    "name": "Temple of Silence",
+    "data": "{\"name\":\"Temple of Silence\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped.\\nWhen this land enters, scry 1. (Look at the top card of your library. You may put that card on the bottom.)\\n{T}: Add {W} or {B}.\",\"keywords\":[\"Scry\"],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "ebc5ac83-08d4-4d6b-b840-0c4ba71a38ab",
+    "name": "Vault of Champions",
+    "data": "{\"name\":\"Vault of Champions\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you have two or more opponents.\\n{T}: Add {W} or {B}.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "ed1d21ba-ddfe-4f82-9e37-93f9e2c7ba33",
+    "name": "Satoru Umezawa",
+    "data": "{\"name\":\"Satoru Umezawa\",\"mana_cost\":\"{1}{U}{B}\",\"cmc\":3,\"type_line\":\"Legendary Creature — Human Ninja\",\"oracle_text\":\"Whenever you activate a ninjutsu ability, look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order. This ability triggers only once each turn.\\nEach creature card in your hand has ninjutsu {2}{U}{B}.\",\"power\":\"2\",\"toughness\":\"4\",\"keywords\":[],\"colors\":[\"B\",\"U\"],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "ed9cc560-f30b-4b60-a094-ccf93ed656a7",
+    "name": "Access Tunnel",
+    "data": "{\"name\":\"Access Tunnel\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}: Add {C}.\\n{3}, {T}: Target creature with power 3 or less can't be blocked this turn.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "ee334bd7-d344-4684-85c8-d0464bbaf2b4",
+    "name": "Tormented Soul",
+    "data": "{\"name\":\"Tormented Soul\",\"mana_cost\":\"{B}\",\"cmc\":1,\"type_line\":\"Creature — Spirit\",\"oracle_text\":\"This creature can't block and can't be blocked.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "ee579a32-a048-4335-b966-231ba731cdea",
+    "name": "Phyrexian Arena",
+    "data": "{\"name\":\"Phyrexian Arena\",\"mana_cost\":\"{1}{B}{B}\",\"cmc\":3,\"type_line\":\"Enchantment\",\"oracle_text\":\"At the beginning of your upkeep, you draw a card and lose 1 life.\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "ef577d7d-7a24-4bd3-b86b-f69e37bb2ce7",
+    "name": "Wu Scout",
+    "data": "{\"name\":\"Wu Scout\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Creature — Human Soldier Scout\",\"oracle_text\":\"Horsemanship (This creature can't be blocked except by creatures with horsemanship.)\\nWhen this creature enters, look at target opponent's hand.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[\"Horsemanship\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "ef86989d-ce80-4e55-aece-7d11710eeffa",
+    "name": "Polluted Delta",
+    "data": "{\"name\":\"Polluted Delta\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.\",\"keywords\":[],\"colors\":[],\"color_identity\":[],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "f0e4dda1-2ffb-4353-a292-dcbc966967b4",
+    "name": "Yuan-Ti Malison",
+    "data": "{\"name\":\"Yuan-Ti Malison\",\"mana_cost\":\"{1}{U}\",\"cmc\":2,\"type_line\":\"Creature — Snake Rogue\",\"oracle_text\":\"This creature can't be blocked as long as it's attacking alone.\\nWhenever this creature deals combat damage to a player, venture into the dungeon. (Enter the first room or advance to the next room.)\",\"power\":\"2\",\"toughness\":\"1\",\"keywords\":[\"Venture into the dungeon\"],\"colors\":[\"U\"],\"color_identity\":[\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "f0ead7f5-5c82-40fd-8e89-3e3c5d31fbad",
+    "name": "Cleric Class",
+    "data": "{\"name\":\"Cleric Class\",\"mana_cost\":\"{W}\",\"cmc\":1,\"type_line\":\"Enchantment — Class\",\"oracle_text\":\"(Gain the next level as a sorcery to add its ability.)\\nIf you would gain life, you gain that much life plus 1 instead.\\n{3}{W}: Level 2\\nWhenever you gain life, put a +1/+1 counter on target creature you control.\\n{4}{W}: Level 3\\nWhen this Class becomes level 3, return target creature card from your graveyard to the battlefield. You gain life equal to that creature's toughness.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"class\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "f1c2dbe2-fbe0-4058-bdf1-91d1b1832786",
+    "name": "Dauthi Voidwalker",
+    "data": "{\"name\":\"Dauthi Voidwalker\",\"mana_cost\":\"{B}{B}\",\"cmc\":2,\"type_line\":\"Creature — Dauthi Rogue\",\"oracle_text\":\"Shadow (This creature can block or be blocked by only creatures with shadow.)\\nIf a card would be put into an opponent's graveyard from anywhere, instead exile it with a void counter on it.\\n{T}, Sacrifice this creature: Choose an exiled card an opponent owns with a void counter on it. You may play it this turn without paying its mana cost.\",\"power\":\"3\",\"toughness\":\"2\",\"keywords\":[\"Shadow\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "f3fad295-1af2-4ecc-8546-b121ad6be27b",
+    "name": "Soul Warden",
+    "data": "{\"name\":\"Soul Warden\",\"mana_cost\":\"{W}\",\"cmc\":1,\"type_line\":\"Creature — Human Cleric\",\"oracle_text\":\"Whenever another creature enters, you gain 1 life.\",\"power\":\"1\",\"toughness\":\"1\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "f7d8b91b-6541-4d3e-af51-7e000eac69c1",
+    "name": "Legion's Landing // Adanto, the First Fort",
+    "data": "{\"name\":\"Legion's Landing // Adanto, the First Fort\",\"cmc\":1,\"type_line\":\"Legendary Enchantment // Legendary Land\",\"keywords\":[\"Transform\"],\"color_identity\":[\"W\"],\"layout\":\"transform\",\"card_faces\":[{\"name\":\"Legion's Landing\",\"mana_cost\":\"{W}\",\"type_line\":\"Legendary Enchantment\",\"oracle_text\":\"When Legion's Landing enters, create a 1/1 white Vampire creature token with lifelink.\\nWhen you attack with three or more creatures, transform Legion's Landing.\"},{\"name\":\"Adanto, the First Fort\",\"mana_cost\":\"\",\"type_line\":\"Legendary Land\",\"oracle_text\":\"(Transforms from Legion's Landing.)\\n{T}: Add {W}.\\n{2}{W}, {T}: Create a 1/1 white Vampire creature token with lifelink.\"}]}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "f83a768c-162d-46f0-8ebd-d9c6b2c69322",
+    "name": "Vein Ripper",
+    "data": "{\"name\":\"Vein Ripper\",\"mana_cost\":\"{3}{B}{B}{B}\",\"cmc\":6,\"type_line\":\"Creature — Vampire Assassin\",\"oracle_text\":\"Flying\\nWard—Sacrifice a creature.\\nWhenever a creature dies, target opponent loses 2 life and you gain 2 life.\",\"power\":\"6\",\"toughness\":\"5\",\"keywords\":[\"Flying\",\"Ward\"],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "f8f4fc60-725d-46d8-8e8f-e68e00d20589",
+    "name": "Castle Ardenvale",
+    "data": "{\"name\":\"Castle Ardenvale\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land\",\"oracle_text\":\"This land enters tapped unless you control a Plains.\\n{T}: Add {W}.\\n{2}{W}{W}, {T}: Create a 1/1 white Human creature token.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "faa01ed1-ccfa-4e58-951f-cd81f9068027",
+    "name": "Mortify",
+    "data": "{\"name\":\"Mortify\",\"mana_cost\":\"{1}{W}{B}\",\"cmc\":3,\"type_line\":\"Instant\",\"oracle_text\":\"Destroy target creature or enchantment.\",\"keywords\":[],\"colors\":[\"B\",\"W\"],\"color_identity\":[\"B\",\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "fae37e28-e137-4177-b973-fa8b4dd8f409",
+    "name": "Generous Gift",
+    "data": "{\"name\":\"Generous Gift\",\"mana_cost\":\"{2}{W}\",\"cmc\":3,\"type_line\":\"Instant\",\"oracle_text\":\"Destroy target permanent. Its controller creates a 3/3 green Elephant creature token.\",\"keywords\":[],\"colors\":[\"W\"],\"color_identity\":[\"W\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "fbffaf9f-40e7-4113-a037-533b733cebce",
+    "name": "Sorin the Mirthless",
+    "data": "{\"name\":\"Sorin the Mirthless\",\"mana_cost\":\"{2}{B}{B}\",\"cmc\":4,\"type_line\":\"Legendary Planeswalker — Sorin\",\"oracle_text\":\"+1: Look at the top card of your library. You may reveal that card and put it into your hand. If you do, you lose life equal to its mana value.\\n−2: Create a 2/3 black Vampire creature token with flying and lifelink.\\n−7: Sorin deals 13 damage to any target. You gain 13 life.\",\"loyalty\":\"4\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   },
+   {
+    "oracle_id": "fc9ec820-4245-4a96-b009-5308a818ca58",
+    "name": "Watery Grave",
+    "data": "{\"name\":\"Watery Grave\",\"mana_cost\":\"\",\"cmc\":0,\"type_line\":\"Land — Island Swamp\",\"oracle_text\":\"({T}: Add {U} or {B}.)\\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.\",\"keywords\":[],\"colors\":[],\"color_identity\":[\"B\",\"U\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:26:01.013Z"
+   },
+   {
+    "oracle_id": "fee680c6-afe2-4321-9d8a-8f81a612a53b",
+    "name": "Sorin, Imperious Bloodlord",
+    "data": "{\"name\":\"Sorin, Imperious Bloodlord\",\"mana_cost\":\"{2}{B}\",\"cmc\":3,\"type_line\":\"Legendary Planeswalker — Sorin\",\"oracle_text\":\"+1: Target creature you control gains deathtouch and lifelink until end of turn. If it's a Vampire, put a +1/+1 counter on it.\\n+1: You may sacrifice a Vampire. When you do, Sorin deals 3 damage to any target and you gain 3 life.\\n−3: You may put a Vampire creature card from your hand onto the battlefield.\",\"loyalty\":\"4\",\"keywords\":[],\"colors\":[\"B\"],\"color_identity\":[\"B\"],\"layout\":\"normal\"}",
+    "fetched_at": "2026-11-28T14:25:46.656Z"
+   }
+  ],
+  "printings": [
+   {
+    "scryfall_id": "0365631c-8b38-4cc6-a237-a049daad67a8",
+    "oracle_id": "ebc5ac83-08d4-4d6b-b840-0c4ba71a38ab",
+    "set_code": "trc",
+    "collector_number": "576",
+    "image_url": "https://cards.scryfall.io/grid/front/0/3/0365631c-8b38-4cc6-a237-a049daad67a8.webp?1793197625",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "050ca791-265a-4e7b-9640-4fd5a6d8cd3a",
+    "oracle_id": "a3afd8b9-d499-40f7-be41-f8fee6636a1d",
+    "set_code": "mkc",
+    "collector_number": "143",
+    "image_url": "https://cards.scryfall.io/grid/front/0/5/050ca791-265a-4e7b-9640-4fd5a6d8cd3a.webp?1783913002",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "0548fb60-c843-4f8f-a029-6f10efc63a41",
+    "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+    "set_code": "msc",
+    "collector_number": "233",
+    "image_url": "https://cards.scryfall.io/grid/front/0/5/0548fb60-c843-4f8f-a029-6f10efc63a41.webp?1783903206",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "061ac694-610c-479f-b038-a4ef5270d5d7",
+    "oracle_id": "bb9ce416-eef1-49e8-89a0-2b6837505070",
+    "set_code": "tla",
+    "collector_number": "276",
+    "image_url": "https://cards.scryfall.io/grid/front/0/6/061ac694-610c-479f-b038-a4ef5270d5d7.webp?1783904907",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "073c301e-5bb6-49fa-bf61-2f662030540f",
+    "oracle_id": "59c7496b-19a2-478b-b28f-6f153c2458ae",
+    "set_code": "lcc",
+    "collector_number": "171",
+    "image_url": "https://cards.scryfall.io/grid/front/0/7/073c301e-5bb6-49fa-bf61-2f662030540f.webp?1783913883",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "0784b6f0-9ebf-43d2-ba0f-a6bc93ba0c48",
+    "oracle_id": "ee579a32-a048-4335-b966-231ba731cdea",
+    "set_code": "fdn",
+    "collector_number": "180",
+    "image_url": "https://cards.scryfall.io/grid/front/0/7/0784b6f0-9ebf-43d2-ba0f-a6bc93ba0c48.webp?1783909072",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "078933b3-6d82-45f2-94e8-addf54cf1704",
+    "oracle_id": "f83a768c-162d-46f0-8ebd-d9c6b2c69322",
+    "set_code": "mkm",
+    "collector_number": "110",
+    "image_url": "https://cards.scryfall.io/grid/front/0/7/078933b3-6d82-45f2-94e8-addf54cf1704.webp?1783912890",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "08033756-5fee-49c1-a968-9ed3e70cd571",
+    "oracle_id": "d7a38484-2acc-49a6-b32d-d54dddb14d31",
+    "set_code": "ltc",
+    "collector_number": "164",
+    "image_url": "https://cards.scryfall.io/grid/front/0/8/08033756-5fee-49c1-a968-9ed3e70cd571.webp?1783915968",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "091600ae-6578-4353-8e0f-d170f555bcd0",
+    "oracle_id": "c97361b5-af16-4a7b-af85-a429dbaf4ad2",
+    "set_code": "trc",
+    "collector_number": "497",
+    "image_url": "https://cards.scryfall.io/grid/front/0/9/091600ae-6578-4353-8e0f-d170f555bcd0.webp?1793965409",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "09ac862f-0a51-44dd-b86f-9412b8218b13",
+    "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+    "set_code": "mdd",
+    "collector_number": "292",
+    "image_url": "https://cards.scryfall.io/grid/front/0/9/09ac862f-0a51-44dd-b86f-9412b8218b13.webp?1791578423",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "0f51afd9-7093-4aa3-ad5b-7383684d6285",
+    "oracle_id": "f0e4dda1-2ffb-4353-a292-dcbc966967b4",
+    "set_code": "afr",
+    "collector_number": "86",
+    "image_url": "https://cards.scryfall.io/grid/front/0/f/0f51afd9-7093-4aa3-ad5b-7383684d6285.webp?1783926503",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "0fd1fc09-a09d-45e6-8a07-3a8a83b4e6ec",
+    "oracle_id": "3dc364f3-3094-4660-80ca-9418588c7fde",
+    "set_code": "ltr",
+    "collector_number": "245",
+    "image_url": "https://cards.scryfall.io/grid/front/0/f/0fd1fc09-a09d-45e6-8a07-3a8a83b4e6ec.webp?1783916237",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "128deed2-b9bc-4065-95c9-ccd7b08f1230",
+    "oracle_id": "a3da7d5b-2c2b-45fe-b9c5-413b8c8fc0a2",
+    "set_code": "drc",
+    "collector_number": "58",
+    "image_url": "https://cards.scryfall.io/grid/front/1/2/128deed2-b9bc-4065-95c9-ccd7b08f1230.webp?1783907736",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "136a7d63-94ae-4d92-86ab-12bf9d78a803",
+    "oracle_id": "1baec770-0785-4cbc-be18-83572fd8e9c1",
+    "set_code": "tmp",
+    "collector_number": "94",
+    "image_url": "https://cards.scryfall.io/grid/front/1/3/136a7d63-94ae-4d92-86ab-12bf9d78a803.webp?1783946649",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "14a41e7e-9f68-4449-9e2c-4c862036bce5",
+    "oracle_id": "f7d8b91b-6541-4d3e-af51-7e000eac69c1",
+    "set_code": "plst",
+    "collector_number": "XLN-22",
+    "image_url": "https://cards.scryfall.io/grid/front/1/4/14a41e7e-9f68-4449-9e2c-4c862036bce5.webp?1783916595",
+    "back_image_url": "https://cards.scryfall.io/grid/back/1/4/14a41e7e-9f68-4449-9e2c-4c862036bce5.webp?1783916595"
+   },
+   {
+    "scryfall_id": "156df6eb-1ac9-4954-bf93-b1668096b8bd",
+    "oracle_id": "5f42b67f-87fd-4f98-a0e8-0c8313f4bbc8",
+    "set_code": "inr",
+    "collector_number": "284",
+    "image_url": "https://cards.scryfall.io/grid/front/1/5/156df6eb-1ac9-4954-bf93-b1668096b8bd.webp?1783908058",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "15c34447-b0f4-4fcc-b557-23c92850b31b",
+    "oracle_id": "4f2d4538-dc1d-4c09-964b-b0d7c240fb7d",
+    "set_code": "2xm",
+    "collector_number": "5",
+    "image_url": "https://cards.scryfall.io/grid/front/1/5/15c34447-b0f4-4fcc-b557-23c92850b31b.webp?1783930222",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "1642df77-6fe8-47cf-b750-ca4dd9b331ba",
+    "oracle_id": "353dd446-2ea6-41c9-a10f-5a03e4de19b4",
+    "set_code": "nec",
+    "collector_number": "11",
+    "image_url": "https://cards.scryfall.io/grid/front/1/6/1642df77-6fe8-47cf-b750-ca4dd9b331ba.webp?1783923996",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "1be45e44-44b5-438f-9fcd-22c1c6668e11",
+    "oracle_id": "02746b0e-3ef9-46c0-9517-6c52c2905d0b",
+    "set_code": "plst",
+    "collector_number": "BBD-35",
+    "image_url": "https://cards.scryfall.io/grid/front/1/b/1be45e44-44b5-438f-9fcd-22c1c6668e11.webp?1783917883",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "1cad1bd2-7c56-4ce0-99a6-b2a49c1288dd",
+    "oracle_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+    "set_code": "msc",
+    "collector_number": "191",
+    "image_url": "https://cards.scryfall.io/grid/front/1/c/1cad1bd2-7c56-4ce0-99a6-b2a49c1288dd.webp?1783903222",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "1d94ff37-f04e-48ee-8253-d62ab07f0632",
+    "oracle_id": "a656ad7f-133f-4d93-919a-43bcf1f815f3",
+    "set_code": "rix",
+    "collector_number": "166",
+    "image_url": "https://cards.scryfall.io/grid/front/1/d/1d94ff37-f04e-48ee-8253-d62ab07f0632.webp?1783935277",
+    "back_image_url": "https://cards.scryfall.io/grid/back/1/d/1d94ff37-f04e-48ee-8253-d62ab07f0632.webp?1783935277"
+   },
+   {
+    "scryfall_id": "1df2c2a6-94a9-4365-9bd5-dd5f2854c562",
+    "oracle_id": "afaef788-34d1-460b-b884-9d7ae6ddeb18",
+    "set_code": "trc",
+    "collector_number": "448",
+    "image_url": "https://cards.scryfall.io/grid/front/1/d/1df2c2a6-94a9-4365-9bd5-dd5f2854c562.webp?1793023039",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "1e19ed76-26fe-4e39-8d65-959ae5675d5e",
+    "oracle_id": "74255add-2894-4c31-81c1-d38873fa325f",
+    "set_code": "msc",
+    "collector_number": "760",
+    "image_url": "https://cards.scryfall.io/grid/front/1/e/1e19ed76-26fe-4e39-8d65-959ae5675d5e.webp?1783903025",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "1e5a6db8-130a-4931-b7a5-2f024331802b",
+    "oracle_id": "093f6123-6b1d-456f-a526-8740bc969b4e",
+    "set_code": "j25",
+    "collector_number": "7",
+    "image_url": "https://cards.scryfall.io/grid/front/1/e/1e5a6db8-130a-4931-b7a5-2f024331802b.webp?1783908869",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "1eae3165-554d-4759-8f18-794e2a7d8464",
+    "oracle_id": "14aefe99-fb60-4f1c-a71f-7ffbe94c8b13",
+    "set_code": "fdn",
+    "collector_number": "184",
+    "image_url": "https://cards.scryfall.io/grid/front/1/e/1eae3165-554d-4759-8f18-794e2a7d8464.webp?1783909071",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "20adee32-2144-44ad-a70c-ebfbda0900ec",
+    "oracle_id": "bc8de6c7-c69d-4add-8f25-825d945874f9",
+    "set_code": "dmc",
+    "collector_number": "155",
+    "image_url": "https://cards.scryfall.io/grid/front/2/0/20adee32-2144-44ad-a70c-ebfbda0900ec.webp?1783921411",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "211af1bf-910b-41a5-b928-f378188d1871",
+    "oracle_id": "7bb51602-60e8-4730-b11c-2870d6b42e20",
+    "set_code": "blb",
+    "collector_number": "41",
+    "image_url": "https://cards.scryfall.io/grid/front/2/1/211af1bf-910b-41a5-b928-f378188d1871.webp?1783910852",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "21522dff-8a65-4816-8b6e-b71270fda3cd",
+    "oracle_id": "61cceb14-9568-4a5e-9b56-07afa6407df2",
+    "set_code": "scd",
+    "collector_number": "55",
+    "image_url": "https://cards.scryfall.io/grid/front/2/1/21522dff-8a65-4816-8b6e-b71270fda3cd.webp?1783918717",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "219d3e48-e0b1-472d-ac45-11c14b292c9e",
+    "oracle_id": "fee680c6-afe2-4321-9d8a-8f81a612a53b",
+    "set_code": "inr",
+    "collector_number": "133",
+    "image_url": "https://cards.scryfall.io/grid/front/2/1/219d3e48-e0b1-472d-ac45-11c14b292c9e.webp?1790456308",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "254a6531-7cf7-4c74-9050-65fe4b273744",
+    "oracle_id": "250cb58b-2924-4dff-92fe-ac0ebbbeb218",
+    "set_code": "who",
+    "collector_number": "267",
+    "image_url": "https://cards.scryfall.io/grid/front/2/5/254a6531-7cf7-4c74-9050-65fe4b273744.webp?1783914584",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "2599b027-1ff8-48b8-8a90-8ac1fac7ed63",
+    "oracle_id": "21d700e8-0255-418e-96a0-6fe05b3f836d",
+    "set_code": "j22",
+    "collector_number": "94",
+    "image_url": "https://cards.scryfall.io/grid/front/2/5/2599b027-1ff8-48b8-8a90-8ac1fac7ed63.webp?1783919156",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "27b2d8b7-3160-4a51-a898-a3c05180ff75",
+    "oracle_id": "867dbd5a-c3cf-41ce-980b-c9babc6f30f2",
+    "set_code": "hoc",
+    "collector_number": "48",
+    "image_url": "https://cards.scryfall.io/grid/front/2/7/27b2d8b7-3160-4a51-a898-a3c05180ff75.webp?1784634923",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "27beed9c-a42e-46de-8fbc-885da337ae75",
+    "oracle_id": "b1c56e23-eae6-47a1-a1cd-3a2d01621768",
+    "set_code": "lcc",
+    "collector_number": "293",
+    "image_url": "https://cards.scryfall.io/grid/front/2/7/27beed9c-a42e-46de-8fbc-885da337ae75.webp?1783913842",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "289cc92d-68e7-4b9c-8779-fa2583f3eef1",
+    "oracle_id": "08e2fead-53e9-445b-8fd1-c108bb09d81c",
+    "set_code": "j25",
+    "collector_number": "296",
+    "image_url": "https://cards.scryfall.io/grid/front/2/8/289cc92d-68e7-4b9c-8779-fa2583f3eef1.webp?1783908775",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "2b5801fb-2026-4f25-98bc-ebb2f99684b9",
+    "oracle_id": "08d80efc-9542-4ba2-824c-c8615d8d07f2",
+    "set_code": "mkm",
+    "collector_number": "270",
+    "image_url": "https://cards.scryfall.io/grid/front/2/b/2b5801fb-2026-4f25-98bc-ebb2f99684b9.webp?1786507741",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "2c09f45f-54a5-47b5-afd7-9ac7c05438e7",
+    "oracle_id": "bd16434d-55ea-4c5a-a9ef-752971a4af16",
+    "set_code": "frc",
+    "collector_number": "50",
+    "image_url": "https://cards.scryfall.io/grid/front/2/c/2c09f45f-54a5-47b5-afd7-9ac7c05438e7.webp?1789599827",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3183897e-4f86-4020-b149-cc4c2451a6c0",
+    "oracle_id": "4e7a8817-1a66-45c3-ade9-eac79b40b89f",
+    "set_code": "inr",
+    "collector_number": "330",
+    "image_url": "https://cards.scryfall.io/grid/front/3/1/3183897e-4f86-4020-b149-cc4c2451a6c0.webp?1783908032",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3245ff74-1f9c-4518-a23f-1579f338f232",
+    "oracle_id": "63e596a2-9126-4af6-8782-c38687d664ad",
+    "set_code": "cmm",
+    "collector_number": "29",
+    "image_url": "https://cards.scryfall.io/grid/front/3/2/3245ff74-1f9c-4518-a23f-1579f338f232.webp?1783915722",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "354fe9bd-4ec8-409c-8ce5-b29393f3d169",
+    "oracle_id": "cffb615c-2de0-4c65-9d0b-08a649ba0695",
+    "set_code": "war",
+    "collector_number": "217",
+    "image_url": "https://cards.scryfall.io/grid/front/3/5/354fe9bd-4ec8-409c-8ce5-b29393f3d169.webp?1783933388",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3573b9a2-7911-475c-8ae7-25bd0dbb7159",
+    "oracle_id": "f1c2dbe2-fbe0-4058-bdf1-91d1b1832786",
+    "set_code": "tdc",
+    "collector_number": "176",
+    "image_url": "https://cards.scryfall.io/grid/front/3/5/3573b9a2-7911-475c-8ae7-25bd0dbb7159.webp?1783907090",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "35a69bb5-b8e6-4558-9563-10c7a3662f93",
+    "oracle_id": "605c1ee0-5e8a-4e0a-a99b-42a38873f822",
+    "set_code": "tdc",
+    "collector_number": "140",
+    "image_url": "https://cards.scryfall.io/grid/front/3/5/35a69bb5-b8e6-4558-9563-10c7a3662f93.webp?1783907112",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3616a2f7-d852-4606-898b-76799c647b40",
+    "oracle_id": "144119bc-7fd1-45c5-9e29-f742e7c255ac",
+    "set_code": "plst",
+    "collector_number": "ZNR-260",
+    "image_url": "https://cards.scryfall.io/grid/front/3/6/3616a2f7-d852-4606-898b-76799c647b40.webp?1783916552",
+    "back_image_url": "https://cards.scryfall.io/grid/back/3/6/3616a2f7-d852-4606-898b-76799c647b40.webp?1783916552"
+   },
+   {
+    "scryfall_id": "37f920f0-4dfc-477b-af7e-a17dfc9ba455",
+    "oracle_id": "ad95eac2-5b48-4102-9988-a6d7b1ec30e0",
+    "set_code": "clb",
+    "collector_number": "332",
+    "image_url": "https://cards.scryfall.io/grid/front/3/7/37f920f0-4dfc-477b-af7e-a17dfc9ba455.webp?1783922667",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "37fee9ca-a9bc-4369-b71f-69f4183d1c1e",
+    "oracle_id": "f3fad295-1af2-4ecc-8546-b121ad6be27b",
+    "set_code": "plst",
+    "collector_number": "MM3-24",
+    "image_url": "https://cards.scryfall.io/grid/front/3/7/37fee9ca-a9bc-4369-b71f-69f4183d1c1e.webp?1783931899",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3a8eef9b-9b03-42cd-a27a-07021bf0b33f",
+    "oracle_id": "cd2c90ac-2b04-461c-92f3-939871b6b6a3",
+    "set_code": "msc",
+    "collector_number": "271",
+    "image_url": "https://cards.scryfall.io/grid/front/3/a/3a8eef9b-9b03-42cd-a27a-07021bf0b33f.webp?1783903191",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3b69b12e-ef29-455c-8939-eacf44c6c3f6",
+    "oracle_id": "c8b143ad-43ec-4e0d-a440-e348daa31391",
+    "set_code": "trc",
+    "collector_number": "501",
+    "image_url": "https://cards.scryfall.io/grid/front/3/b/3b69b12e-ef29-455c-8939-eacf44c6c3f6.webp?1793021194",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3e23d56b-0251-4bc7-af89-2fbc68e125b5",
+    "oracle_id": "c597cfae-3f92-4d31-8bc1-5a2da995f1bf",
+    "set_code": "plst",
+    "collector_number": "EMN-60",
+    "image_url": "https://cards.scryfall.io/grid/front/3/e/3e23d56b-0251-4bc7-af89-2fbc68e125b5.webp?1783932279",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "3ffe82a4-584e-4ebd-9551-a745bed01e26",
+    "oracle_id": "4e183439-17d2-47ff-9d99-5e22821d91e3",
+    "set_code": "frc",
+    "collector_number": "25",
+    "image_url": "https://cards.scryfall.io/grid/front/3/f/3ffe82a4-584e-4ebd-9551-a745bed01e26.webp?1789599786",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "4645eebf-c9fc-4ee7-b646-61dc1205b4b0",
+    "oracle_id": "b1544f21-7e98-461b-aed5-e748b0168c52",
+    "set_code": "trc",
+    "collector_number": "429",
+    "image_url": "https://cards.scryfall.io/grid/front/4/6/4645eebf-c9fc-4ee7-b646-61dc1205b4b0.webp?1793111861",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "47433ce9-1ac6-4359-a5e4-4ec68490cb0c",
+    "oracle_id": "379ed4ec-8f2e-448b-9ed2-a3181e2f877e",
+    "set_code": "otc",
+    "collector_number": "144",
+    "image_url": "https://cards.scryfall.io/grid/front/4/7/47433ce9-1ac6-4359-a5e4-4ec68490cb0c.webp?1783911927",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "47ce8b7e-d8e1-489a-a69e-99089eeb8739",
+    "oracle_id": "f0ead7f5-5c82-40fd-8e89-3e3c5d31fbad",
+    "set_code": "afr",
+    "collector_number": "6",
+    "image_url": "https://cards.scryfall.io/grid/front/4/7/47ce8b7e-d8e1-489a-a69e-99089eeb8739.webp?1783926538",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "483fa1cb-1e35-44f2-a143-98c0f107f5ca",
+    "oracle_id": "0d4ecdb1-ec90-497f-a7a4-1c68092b8757",
+    "set_code": "2x2",
+    "collector_number": "32",
+    "image_url": "https://cards.scryfall.io/grid/front/4/8/483fa1cb-1e35-44f2-a143-98c0f107f5ca.webp?1783921926",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "48e40927-dd87-42ed-b805-0ae8ba81f5fb",
+    "oracle_id": "bd004c9d-771e-4e63-a97d-a2259c096af8",
+    "set_code": "clb",
+    "collector_number": "357",
+    "image_url": "https://cards.scryfall.io/grid/front/4/8/48e40927-dd87-42ed-b805-0ae8ba81f5fb.webp?1783922655",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "4ae1ec4a-5367-4663-841b-4038ae30a690",
+    "oracle_id": "37688720-03de-4eca-a82d-a0afe8d58adc",
+    "set_code": "fic",
+    "collector_number": "318",
+    "image_url": "https://cards.scryfall.io/grid/front/4/a/4ae1ec4a-5367-4663-841b-4038ae30a690.webp?1783906251",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "4bef5957-71a4-4fe0-b2ce-dff8e8690bd9",
+    "oracle_id": "ed9cc560-f30b-4b60-a094-ccf93ed656a7",
+    "set_code": "tdc",
+    "collector_number": "337",
+    "image_url": "https://cards.scryfall.io/grid/front/4/b/4bef5957-71a4-4fe0-b2ce-dff8e8690bd9.webp?1783906998",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "4cd86997-d7b9-4b5b-9488-11f5c679e4d3",
+    "oracle_id": "17b60106-a4c7-410a-8ac3-ec8e74e29a7c",
+    "set_code": "soc",
+    "collector_number": "388",
+    "image_url": "https://cards.scryfall.io/grid/front/4/c/4cd86997-d7b9-4b5b-9488-11f5c679e4d3.webp?1783903726",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "511bff25-3213-42c4-8abd-9eda49f8dc96",
+    "oracle_id": "71a60247-17e5-44bd-9fed-f7d550b09ef3",
+    "set_code": "otc",
+    "collector_number": "121",
+    "image_url": "https://cards.scryfall.io/grid/front/5/1/511bff25-3213-42c4-8abd-9eda49f8dc96.webp?1783911934",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "52bc6720-0f16-4e8a-a2e5-b1714bd68991",
+    "oracle_id": "bde976c6-afed-44bb-8e3d-4103289dff5e",
+    "set_code": "plst",
+    "collector_number": "DTK-56",
+    "image_url": "https://cards.scryfall.io/grid/front/5/2/52bc6720-0f16-4e8a-a2e5-b1714bd68991.webp?1783910337",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "52d58fe4-6070-4022-9cd7-c35a11b44525",
+    "oracle_id": "3407fe41-fdd3-4119-8f70-4bc4590a379f",
+    "set_code": "tmt",
+    "collector_number": "47",
+    "image_url": "https://cards.scryfall.io/grid/front/5/2/52d58fe4-6070-4022-9cd7-c35a11b44525.webp?1783904112",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "53e3fa87-8de0-4e3a-90bf-780dd0a9fb48",
+    "oracle_id": "55f3c721-e13a-406e-bc8e-d6cdc91ac477",
+    "set_code": "fic",
+    "collector_number": "232",
+    "image_url": "https://cards.scryfall.io/grid/front/5/3/53e3fa87-8de0-4e3a-90bf-780dd0a9fb48.webp?1783906294",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "551d1f1e-8bc0-4196-8998-0aa7db23b388",
+    "oracle_id": "bad2385b-6981-46fa-a012-d3992c3bc118",
+    "set_code": "acr",
+    "collector_number": "283",
+    "image_url": "https://cards.scryfall.io/grid/front/5/5/551d1f1e-8bc0-4196-8998-0aa7db23b388.webp?1783910896",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5525d6a6-e532-4047-9da4-bfae7927fecc",
+    "oracle_id": "fc9ec820-4245-4a96-b009-5308a818ca58",
+    "set_code": "trk",
+    "collector_number": "306",
+    "image_url": "https://cards.scryfall.io/grid/front/5/5/5525d6a6-e532-4047-9da4-bfae7927fecc.webp?1784036860",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5544247d-1f8f-443f-a4c4-d8461db28a79",
+    "oracle_id": "1915a311-209b-4628-8122-af3055a78fed",
+    "set_code": "ogw",
+    "collector_number": "153",
+    "image_url": "https://cards.scryfall.io/grid/front/5/5/5544247d-1f8f-443f-a4c4-d8461db28a79.webp?1783937896",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "55b5b094-9d2d-4d96-b90c-78fecdae725a",
+    "oracle_id": "04b7362d-0490-4cb0-b5d7-2a7732f659ce",
+    "set_code": "soc",
+    "collector_number": "363",
+    "image_url": "https://cards.scryfall.io/grid/front/5/5/55b5b094-9d2d-4d96-b90c-78fecdae725a.webp?1783903734",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5a6be1db-8651-4194-8e17-74c347bff5f1",
+    "oracle_id": "40c88392-2aa7-4e12-86a4-8d680219e670",
+    "set_code": "plst",
+    "collector_number": "THB-13",
+    "image_url": "https://cards.scryfall.io/grid/front/5/a/5a6be1db-8651-4194-8e17-74c347bff5f1.webp?1783928104",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5aa0c810-3b7d-4661-979e-e84fb327742d",
+    "oracle_id": "c854ecb0-cc60-4c48-a9aa-7f2348a7a8c6",
+    "set_code": "sos",
+    "collector_number": "260",
+    "image_url": "https://cards.scryfall.io/grid/front/5/a/5aa0c810-3b7d-4661-979e-e84fb327742d.webp?1783903618",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5deb74ff-15df-4894-b074-9a98731bd2c0",
+    "oracle_id": "7336a541-3ae9-4ab2-acb8-f574c0a5b3a9",
+    "set_code": "j25",
+    "collector_number": "71",
+    "image_url": "https://cards.scryfall.io/grid/front/5/d/5deb74ff-15df-4894-b074-9a98731bd2c0.webp?1783908850",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5df90940-15ea-418c-8547-6c75d69ec6d3",
+    "oracle_id": "0056fc91-4398-471c-b561-7ff99750ac8a",
+    "set_code": "tmt",
+    "collector_number": "184",
+    "image_url": "https://cards.scryfall.io/grid/front/5/d/5df90940-15ea-418c-8547-6c75d69ec6d3.webp?1783904064",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5ea98881-83bf-4daa-9d53-9e638340ea2e",
+    "oracle_id": "0c85b8f7-0bd0-4680-9ec5-d4b110460a54",
+    "set_code": "trc",
+    "collector_number": "529",
+    "image_url": "https://cards.scryfall.io/grid/front/5/e/5ea98881-83bf-4daa-9d53-9e638340ea2e.webp?1793112001",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5eb843ef-b223-40d0-a461-54b16d188d0e",
+    "oracle_id": "ab1cc360-b9de-48d9-9983-4dfe4a7d2a37",
+    "set_code": "msc",
+    "collector_number": "147",
+    "image_url": "https://cards.scryfall.io/grid/front/5/e/5eb843ef-b223-40d0-a461-54b16d188d0e.webp?1783903242",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5f4fa21b-4733-49a6-b751-779b8325c4d2",
+    "oracle_id": "faa01ed1-ccfa-4e58-951f-cd81f9068027",
+    "set_code": "fic",
+    "collector_number": "327",
+    "image_url": "https://cards.scryfall.io/grid/front/5/f/5f4fa21b-4733-49a6-b751-779b8325c4d2.webp?1783906252",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "5fa4556f-2fdc-42e6-98cb-291cee2ca3ac",
+    "oracle_id": "32b03b48-06da-4a74-a7ac-e5ae39a4f428",
+    "set_code": "msc",
+    "collector_number": "243",
+    "image_url": "https://cards.scryfall.io/grid/front/5/f/5fa4556f-2fdc-42e6-98cb-291cee2ca3ac.webp?1783903202",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "61248b5d-3f4b-4329-a1af-7252443883a0",
+    "oracle_id": "73089a39-a2f6-4aa2-a058-e6551475153d",
+    "set_code": "ltc",
+    "collector_number": "208",
+    "image_url": "https://cards.scryfall.io/grid/front/6/1/61248b5d-3f4b-4329-a1af-7252443883a0.webp?1783915940",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "616e50a5-9c29-4557-a1a8-d64a2cd28d2e",
+    "oracle_id": "44f3241f-af82-4f2e-b15d-7f279bf6e816",
+    "set_code": "plst",
+    "collector_number": "SHM-267",
+    "image_url": "https://cards.scryfall.io/grid/front/6/1/616e50a5-9c29-4557-a1a8-d64a2cd28d2e.webp?1783925193",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "6173d331-1dd9-47e0-bb9c-5655b179737f",
+    "oracle_id": "7d881c57-0bd9-4c57-aa4a-b10808b86143",
+    "set_code": "drc",
+    "collector_number": "129",
+    "image_url": "https://cards.scryfall.io/grid/front/6/1/6173d331-1dd9-47e0-bb9c-5655b179737f.webp?1783907712",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "61fdb579-86f3-4f8d-a0b1-fd545917105d",
+    "oracle_id": "be811e70-aaaa-41f3-bf9e-5d3f9f719b49",
+    "set_code": "fdc",
+    "collector_number": "299",
+    "image_url": "https://cards.scryfall.io/grid/front/6/1/61fdb579-86f3-4f8d-a0b1-fd545917105d.webp?1789753359",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "62ef854d-ec9e-443d-a4ba-4b2875ed3fe7",
+    "oracle_id": "0c85b8f7-0bd0-4680-9ec5-d4b110460a54",
+    "set_code": "msc",
+    "collector_number": "242",
+    "image_url": "https://cards.scryfall.io/grid/front/6/2/62ef854d-ec9e-443d-a4ba-4b2875ed3fe7.webp?1783903202",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "65e4de2e-47d2-4967-be31-9df0057a9c74",
+    "oracle_id": "f8f4fc60-725d-46d8-8e8f-e68e00d20589",
+    "set_code": "tdc",
+    "collector_number": "346",
+    "image_url": "https://cards.scryfall.io/grid/front/6/5/65e4de2e-47d2-4967-be31-9df0057a9c74.webp?1783906996",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "66490fc8-3378-4283-a107-f631787133ea",
+    "oracle_id": "b693c3de-2eaf-4850-b405-e79d00adefda",
+    "set_code": "trc",
+    "collector_number": "506",
+    "image_url": "https://cards.scryfall.io/grid/front/6/6/66490fc8-3378-4283-a107-f631787133ea.webp?1793021207",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "670a36cc-34e1-4d11-808e-1b6bc88eb5d8",
+    "oracle_id": "93cf50cf-0ecc-4d3e-abea-778c1ebacec4",
+    "set_code": "fdn",
+    "collector_number": "754",
+    "image_url": "https://cards.scryfall.io/grid/front/6/7/670a36cc-34e1-4d11-808e-1b6bc88eb5d8.webp?1787562900",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "69d1dd6c-21d3-4fe8-af1b-7088dcceef08",
+    "oracle_id": "7685ff3f-6d61-4b1d-a381-49bc6274aa01",
+    "set_code": "clb",
+    "collector_number": "856",
+    "image_url": "https://cards.scryfall.io/grid/front/6/9/69d1dd6c-21d3-4fe8-af1b-7088dcceef08.webp?1783922392",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "6a91d75c-7cdb-4b2a-abdd-c9feae8cb42e",
+    "oracle_id": "1c633e02-95ef-445e-b4e0-fbfbc5ed9cc9",
+    "set_code": "plst",
+    "collector_number": "ZNR-259",
+    "image_url": "https://cards.scryfall.io/grid/front/6/a/6a91d75c-7cdb-4b2a-abdd-c9feae8cb42e.webp?1783916552",
+    "back_image_url": "https://cards.scryfall.io/grid/back/6/a/6a91d75c-7cdb-4b2a-abdd-c9feae8cb42e.webp?1783916552"
+   },
+   {
+    "scryfall_id": "6e288374-2b71-4ace-b1d2-a19fee6cb4af",
+    "oracle_id": "ef86989d-ce80-4e55-aece-7d11710eeffa",
+    "set_code": "mh3",
+    "collector_number": "224",
+    "image_url": "https://cards.scryfall.io/grid/front/6/e/6e288374-2b71-4ace-b1d2-a19fee6cb4af.webp?1783911240",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "6e6147c6-0b51-4e33-a90b-94ed296e665e",
+    "oracle_id": "c9fc13d6-bd10-47bc-b2b6-7f67a1f3371e",
+    "set_code": "trc",
+    "collector_number": "558",
+    "image_url": "https://cards.scryfall.io/grid/front/6/e/6e6147c6-0b51-4e33-a90b-94ed296e665e.webp?1793021367",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "6fe6ccad-e303-48f9-9dfa-0db7c1878031",
+    "oracle_id": "c7f33cea-2ec8-4081-9208-a5b1d86721b3",
+    "set_code": "tle",
+    "collector_number": "160",
+    "image_url": "https://cards.scryfall.io/grid/front/6/f/6fe6ccad-e303-48f9-9dfa-0db7c1878031.webp?1783904806",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "70d0540f-93c6-4af5-ab2d-65e6c03001c7",
+    "oracle_id": "127de52b-df75-4342-95a0-20d84c5bf916",
+    "set_code": "inr",
+    "collector_number": "122",
+    "image_url": "https://cards.scryfall.io/grid/front/7/0/70d0540f-93c6-4af5-ab2d-65e6c03001c7.webp?1783908137",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "769326d4-60af-4b19-85d9-d96d3acdb56e",
+    "oracle_id": "8b27326f-e7b8-4a4d-b589-df459246d19a",
+    "set_code": "plst",
+    "collector_number": "THB-236",
+    "image_url": "https://cards.scryfall.io/grid/front/7/6/769326d4-60af-4b19-85d9-d96d3acdb56e.webp?1783924610",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "795df2ee-fbfc-4961-852c-e3ec50cc52da",
+    "oracle_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+    "set_code": "trc",
+    "collector_number": "485",
+    "image_url": "https://cards.scryfall.io/grid/front/7/9/795df2ee-fbfc-4961-852c-e3ec50cc52da.webp?1793021117",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "7980e24c-bcb4-479c-8012-f19f4e87f0bf",
+    "oracle_id": "29f61caf-1aba-40cd-aff6-c3685a0997d7",
+    "set_code": "m20",
+    "collector_number": "317",
+    "image_url": "https://cards.scryfall.io/grid/front/7/9/7980e24c-bcb4-479c-8012-f19f4e87f0bf.webp?1783932908",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "7ab1a074-9d92-4125-9200-84cd035f8f53",
+    "oracle_id": "3644f316-f9a3-46c9-9b1e-747f86cf4ead",
+    "set_code": "eoc",
+    "collector_number": "150",
+    "image_url": "https://cards.scryfall.io/grid/front/7/a/7ab1a074-9d92-4125-9200-84cd035f8f53.webp?1783906016",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "7ee28c45-01c4-4f15-83d5-ede29f05a256",
+    "oracle_id": "2ff470ee-4532-4ded-a684-a2c0d1253fb3",
+    "set_code": "mbc",
+    "collector_number": "11",
+    "image_url": "https://cards.scryfall.io/grid/front/7/e/7ee28c45-01c4-4f15-83d5-ede29f05a256.webp?1792739794",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "838ffc87-517a-4d94-8ce0-bc9ed01ecc52",
+    "oracle_id": "bbf9494c-c4bb-4d36-98fe-8387846b342e",
+    "set_code": "cmr",
+    "collector_number": "335",
+    "image_url": "https://cards.scryfall.io/grid/front/8/3/838ffc87-517a-4d94-8ce0-bc9ed01ecc52.webp?1783928748",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "83f510b7-4cbd-4883-9c26-c8824bc668ac",
+    "oracle_id": "d71bda4c-3dee-4398-8fd0-f77d8743b887",
+    "set_code": "dsk",
+    "collector_number": "260",
+    "image_url": "https://cards.scryfall.io/grid/front/8/3/83f510b7-4cbd-4883-9c26-c8824bc668ac.webp?1783909428",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8542d37d-99cd-4b64-a524-94d2b2a4d9c3",
+    "oracle_id": "5f15125e-ae89-471e-b055-226a783bc7c1",
+    "set_code": "plst",
+    "collector_number": "KLD-192",
+    "image_url": "https://cards.scryfall.io/grid/front/8/5/8542d37d-99cd-4b64-a524-94d2b2a4d9c3.webp?1783931976",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "859e5ca5-c184-47ee-a2ea-8075847f46d9",
+    "oracle_id": "5a55641b-0818-4418-a2e5-44157056353c",
+    "set_code": "otc",
+    "collector_number": "114",
+    "image_url": "https://cards.scryfall.io/grid/front/8/5/859e5ca5-c184-47ee-a2ea-8075847f46d9.webp?1783911937",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "861b5889-0183-4bee-afeb-a4b2aa700a8e",
+    "oracle_id": "153376c9-dffd-458c-8ce3-a4c8269bc4e9",
+    "set_code": "cmm",
+    "collector_number": "57",
+    "image_url": "https://cards.scryfall.io/grid/front/8/6/861b5889-0183-4bee-afeb-a4b2aa700a8e.webp?1783915712",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8887f26d-b097-4fbc-9c48-bdc656409a32",
+    "oracle_id": "ed1d21ba-ddfe-4f82-9e37-93f9e2c7ba33",
+    "set_code": "neo",
+    "collector_number": "234",
+    "image_url": "https://cards.scryfall.io/grid/front/8/8/8887f26d-b097-4fbc-9c48-bdc656409a32.webp?1783923830",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8a2ab58d-a632-4162-82b2-664e9ac4b319",
+    "oracle_id": "85cbb035-25df-43bb-ae06-ab098f448b02",
+    "set_code": "h1r",
+    "collector_number": "7",
+    "image_url": "https://cards.scryfall.io/grid/front/8/a/8a2ab58d-a632-4162-82b2-664e9ac4b319.webp?1787739340",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8a475868-a335-45e7-9d59-9dc4c2cea1ae",
+    "oracle_id": "5b8f0cdf-572d-4025-b930-79291f7c35be",
+    "set_code": "soc",
+    "collector_number": "335",
+    "image_url": "https://cards.scryfall.io/grid/front/8/a/8a475868-a335-45e7-9d59-9dc4c2cea1ae.webp?1783903743",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8a6357d2-f77c-4df7-90cd-6e416e6405cc",
+    "oracle_id": "ad09b3c3-c8e7-481c-8c45-e7f234935117",
+    "set_code": "trc",
+    "collector_number": "472",
+    "image_url": "https://cards.scryfall.io/grid/front/8/a/8a6357d2-f77c-4df7-90cd-6e416e6405cc.webp?1793021105",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8bff0aa6-16d9-4c83-b598-ef00a3b33d2c",
+    "oracle_id": "a73d9109-36e0-40ea-ab06-5c5f7eb4ac54",
+    "set_code": "hob",
+    "collector_number": "32",
+    "image_url": "https://cards.scryfall.io/grid/front/8/b/8bff0aa6-16d9-4c83-b598-ef00a3b33d2c.webp?1783902786",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8cbedb0a-34ca-4d42-bb43-cbea0f3c6d02",
+    "oracle_id": "70ac902e-1eb5-4f83-a5a6-00ac89cfe50f",
+    "set_code": "bfz",
+    "collector_number": "17",
+    "image_url": "https://cards.scryfall.io/grid/front/8/c/8cbedb0a-34ca-4d42-bb43-cbea0f3c6d02.webp?1783938221",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8d13330f-6e07-451f-b17a-4e1606a74c3f",
+    "oracle_id": "ef577d7d-7a24-4bd3-b86b-f69e37bb2ce7",
+    "set_code": "ptk",
+    "collector_number": "62",
+    "image_url": "https://cards.scryfall.io/grid/front/8/d/8d13330f-6e07-451f-b17a-4e1606a74c3f.webp?1783946119",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8d242dc2-5117-4bd6-a0c9-813d36d01e11",
+    "oracle_id": "6f498ff7-38c9-44ea-9cb5-994a003825ee",
+    "set_code": "soc",
+    "collector_number": "115",
+    "image_url": "https://cards.scryfall.io/grid/front/8/d/8d242dc2-5117-4bd6-a0c9-813d36d01e11.webp?1783903822",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "8fbd1ae0-3d4c-492a-a1ea-85a95fa3d7b6",
+    "oracle_id": "73864fcc-1bde-4bc0-831e-2b93e546e417",
+    "set_code": "trk",
+    "collector_number": "285",
+    "image_url": "https://cards.scryfall.io/grid/front/8/f/8fbd1ae0-3d4c-492a-a1ea-85a95fa3d7b6.webp?1784036826",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "90894726-1940-4291-a05c-b85cefbfa344",
+    "oracle_id": "de3dcb5d-775a-479f-99f5-d1883ed9b1b5",
+    "set_code": "tdc",
+    "collector_number": "323",
+    "image_url": "https://cards.scryfall.io/grid/front/9/0/90894726-1940-4291-a05c-b85cefbfa344.webp?1783907008",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "91fdb56b-54d5-4272-8319-505ff987fe9b",
+    "oracle_id": "6ad8011d-3471-4369-9d68-b264cc027487",
+    "set_code": "msc",
+    "collector_number": "211",
+    "image_url": "https://cards.scryfall.io/grid/front/9/1/91fdb56b-54d5-4272-8319-505ff987fe9b.webp?1783903215",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "9464a820-65de-44f2-9895-46a35e8621a0",
+    "oracle_id": "b817bc56-9b4d-4c50-bafa-3c652b99578f",
+    "set_code": "2x2",
+    "collector_number": "3",
+    "image_url": "https://cards.scryfall.io/grid/front/9/4/9464a820-65de-44f2-9895-46a35e8621a0.webp?1783921939",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "95c2d832-5244-4236-81d5-2920aa2e281e",
+    "oracle_id": "4dc5726e-2f7e-4c2b-9616-c3301d212f78",
+    "set_code": "c21",
+    "collector_number": "271",
+    "image_url": "https://cards.scryfall.io/grid/front/9/5/95c2d832-5244-4236-81d5-2920aa2e281e.webp?1783927502",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "97012a9c-34cb-4d66-bb2c-3127be4c0f28",
+    "oracle_id": "ee334bd7-d344-4684-85c8-d0464bbaf2b4",
+    "set_code": "j22",
+    "collector_number": "477",
+    "image_url": "https://cards.scryfall.io/grid/front/9/7/97012a9c-34cb-4d66-bb2c-3127be4c0f28.webp?1783918974",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "979076a7-313f-4227-a4c3-548e86997e0a",
+    "oracle_id": "4fc5f871-a809-4a4a-adfb-eb4cd52837c8",
+    "set_code": "otc",
+    "collector_number": "226",
+    "image_url": "https://cards.scryfall.io/grid/front/9/7/979076a7-313f-4227-a4c3-548e86997e0a.webp?1783911903",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "99164d90-87bc-49bf-9c54-e24f0e73b740",
+    "oracle_id": "d215127b-5f1d-4d3c-935b-c228c9c7f874",
+    "set_code": "plst",
+    "collector_number": "PCA-86",
+    "image_url": "https://cards.scryfall.io/grid/front/9/9/99164d90-87bc-49bf-9c54-e24f0e73b740.webp?1783910262",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "9cd16dac-3bf9-4a71-a906-0cfbf98cdca5",
+    "oracle_id": "71d785a9-ddc8-472e-a778-a551b444a4bd",
+    "set_code": "soc",
+    "collector_number": "167",
+    "image_url": "https://cards.scryfall.io/grid/front/9/c/9cd16dac-3bf9-4a71-a906-0cfbf98cdca5.webp?1783903802",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "9d9ca869-e68a-4f53-9f52-85c714dac6f3",
+    "oracle_id": "d2664f28-49e1-46f8-a863-b217e961a57c",
+    "set_code": "msc",
+    "collector_number": "155",
+    "image_url": "https://cards.scryfall.io/grid/front/9/d/9d9ca869-e68a-4f53-9f52-85c714dac6f3.webp?1783903238",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "9dd8d940-a973-4469-bf78-90318d98f3ab",
+    "oracle_id": "1d1d78af-7982-419d-b9be-2bf4c149d97d",
+    "set_code": "rvr",
+    "collector_number": "260",
+    "image_url": "https://cards.scryfall.io/grid/front/9/d/9dd8d940-a973-4469-bf78-90318d98f3ab.webp?1783913261",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "a73297d2-580c-4174-a427-265f6916d09f",
+    "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+    "set_code": "trc",
+    "collector_number": "521",
+    "image_url": "https://cards.scryfall.io/grid/front/a/7/a73297d2-580c-4174-a427-265f6916d09f.webp?1793021256",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "aa0ba9cb-e45c-4c23-baab-38e01391ec6b",
+    "oracle_id": "af247e2f-b271-4f5b-ab98-4579d2c17c21",
+    "set_code": "fic",
+    "collector_number": "273",
+    "image_url": "https://cards.scryfall.io/grid/front/a/a/aa0ba9cb-e45c-4c23-baab-38e01391ec6b.webp?1783906272",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "aaadceb3-8a57-45de-b3f1-aca94f20de18",
+    "oracle_id": "c2dd6c78-e482-4a3c-ad9c-7dd71b3e34d2",
+    "set_code": "rix",
+    "collector_number": "2",
+    "image_url": "https://cards.scryfall.io/grid/front/a/a/aaadceb3-8a57-45de-b3f1-aca94f20de18.webp?1783935342",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "aac4f0cc-63be-4f08-956e-39839c9735ba",
+    "oracle_id": "6aea681e-88d2-48df-a717-3ce0bc95205b",
+    "set_code": "dsk",
+    "collector_number": "72",
+    "image_url": "https://cards.scryfall.io/grid/front/a/a/aac4f0cc-63be-4f08-956e-39839c9735ba.webp?1783909489",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "ab499df5-ed76-43ad-81b3-70afd0487ccd",
+    "oracle_id": "a61ef0cc-1da9-49f9-b0dc-01cf9f6205be",
+    "set_code": "otc",
+    "collector_number": "128",
+    "image_url": "https://cards.scryfall.io/grid/front/a/b/ab499df5-ed76-43ad-81b3-70afd0487ccd.webp?1783911932",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "ac896541-b271-4bbb-a45c-753869361df6",
+    "oracle_id": "597bce51-af89-4d13-9a97-667b4f4f4694",
+    "set_code": "m3c",
+    "collector_number": "161",
+    "image_url": "https://cards.scryfall.io/grid/front/a/c/ac896541-b271-4bbb-a45c-753869361df6.webp?1783911391",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b0937274-d5cb-4790-8c10-804f537c5581",
+    "oracle_id": "69e1a166-02f7-43f8-b099-dbb01034370c",
+    "set_code": "m10",
+    "collector_number": "73",
+    "image_url": "https://cards.scryfall.io/grid/front/b/0/b0937274-d5cb-4790-8c10-804f537c5581.webp?1783942388",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b233b117-9369-45c1-80c5-cc857386b6be",
+    "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+    "set_code": "mdd",
+    "collector_number": "296",
+    "image_url": "https://cards.scryfall.io/grid/front/b/2/b233b117-9369-45c1-80c5-cc857386b6be.webp?1791578437",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b4b47b80-69ed-44b0-afa0-ca90206dc16d",
+    "oracle_id": "d37f858e-03c8-4594-9b92-cd03699a1591",
+    "set_code": "tdm",
+    "collector_number": "267",
+    "image_url": "https://cards.scryfall.io/grid/front/b/4/b4b47b80-69ed-44b0-afa0-ca90206dc16d.webp?1783907273",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b5275d76-2947-4219-be21-614c7421614a",
+    "oracle_id": "310f141c-7f37-4729-aed6-dd9c09db448d",
+    "set_code": "soc",
+    "collector_number": "209",
+    "image_url": "https://cards.scryfall.io/grid/front/b/5/b5275d76-2947-4219-be21-614c7421614a.webp?1783903786",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b5821c21-8133-40f7-a28d-addf64b1e35f",
+    "oracle_id": "2afefaab-c614-4fca-afba-d8d206d9a8b9",
+    "set_code": "m3c",
+    "collector_number": "38",
+    "image_url": "https://cards.scryfall.io/grid/front/b/5/b5821c21-8133-40f7-a28d-addf64b1e35f.webp?1783911427",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b61634ae-05be-4b56-8ebb-9d4ade902e42",
+    "oracle_id": "ca204b66-8d0c-431a-8d34-282f7c2d17da",
+    "set_code": "msc",
+    "collector_number": "202",
+    "image_url": "https://cards.scryfall.io/grid/front/b/6/b61634ae-05be-4b56-8ebb-9d4ade902e42.webp?1783903217",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b7387103-1df1-4fd0-9e91-1544509792c7",
+    "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+    "set_code": "trk",
+    "collector_number": "321",
+    "image_url": "https://cards.scryfall.io/grid/front/b/7/b7387103-1df1-4fd0-9e91-1544509792c7.webp?1785981659",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b74caf65-1e6c-444e-9121-906ba7e8ea20",
+    "oracle_id": "dad4af15-5b26-417d-a41b-29e671e878f4",
+    "set_code": "mkc",
+    "collector_number": "41",
+    "image_url": "https://cards.scryfall.io/grid/front/b/7/b74caf65-1e6c-444e-9121-906ba7e8ea20.webp?1783913041",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b75df1f0-0513-40e4-a449-454f75de6434",
+    "oracle_id": "2d899466-b1eb-4901-b626-1f2fb09b786d",
+    "set_code": "otj",
+    "collector_number": "268",
+    "image_url": "https://cards.scryfall.io/grid/front/b/7/b75df1f0-0513-40e4-a449-454f75de6434.webp?1783911773",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "b87891cd-b457-4dff-8d18-a7eaf6748fc6",
+    "oracle_id": "6c8f276e-4e7b-4974-ab02-9356cc0ffb2b",
+    "set_code": "eld",
+    "collector_number": "249",
+    "image_url": "https://cards.scryfall.io/grid/front/b/8/b87891cd-b457-4dff-8d18-a7eaf6748fc6.webp?1783932575",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "bb95d15e-0911-475c-8283-43bb742b166b",
+    "oracle_id": "724f3d2f-0513-4efd-961f-56a7ea7b5731",
+    "set_code": "plst",
+    "collector_number": "MBS-131",
+    "image_url": "https://cards.scryfall.io/grid/front/b/b/bb95d15e-0911-475c-8283-43bb742b166b.webp?1783910163",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "bcb5a670-7c8f-4b76-82c6-c89abffbb4bd",
+    "oracle_id": "4869a530-757f-4364-8d8e-4dc8001f433c",
+    "set_code": "fic",
+    "collector_number": "384",
+    "image_url": "https://cards.scryfall.io/grid/front/b/c/bcb5a670-7c8f-4b76-82c6-c89abffbb4bd.webp?1783906224",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "be2d74cd-76fb-4bca-99b5-07749aef4d06",
+    "oracle_id": "516101be-be39-4d84-8fee-d8a79930dd0a",
+    "set_code": "mkc",
+    "collector_number": "118",
+    "image_url": "https://cards.scryfall.io/grid/front/b/e/be2d74cd-76fb-4bca-99b5-07749aef4d06.webp?1783913012",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "c12027df-b6fb-4956-a6da-6e8375be7364",
+    "oracle_id": "bc08ac66-969c-4905-a2d6-16ff565be475",
+    "set_code": "plst",
+    "collector_number": "BFZ-7",
+    "image_url": "https://cards.scryfall.io/grid/front/c/1/c12027df-b6fb-4956-a6da-6e8375be7364.webp?1783932439",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "c2248694-aab0-47a8-ae8b-8d5283075e10",
+    "oracle_id": "1e2ee630-9d37-4396-ae18-697c1a3a4e62",
+    "set_code": "pip",
+    "collector_number": "140",
+    "image_url": "https://cards.scryfall.io/grid/front/c/2/c2248694-aab0-47a8-ae8b-8d5283075e10.webp?1783912377",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "c3f9b454-97e9-4c77-b37a-e974221ae385",
+    "oracle_id": "fae37e28-e137-4177-b973-fa8b4dd8f409",
+    "set_code": "msc",
+    "collector_number": "133",
+    "image_url": "https://cards.scryfall.io/grid/front/c/3/c3f9b454-97e9-4c77-b37a-e974221ae385.webp?1783903247",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "c632f5a4-7f5f-4d77-9364-58ea03dfdcad",
+    "oracle_id": "19409704-09c4-4a4b-a5a7-f95120b425db",
+    "set_code": "m3c",
+    "collector_number": "153",
+    "image_url": "https://cards.scryfall.io/grid/front/c/6/c632f5a4-7f5f-4d77-9364-58ea03dfdcad.webp?1783911396",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "c74ae706-b3b3-4097-a387-6f6c38a9b603",
+    "oracle_id": "0bfa4512-e35a-4c93-b324-80ec659f5a97",
+    "set_code": "cmm",
+    "collector_number": "5",
+    "image_url": "https://cards.scryfall.io/grid/front/c/7/c74ae706-b3b3-4097-a387-6f6c38a9b603.webp?1783915730",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "c9b1d4d8-7df9-41e0-b2d9-dbca9c9f6994",
+    "oracle_id": "4bf95747-4572-49b8-b892-87fe7f910252",
+    "set_code": "cmm",
+    "collector_number": "4",
+    "image_url": "https://cards.scryfall.io/grid/front/c/9/c9b1d4d8-7df9-41e0-b2d9-dbca9c9f6994.webp?1783915731",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "c9bd60fc-2777-44bc-b314-a792e8e48360",
+    "oracle_id": "311a449d-dc74-46e6-9a47-6a597931f736",
+    "set_code": "2x2",
+    "collector_number": "43",
+    "image_url": "https://cards.scryfall.io/grid/front/c/9/c9bd60fc-2777-44bc-b314-a792e8e48360.webp?1783921921",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "ca08b369-783d-4fe4-8fc8-9cd595638550",
+    "oracle_id": "b11187ab-f8a8-422b-b550-4495f96de0f2",
+    "set_code": "cmm",
+    "collector_number": "805",
+    "image_url": "https://cards.scryfall.io/grid/front/c/a/ca08b369-783d-4fe4-8fc8-9cd595638550.webp?1783915458",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "ca814c7c-9908-4727-b556-3f85bfd653ca",
+    "oracle_id": "33de01e9-ce5a-42d4-afcb-343cd54a6d80",
+    "set_code": "frc",
+    "collector_number": "66",
+    "image_url": "https://cards.scryfall.io/grid/front/c/a/ca814c7c-9908-4727-b556-3f85bfd653ca.webp?1789599896",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "cacc36d9-4c4b-43b2-a8b4-d265deb1e6b2",
+    "oracle_id": "60ec735d-c9be-4776-beb7-f603ae22edbf",
+    "set_code": "neo",
+    "collector_number": "236",
+    "image_url": "https://cards.scryfall.io/grid/front/c/a/cacc36d9-4c4b-43b2-a8b4-d265deb1e6b2.webp?1783923831",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "cc7ff5f4-a7cc-41a1-a22b-8cf67ad18707",
+    "oracle_id": "fbffaf9f-40e7-4113-a037-533b733cebce",
+    "set_code": "vow",
+    "collector_number": "131",
+    "image_url": "https://cards.scryfall.io/grid/front/c/c/cc7ff5f4-a7cc-41a1-a22b-8cf67ad18707.webp?1783924850",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "d188a93a-cd9b-4a0b-80fb-738907b228cf",
+    "oracle_id": "e1cfd1cb-44a5-429f-a5c1-e6d29bad1c71",
+    "set_code": "fdc",
+    "collector_number": "108",
+    "image_url": "https://cards.scryfall.io/grid/front/d/1/d188a93a-cd9b-4a0b-80fb-738907b228cf.webp?1789753038",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "d27cf7b7-7982-46bd-a559-7789c0e74bae",
+    "oracle_id": "7b8528b0-71eb-4c9e-bed9-aa2d2e84038f",
+    "set_code": "2x2",
+    "collector_number": "2",
+    "image_url": "https://cards.scryfall.io/grid/front/d/2/d27cf7b7-7982-46bd-a559-7789c0e74bae.webp?1783921940",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "d5806e68-1054-458e-866d-1f2470f682b2",
+    "oracle_id": "3aa83ed2-f48b-4ce6-a614-2c54ddf50538",
+    "set_code": "ltr",
+    "collector_number": "246",
+    "image_url": "https://cards.scryfall.io/grid/front/d/5/d5806e68-1054-458e-866d-1f2470f682b2.webp?1790212038",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "d5bf8cf0-419a-4dc9-9342-aad55c1af05a",
+    "oracle_id": "c15cad77-e70f-42cc-a9f5-50e1fd8c9c96",
+    "set_code": "blb",
+    "collector_number": "70",
+    "image_url": "https://cards.scryfall.io/grid/front/d/5/d5bf8cf0-419a-4dc9-9342-aad55c1af05a.webp?1783910842",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
+    "oracle_id": "34f34409-326d-4994-a0ea-1a69aa278f03",
+    "set_code": "dmu",
+    "collector_number": "107",
+    "image_url": "https://cards.scryfall.io/grid/front/d/6/d67be074-cdd4-41d9-ac89-0a0456c4e4b2.webp?1783921327",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "d7c02aec-4a89-4ccc-8525-6f979c10d799",
+    "oracle_id": "ab44c6fe-6a66-42f0-9e75-8b25641e1f13",
+    "set_code": "rna",
+    "collector_number": "74",
+    "image_url": "https://cards.scryfall.io/grid/front/d/7/d7c02aec-4a89-4ccc-8525-6f979c10d799.webp?1783933694",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "da2e856f-59c5-410a-9442-b42dd0a1724a",
+    "oracle_id": "6df620b8-1e54-4f63-8556-12c75e5679af",
+    "set_code": "plst",
+    "collector_number": "DDH-59",
+    "image_url": "https://cards.scryfall.io/grid/front/d/a/da2e856f-59c5-410a-9442-b42dd0a1724a.webp?1783910330",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "e15ab0aa-4059-4923-9816-6f7a9e5b5a18",
+    "oracle_id": "bdeb440d-a714-40e8-9038-f651e6ae45fb",
+    "set_code": "ecl",
+    "collector_number": "260",
+    "image_url": "https://cards.scryfall.io/grid/front/e/1/e15ab0aa-4059-4923-9816-6f7a9e5b5a18.webp?1783904399",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "e18feca3-1b1b-4456-8873-25a24849a917",
+    "oracle_id": "ce35f262-b93f-4409-8b33-26a7ed7abac8",
+    "set_code": "lcc",
+    "collector_number": "268",
+    "image_url": "https://cards.scryfall.io/grid/front/e/1/e18feca3-1b1b-4456-8873-25a24849a917.webp?1783913851",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "e3fb0104-3a31-41fd-be98-af4656b43f8c",
+    "oracle_id": "b5b4cf54-ed5e-42d0-9d98-5fec76b0b0b8",
+    "set_code": "trc",
+    "collector_number": "488",
+    "image_url": "https://cards.scryfall.io/grid/front/e/3/e3fb0104-3a31-41fd-be98-af4656b43f8c.webp?1793021143",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "e8510205-4baa-4f1c-bf64-5d931e2ddf48",
+    "oracle_id": "58257464-278e-45fa-8e0b-bcd9a7500bc1",
+    "set_code": "tmc",
+    "collector_number": "60",
+    "image_url": "https://cards.scryfall.io/grid/front/e/8/e8510205-4baa-4f1c-bf64-5d931e2ddf48.webp?1783904155",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "e992b8e8-1d0c-4c44-b413-10d6596c9b23",
+    "oracle_id": "7e5d9efe-48a9-434b-bb09-056e0e09cc9a",
+    "set_code": "trc",
+    "collector_number": "539",
+    "image_url": "https://cards.scryfall.io/grid/front/e/9/e992b8e8-1d0c-4c44-b413-10d6596c9b23.webp?1793021328",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "eb9dbad5-7df6-4f78-b809-d6043bf15d4b",
+    "oracle_id": "1a137a67-4156-45c8-aae9-838f688e12bd",
+    "set_code": "plst",
+    "collector_number": "ISD-60",
+    "image_url": "https://cards.scryfall.io/grid/front/e/b/eb9dbad5-7df6-4f78-b809-d6043bf15d4b.webp?1783926377",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "ebea49ab-e5cf-46d9-ae35-226a7321ede0",
+    "oracle_id": "819fc966-434e-470f-91e9-a38df974ad17",
+    "set_code": "msc",
+    "collector_number": "239",
+    "image_url": "https://cards.scryfall.io/grid/front/e/b/ebea49ab-e5cf-46d9-ae35-226a7321ede0.webp?1783903205",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "f2bdcfec-d412-442c-91c8-53022c8e316d",
+    "oracle_id": "4ec85850-f274-4c0c-9a03-0488267caa14",
+    "set_code": "h1r",
+    "collector_number": "3",
+    "image_url": "https://cards.scryfall.io/grid/front/f/2/f2bdcfec-d412-442c-91c8-53022c8e316d.webp?1787739287",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "f3cc07cd-cc79-4745-b0b7-eade60175cc3",
+    "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+    "set_code": "trk",
+    "collector_number": "319",
+    "image_url": "https://cards.scryfall.io/grid/front/f/3/f3cc07cd-cc79-4745-b0b7-eade60175cc3.webp?1785981645",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "f67b323d-0dda-45f8-84b7-d883ce5045a8",
+    "oracle_id": "94f0a572-e91c-4b56-a5d1-6cbbeabd210d",
+    "set_code": "soc",
+    "collector_number": "216",
+    "image_url": "https://cards.scryfall.io/grid/front/f/6/f67b323d-0dda-45f8-84b7-d883ce5045a8.webp?1783903785",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "f7d08008-9272-405e-82ef-566e6d42bb17",
+    "oracle_id": "a1ac6d5c-b2d0-4ca4-8af8-16fd3dd3b3b5",
+    "set_code": "otj",
+    "collector_number": "63",
+    "image_url": "https://cards.scryfall.io/grid/front/f/7/f7d08008-9272-405e-82ef-566e6d42bb17.webp?1783911842",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "f7d3770f-cde6-4e29-8cbf-fe841634a5d7",
+    "oracle_id": "e6e6fce8-0f6a-4b84-865e-d4e4a4182f9f",
+    "set_code": "soc",
+    "collector_number": "415",
+    "image_url": "https://cards.scryfall.io/grid/front/f/7/f7d3770f-cde6-4e29-8cbf-fe841634a5d7.webp?1783903716",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "f8aa19c1-4e87-4f42-814c-490e75565f6e",
+    "oracle_id": "8a70bde5-c514-4dcf-919a-48bdd1c17768",
+    "set_code": "acr",
+    "collector_number": "49",
+    "image_url": "https://cards.scryfall.io/grid/front/f/8/f8aa19c1-4e87-4f42-814c-490e75565f6e.webp?1783910974",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "fc817e07-c1f3-469f-9cf7-0945dea7400f",
+    "oracle_id": "6ad8011d-3471-4369-9d68-b264cc027487",
+    "set_code": "trc",
+    "collector_number": "499",
+    "image_url": "https://cards.scryfall.io/grid/front/f/c/fc817e07-c1f3-469f-9cf7-0945dea7400f.webp?1793021181",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "fd00d56a-86bd-41d8-82b6-975404ef8067",
+    "oracle_id": "97836c48-8777-4b4e-98fb-e99204f38bdd",
+    "set_code": "mh3",
+    "collector_number": "15",
+    "image_url": "https://cards.scryfall.io/grid/front/f/d/fd00d56a-86bd-41d8-82b6-975404ef8067.webp?1783911305",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "fe692959-64ca-4065-9f9e-1abe590e3d0f",
+    "oracle_id": "bd49a05c-ed51-4d69-ab9b-11192442ec17",
+    "set_code": "msh",
+    "collector_number": "76",
+    "image_url": "https://cards.scryfall.io/grid/front/f/e/fe692959-64ca-4065-9f9e-1abe590e3d0f.webp?1783902951",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "fe839cbc-7eae-4f86-be35-96542223347c",
+    "oracle_id": "b0394cf2-12a0-4d4f-87e0-fe8937e6faff",
+    "set_code": "ltc",
+    "collector_number": "291",
+    "image_url": "https://cards.scryfall.io/grid/front/f/e/fe839cbc-7eae-4f86-be35-96542223347c.webp?1783915891",
+    "back_image_url": null
+   },
+   {
+    "scryfall_id": "fef94159-c0ad-4731-bff8-dd33439db8c3",
+    "oracle_id": "afb71560-0fc9-4ea5-9d52-d93c17d72519",
+    "set_code": "j25",
+    "collector_number": "485",
+    "image_url": "https://cards.scryfall.io/grid/front/f/e/fef94159-c0ad-4731-bff8-dd33439db8c3.webp?1783908712",
+    "back_image_url": null
+   }
+  ],
+  "decks": [
+   {
+    "id": "6ff677e6-9835-4683-871d-7eea55c07046",
+    "name": "Vona",
+    "archidekt_id": "28451037",
+    "unmatched": "[]",
+    "created_at": "2026-11-28T14:25:46.665Z",
+    "imported_at": "2026-11-28T14:25:46.665Z",
+    "version": 1
+   },
+   {
+    "id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6",
+    "name": "Ninjutsu Maker",
+    "archidekt_id": "25768463",
+    "unmatched": "[]",
+    "created_at": "2026-11-28T14:26:01.027Z",
+    "imported_at": "2026-11-28T14:26:01.027Z",
+    "version": 1
+   }
+  ],
+  "deck_versions": [
+   {
+    "id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "deck_id": "6ff677e6-9835-4683-871d-7eea55c07046",
+    "number": 1,
+    "created_at": "2026-11-28T14:25:46.665Z"
+   },
+   {
+    "id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "deck_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6",
+    "number": 1,
+    "created_at": "2026-11-28T14:26:01.027Z"
+   }
+  ],
+  "deck_version_cards": [
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 0,
+    "oracle_id": "b1c56e23-eae6-47a1-a1cd-3a2d01621768",
+    "scryfall_id": "27beed9c-a42e-46de-8fbc-885da337ae75",
+    "quantity": 1,
+    "commander": 1
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 1,
+    "oracle_id": "ad95eac2-5b48-4102-9988-a6d7b1ec30e0",
+    "scryfall_id": "37f920f0-4dfc-477b-af7e-a17dfc9ba455",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 2,
+    "oracle_id": "d2664f28-49e1-46f8-a863-b217e961a57c",
+    "scryfall_id": "9d9ca869-e68a-4f53-9f52-85c714dac6f3",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 3,
+    "oracle_id": "4dc5726e-2f7e-4c2b-9616-c3301d212f78",
+    "scryfall_id": "95c2d832-5244-4236-81d5-2920aa2e281e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 4,
+    "oracle_id": "1d1d78af-7982-419d-b9be-2bf4c149d97d",
+    "scryfall_id": "9dd8d940-a973-4469-bf78-90318d98f3ab",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 5,
+    "oracle_id": "bbf9494c-c4bb-4d36-98fe-8387846b342e",
+    "scryfall_id": "838ffc87-517a-4d94-8ce0-bc9ed01ecc52",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 6,
+    "oracle_id": "44f3241f-af82-4f2e-b15d-7f279bf6e816",
+    "scryfall_id": "616e50a5-9c29-4557-a1a8-d64a2cd28d2e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 7,
+    "oracle_id": "4e183439-17d2-47ff-9d99-5e22821d91e3",
+    "scryfall_id": "3ffe82a4-584e-4ebd-9551-a745bed01e26",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 8,
+    "oracle_id": "c8b143ad-43ec-4e0d-a440-e348daa31391",
+    "scryfall_id": "3b69b12e-ef29-455c-8939-eacf44c6c3f6",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 9,
+    "oracle_id": "3dc364f3-3094-4660-80ca-9418588c7fde",
+    "scryfall_id": "0fd1fc09-a09d-45e6-8a07-3a8a83b4e6ec",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 10,
+    "oracle_id": "0d4ecdb1-ec90-497f-a7a4-1c68092b8757",
+    "scryfall_id": "483fa1cb-1e35-44f2-a143-98c0f107f5ca",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 11,
+    "oracle_id": "71d785a9-ddc8-472e-a778-a551b444a4bd",
+    "scryfall_id": "9cd16dac-3bf9-4a71-a906-0cfbf98cdca5",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 12,
+    "oracle_id": "4ec85850-f274-4c0c-9a03-0488267caa14",
+    "scryfall_id": "f2bdcfec-d412-442c-91c8-53022c8e316d",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 13,
+    "oracle_id": "b5b4cf54-ed5e-42d0-9d98-5fec76b0b0b8",
+    "scryfall_id": "e3fb0104-3a31-41fd-be98-af4656b43f8c",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 14,
+    "oracle_id": "8b27326f-e7b8-4a4d-b589-df459246d19a",
+    "scryfall_id": "769326d4-60af-4b19-85d9-d96d3acdb56e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 15,
+    "oracle_id": "73089a39-a2f6-4aa2-a058-e6551475153d",
+    "scryfall_id": "61248b5d-3f4b-4329-a1af-7252443883a0",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 16,
+    "oracle_id": "fee680c6-afe2-4321-9d8a-8f81a612a53b",
+    "scryfall_id": "219d3e48-e0b1-472d-ac45-11c14b292c9e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 17,
+    "oracle_id": "7336a541-3ae9-4ab2-acb8-f574c0a5b3a9",
+    "scryfall_id": "5deb74ff-15df-4894-b074-9a98731bd2c0",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 18,
+    "oracle_id": "1915a311-209b-4628-8122-af3055a78fed",
+    "scryfall_id": "5544247d-1f8f-443f-a4c4-d8461db28a79",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 19,
+    "oracle_id": "310f141c-7f37-4729-aed6-dd9c09db448d",
+    "scryfall_id": "b5275d76-2947-4219-be21-614c7421614a",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 20,
+    "oracle_id": "f3fad295-1af2-4ecc-8546-b121ad6be27b",
+    "scryfall_id": "37fee9ca-a9bc-4369-b71f-69f4183d1c1e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 21,
+    "oracle_id": "4f2d4538-dc1d-4c09-964b-b0d7c240fb7d",
+    "scryfall_id": "15c34447-b0f4-4fcc-b557-23c92850b31b",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 22,
+    "oracle_id": "63e596a2-9126-4af6-8782-c38687d664ad",
+    "scryfall_id": "3245ff74-1f9c-4518-a23f-1579f338f232",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 23,
+    "oracle_id": "a3afd8b9-d499-40f7-be41-f8fee6636a1d",
+    "scryfall_id": "050ca791-265a-4e7b-9640-4fd5a6d8cd3a",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 24,
+    "oracle_id": "cffb615c-2de0-4c65-9d0b-08a649ba0695",
+    "scryfall_id": "354fe9bd-4ec8-409c-8ce5-b29393f3d169",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 25,
+    "oracle_id": "afb71560-0fc9-4ea5-9d52-d93c17d72519",
+    "scryfall_id": "fef94159-c0ad-4731-bff8-dd33439db8c3",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 26,
+    "oracle_id": "ce35f262-b93f-4409-8b33-26a7ed7abac8",
+    "scryfall_id": "e18feca3-1b1b-4456-8873-25a24849a917",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 27,
+    "oracle_id": "153376c9-dffd-458c-8ce3-a4c8269bc4e9",
+    "scryfall_id": "861b5889-0183-4bee-afeb-a4b2aa700a8e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 28,
+    "oracle_id": "ab44c6fe-6a66-42f0-9e75-8b25641e1f13",
+    "scryfall_id": "d7c02aec-4a89-4ccc-8525-6f979c10d799",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 29,
+    "oracle_id": "5f15125e-ae89-471e-b055-226a783bc7c1",
+    "scryfall_id": "8542d37d-99cd-4b64-a524-94d2b2a4d9c3",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 30,
+    "oracle_id": "55f3c721-e13a-406e-bc8e-d6cdc91ac477",
+    "scryfall_id": "53e3fa87-8de0-4e3a-90bf-780dd0a9fb48",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 31,
+    "oracle_id": "f7d8b91b-6541-4d3e-af51-7e000eac69c1",
+    "scryfall_id": "14a41e7e-9f68-4449-9e2c-4c862036bce5",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 32,
+    "oracle_id": "6ad8011d-3471-4369-9d68-b264cc027487",
+    "scryfall_id": "fc817e07-c1f3-469f-9cf7-0945dea7400f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 33,
+    "oracle_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+    "scryfall_id": "795df2ee-fbfc-4961-852c-e3ec50cc52da",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 34,
+    "oracle_id": "c97361b5-af16-4a7b-af85-a429dbaf4ad2",
+    "scryfall_id": "091600ae-6578-4353-8e0f-d170f555bcd0",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 35,
+    "oracle_id": "c7f33cea-2ec8-4081-9208-a5b1d86721b3",
+    "scryfall_id": "6fe6ccad-e303-48f9-9dfa-0db7c1878031",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 36,
+    "oracle_id": "21d700e8-0255-418e-96a0-6fe05b3f836d",
+    "scryfall_id": "2599b027-1ff8-48b8-8a90-8ac1fac7ed63",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 37,
+    "oracle_id": "b693c3de-2eaf-4850-b405-e79d00adefda",
+    "scryfall_id": "66490fc8-3378-4283-a107-f631787133ea",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 38,
+    "oracle_id": "de3dcb5d-775a-479f-99f5-d1883ed9b1b5",
+    "scryfall_id": "90894726-1940-4291-a05c-b85cefbfa344",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 39,
+    "oracle_id": "ee579a32-a048-4335-b966-231ba731cdea",
+    "scryfall_id": "0784b6f0-9ebf-43d2-ba0f-a6bc93ba0c48",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 40,
+    "oracle_id": "3aa83ed2-f48b-4ce6-a614-2c54ddf50538",
+    "scryfall_id": "d5806e68-1054-458e-866d-1f2470f682b2",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 41,
+    "oracle_id": "f0ead7f5-5c82-40fd-8e89-3e3c5d31fbad",
+    "scryfall_id": "47ce8b7e-d8e1-489a-a69e-99089eeb8739",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 42,
+    "oracle_id": "605c1ee0-5e8a-4e0a-a99b-42a38873f822",
+    "scryfall_id": "35a69bb5-b8e6-4558-9563-10c7a3662f93",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 43,
+    "oracle_id": "b0394cf2-12a0-4d4f-87e0-fe8937e6faff",
+    "scryfall_id": "fe839cbc-7eae-4f86-be35-96542223347c",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 44,
+    "oracle_id": "d7a38484-2acc-49a6-b32d-d54dddb14d31",
+    "scryfall_id": "08033756-5fee-49c1-a968-9ed3e70cd571",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 45,
+    "oracle_id": "b1544f21-7e98-461b-aed5-e748b0168c52",
+    "scryfall_id": "4645eebf-c9fc-4ee7-b646-61dc1205b4b0",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 46,
+    "oracle_id": "faa01ed1-ccfa-4e58-951f-cd81f9068027",
+    "scryfall_id": "5f4fa21b-4733-49a6-b751-779b8325c4d2",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 47,
+    "oracle_id": "bd16434d-55ea-4c5a-a9ef-752971a4af16",
+    "scryfall_id": "2c09f45f-54a5-47b5-afd7-9ac7c05438e7",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 48,
+    "oracle_id": "ad09b3c3-c8e7-481c-8c45-e7f234935117",
+    "scryfall_id": "8a6357d2-f77c-4df7-90cd-6e416e6405cc",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 49,
+    "oracle_id": "94f0a572-e91c-4b56-a5d1-6cbbeabd210d",
+    "scryfall_id": "f67b323d-0dda-45f8-84b7-d883ce5045a8",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 50,
+    "oracle_id": "fae37e28-e137-4177-b973-fa8b4dd8f409",
+    "scryfall_id": "c3f9b454-97e9-4c77-b37a-e974221ae385",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 51,
+    "oracle_id": "5b8f0cdf-572d-4025-b930-79291f7c35be",
+    "scryfall_id": "8a475868-a335-45e7-9d59-9dc4c2cea1ae",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 52,
+    "oracle_id": "c2dd6c78-e482-4a3c-ad9c-7dd71b3e34d2",
+    "scryfall_id": "aaadceb3-8a57-45de-b3f1-aca94f20de18",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 53,
+    "oracle_id": "a656ad7f-133f-4d93-919a-43bcf1f815f3",
+    "scryfall_id": "1d94ff37-f04e-48ee-8253-d62ab07f0632",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 54,
+    "oracle_id": "afaef788-34d1-460b-b884-9d7ae6ddeb18",
+    "scryfall_id": "1df2c2a6-94a9-4365-9bd5-dd5f2854c562",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 55,
+    "oracle_id": "bc8de6c7-c69d-4add-8f25-825d945874f9",
+    "scryfall_id": "20adee32-2144-44ad-a70c-ebfbda0900ec",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 56,
+    "oracle_id": "127de52b-df75-4342-95a0-20d84c5bf916",
+    "scryfall_id": "70d0540f-93c6-4af5-ab2d-65e6c03001c7",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 57,
+    "oracle_id": "93cf50cf-0ecc-4d3e-abea-778c1ebacec4",
+    "scryfall_id": "670a36cc-34e1-4d11-808e-1b6bc88eb5d8",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 58,
+    "oracle_id": "e1cfd1cb-44a5-429f-a5c1-e6d29bad1c71",
+    "scryfall_id": "d188a93a-cd9b-4a0b-80fb-738907b228cf",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 59,
+    "oracle_id": "379ed4ec-8f2e-448b-9ed2-a3181e2f877e",
+    "scryfall_id": "47433ce9-1ac6-4359-a5e4-4ec68490cb0c",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 60,
+    "oracle_id": "fbffaf9f-40e7-4113-a037-533b733cebce",
+    "scryfall_id": "cc7ff5f4-a7cc-41a1-a22b-8cf67ad18707",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 61,
+    "oracle_id": "40c88392-2aa7-4e12-86a4-8d680219e670",
+    "scryfall_id": "5a6be1db-8651-4194-8e17-74c347bff5f1",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 62,
+    "oracle_id": "34f34409-326d-4994-a0ea-1a69aa278f03",
+    "scryfall_id": "d67be074-cdd4-41d9-ac89-0a0456c4e4b2",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 63,
+    "oracle_id": "f83a768c-162d-46f0-8ebd-d9c6b2c69322",
+    "scryfall_id": "078933b3-6d82-45f2-94e8-addf54cf1704",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 64,
+    "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+    "scryfall_id": "a73297d2-580c-4174-a427-265f6916d09f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 65,
+    "oracle_id": "73864fcc-1bde-4bc0-831e-2b93e546e417",
+    "scryfall_id": "8fbd1ae0-3d4c-492a-a1ea-85a95fa3d7b6",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 66,
+    "oracle_id": "33de01e9-ce5a-42d4-afcb-343cd54a6d80",
+    "scryfall_id": "ca814c7c-9908-4727-b556-3f85bfd653ca",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 67,
+    "oracle_id": "7e5d9efe-48a9-434b-bb09-056e0e09cc9a",
+    "scryfall_id": "e992b8e8-1d0c-4c44-b413-10d6596c9b23",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 68,
+    "oracle_id": "2d899466-b1eb-4901-b626-1f2fb09b786d",
+    "scryfall_id": "b75df1f0-0513-40e4-a449-454f75de6434",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 69,
+    "oracle_id": "c854ecb0-cc60-4c48-a9aa-7f2348a7a8c6",
+    "scryfall_id": "5aa0c810-3b7d-4661-979e-e84fb327742d",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 70,
+    "oracle_id": "1c633e02-95ef-445e-b4e0-fbfbc5ed9cc9",
+    "scryfall_id": "6a91d75c-7cdb-4b2a-abdd-c9feae8cb42e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 71,
+    "oracle_id": "d37f858e-03c8-4594-9b92-cd03699a1591",
+    "scryfall_id": "b4b47b80-69ed-44b0-afa0-ca90206dc16d",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 72,
+    "oracle_id": "c9fc13d6-bd10-47bc-b2b6-7f67a1f3371e",
+    "scryfall_id": "6e6147c6-0b51-4e33-a90b-94ed296e665e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 73,
+    "oracle_id": "ebc5ac83-08d4-4d6b-b840-0c4ba71a38ab",
+    "scryfall_id": "0365631c-8b38-4cc6-a237-a049daad67a8",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 74,
+    "oracle_id": "e6e6fce8-0f6a-4b84-865e-d4e4a4182f9f",
+    "scryfall_id": "f7d3770f-cde6-4e29-8cbf-fe841634a5d7",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 75,
+    "oracle_id": "0c85b8f7-0bd0-4680-9ec5-d4b110460a54",
+    "scryfall_id": "5ea98881-83bf-4daa-9d53-9e638340ea2e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 76,
+    "oracle_id": "be811e70-aaaa-41f3-bf9e-5d3f9f719b49",
+    "scryfall_id": "61fdb579-86f3-4f8d-a0b1-fd545917105d",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 77,
+    "oracle_id": "f8f4fc60-725d-46d8-8e8f-e68e00d20589",
+    "scryfall_id": "65e4de2e-47d2-4967-be31-9df0057a9c74",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 78,
+    "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+    "scryfall_id": "09ac862f-0a51-44dd-b86f-9412b8218b13",
+    "quantity": 11,
+    "commander": 0
+   },
+   {
+    "version_id": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+    "position": 79,
+    "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+    "scryfall_id": "b233b117-9369-45c1-80c5-cc857386b6be",
+    "quantity": 11,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 0,
+    "oracle_id": "ed9cc560-f30b-4b60-a094-ccf93ed656a7",
+    "scryfall_id": "4bef5957-71a4-4fe0-b2ce-dff8e8690bd9",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 1,
+    "oracle_id": "250cb58b-2924-4dff-92fe-ac0ebbbeb218",
+    "scryfall_id": "254a6531-7cf7-4c74-9050-65fe4b273744",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 2,
+    "oracle_id": "0056fc91-4398-471c-b561-7ff99750ac8a",
+    "scryfall_id": "5df90940-15ea-418c-8547-6c75d69ec6d3",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 3,
+    "oracle_id": "867dbd5a-c3cf-41ce-980b-c9babc6f30f2",
+    "scryfall_id": "27b2d8b7-3160-4a51-a898-a3c05180ff75",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 4,
+    "oracle_id": "bb9ce416-eef1-49e8-89a0-2b6837505070",
+    "scryfall_id": "061ac694-610c-479f-b038-a4ef5270d5d7",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 5,
+    "oracle_id": "32b03b48-06da-4a74-a7ac-e5ae39a4f428",
+    "scryfall_id": "5fa4556f-2fdc-42e6-98cb-291cee2ca3ac",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 6,
+    "oracle_id": "17b60106-a4c7-410a-8ac3-ec8e74e29a7c",
+    "scryfall_id": "4cd86997-d7b9-4b5b-9488-11f5c679e4d3",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 7,
+    "oracle_id": "cd2c90ac-2b04-461c-92f3-939871b6b6a3",
+    "scryfall_id": "3a8eef9b-9b03-42cd-a27a-07021bf0b33f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 8,
+    "oracle_id": "08d80efc-9542-4ba2-824c-c8615d8d07f2",
+    "scryfall_id": "2b5801fb-2026-4f25-98bc-ebb2f99684b9",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 9,
+    "oracle_id": "fc9ec820-4245-4a96-b009-5308a818ca58",
+    "scryfall_id": "5525d6a6-e532-4047-9da4-bfae7927fecc",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 10,
+    "oracle_id": "6c8f276e-4e7b-4974-ab02-9356cc0ffb2b",
+    "scryfall_id": "b87891cd-b457-4dff-8d18-a7eaf6748fc6",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 11,
+    "oracle_id": "0895c9b7-ae7d-4bb3-af17-3b75deb50a25",
+    "scryfall_id": "0548fb60-c843-4f8f-a029-6f10efc63a41",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 12,
+    "oracle_id": "58257464-278e-45fa-8e0b-bcd9a7500bc1",
+    "scryfall_id": "e8510205-4baa-4f1c-bf64-5d931e2ddf48",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 13,
+    "oracle_id": "3644f316-f9a3-46c9-9b1e-747f86cf4ead",
+    "scryfall_id": "7ab1a074-9d92-4125-9200-84cd035f8f53",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 14,
+    "oracle_id": "0c85b8f7-0bd0-4680-9ec5-d4b110460a54",
+    "scryfall_id": "62ef854d-ec9e-443d-a4ba-4b2875ed3fe7",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 15,
+    "oracle_id": "ef86989d-ce80-4e55-aece-7d11710eeffa",
+    "scryfall_id": "6e288374-2b71-4ace-b1d2-a19fee6cb4af",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 16,
+    "oracle_id": "bd004c9d-771e-4e63-a97d-a2259c096af8",
+    "scryfall_id": "48e40927-dd87-42ed-b805-0ae8ba81f5fb",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 17,
+    "oracle_id": "5f42b67f-87fd-4f98-a0e8-0c8313f4bbc8",
+    "scryfall_id": "156df6eb-1ac9-4954-bf93-b1668096b8bd",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 18,
+    "oracle_id": "d71bda4c-3dee-4398-8fd0-f77d8743b887",
+    "scryfall_id": "83f510b7-4cbd-4883-9c26-c8824bc668ac",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 19,
+    "oracle_id": "144119bc-7fd1-45c5-9e29-f742e7c255ac",
+    "scryfall_id": "3616a2f7-d852-4606-898b-76799c647b40",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 20,
+    "oracle_id": "a3da7d5b-2c2b-45fe-b9c5-413b8c8fc0a2",
+    "scryfall_id": "128deed2-b9bc-4065-95c9-ccd7b08f1230",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 21,
+    "oracle_id": "04b7362d-0490-4cb0-b5d7-2a7732f659ce",
+    "scryfall_id": "55b5b094-9d2d-4d96-b90c-78fecdae725a",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 22,
+    "oracle_id": "0bc7f093-bef0-4f1a-852c-4b75ebf54838",
+    "scryfall_id": "1cad1bd2-7c56-4ce0-99a6-b2a49c1288dd",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 23,
+    "oracle_id": "6ad8011d-3471-4369-9d68-b264cc027487",
+    "scryfall_id": "91fdb56b-54d5-4272-8319-505ff987fe9b",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 24,
+    "oracle_id": "bdeb440d-a714-40e8-9038-f651e6ae45fb",
+    "scryfall_id": "e15ab0aa-4059-4923-9816-6f7a9e5b5a18",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 25,
+    "oracle_id": "d215127b-5f1d-4d3c-935b-c228c9c7f874",
+    "scryfall_id": "99164d90-87bc-49bf-9c54-e24f0e73b740",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 26,
+    "oracle_id": "7685ff3f-6d61-4b1d-a381-49bc6274aa01",
+    "scryfall_id": "69d1dd6c-21d3-4fe8-af1b-7088dcceef08",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 27,
+    "oracle_id": "7d881c57-0bd9-4c57-aa4a-b10808b86143",
+    "scryfall_id": "6173d331-1dd9-47e0-bb9c-5655b179737f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 28,
+    "oracle_id": "1e2ee630-9d37-4396-ae18-697c1a3a4e62",
+    "scryfall_id": "c2248694-aab0-47a8-ae8b-8d5283075e10",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 29,
+    "oracle_id": "7bb51602-60e8-4730-b11c-2870d6b42e20",
+    "scryfall_id": "211af1bf-910b-41a5-b928-f378188d1871",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 30,
+    "oracle_id": "8a70bde5-c514-4dcf-919a-48bdd1c17768",
+    "scryfall_id": "f8aa19c1-4e87-4f42-814c-490e75565f6e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 31,
+    "oracle_id": "a73d9109-36e0-40ea-ab06-5c5f7eb4ac54",
+    "scryfall_id": "8bff0aa6-16d9-4c83-b598-ef00a3b33d2c",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 32,
+    "oracle_id": "a61ef0cc-1da9-49f9-b0dc-01cf9f6205be",
+    "scryfall_id": "ab499df5-ed76-43ad-81b3-70afd0487ccd",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 33,
+    "oracle_id": "f1c2dbe2-fbe0-4058-bdf1-91d1b1832786",
+    "scryfall_id": "3573b9a2-7911-475c-8ae7-25bd0dbb7159",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 34,
+    "oracle_id": "c597cfae-3f92-4d31-8bc1-5a2da995f1bf",
+    "scryfall_id": "3e23d56b-0251-4bc7-af89-2fbc68e125b5",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 35,
+    "oracle_id": "093f6123-6b1d-456f-a526-8740bc969b4e",
+    "scryfall_id": "1e5a6db8-130a-4931-b7a5-2f024331802b",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 36,
+    "oracle_id": "bde976c6-afed-44bb-8e3d-4103289dff5e",
+    "scryfall_id": "52bc6720-0f16-4e8a-a2e5-b1714bd68991",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 37,
+    "oracle_id": "bad2385b-6981-46fa-a012-d3992c3bc118",
+    "scryfall_id": "551d1f1e-8bc0-4196-8998-0aa7db23b388",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 38,
+    "oracle_id": "6f498ff7-38c9-44ea-9cb5-994a003825ee",
+    "scryfall_id": "8d242dc2-5117-4bd6-a0c9-813d36d01e11",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 39,
+    "oracle_id": "1a137a67-4156-45c8-aae9-838f688e12bd",
+    "scryfall_id": "eb9dbad5-7df6-4f78-b809-d6043bf15d4b",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 40,
+    "oracle_id": "74255add-2894-4c31-81c1-d38873fa325f",
+    "scryfall_id": "1e19ed76-26fe-4e39-8d65-959ae5675d5e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 41,
+    "oracle_id": "a1ac6d5c-b2d0-4ca4-8af8-16fd3dd3b3b5",
+    "scryfall_id": "f7d08008-9272-405e-82ef-566e6d42bb17",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 42,
+    "oracle_id": "2ff470ee-4532-4ded-a684-a2c0d1253fb3",
+    "scryfall_id": "7ee28c45-01c4-4f15-83d5-ede29f05a256",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 43,
+    "oracle_id": "c15cad77-e70f-42cc-a9f5-50e1fd8c9c96",
+    "scryfall_id": "d5bf8cf0-419a-4dc9-9342-aad55c1af05a",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 44,
+    "oracle_id": "724f3d2f-0513-4efd-961f-56a7ea7b5731",
+    "scryfall_id": "bb95d15e-0911-475c-8283-43bb742b166b",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 45,
+    "oracle_id": "6aea681e-88d2-48df-a717-3ce0bc95205b",
+    "scryfall_id": "aac4f0cc-63be-4f08-956e-39839c9735ba",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 46,
+    "oracle_id": "5a55641b-0818-4418-a2e5-44157056353c",
+    "scryfall_id": "859e5ca5-c184-47ee-a2ea-8075847f46d9",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 47,
+    "oracle_id": "bd49a05c-ed51-4d69-ab9b-11192442ec17",
+    "scryfall_id": "fe692959-64ca-4065-9f9e-1abe590e3d0f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 48,
+    "oracle_id": "1baec770-0785-4cbc-be18-83572fd8e9c1",
+    "scryfall_id": "136a7d63-94ae-4d92-86ab-12bf9d78a803",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 49,
+    "oracle_id": "ee334bd7-d344-4684-85c8-d0464bbaf2b4",
+    "scryfall_id": "97012a9c-34cb-4d66-bb2c-3127be4c0f28",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 50,
+    "oracle_id": "71a60247-17e5-44bd-9fed-f7d550b09ef3",
+    "scryfall_id": "511bff25-3213-42c4-8abd-9eda49f8dc96",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 51,
+    "oracle_id": "ef577d7d-7a24-4bd3-b86b-f69e37bb2ce7",
+    "scryfall_id": "8d13330f-6e07-451f-b17a-4e1606a74c3f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 52,
+    "oracle_id": "97836c48-8777-4b4e-98fb-e99204f38bdd",
+    "scryfall_id": "fd00d56a-86bd-41d8-82b6-975404ef8067",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 53,
+    "oracle_id": "19409704-09c4-4a4b-a5a7-f95120b425db",
+    "scryfall_id": "c632f5a4-7f5f-4d77-9364-58ea03dfdcad",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 54,
+    "oracle_id": "bc08ac66-969c-4905-a2d6-16ff565be475",
+    "scryfall_id": "c12027df-b6fb-4956-a6da-6e8375be7364",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 55,
+    "oracle_id": "b11187ab-f8a8-422b-b550-4495f96de0f2",
+    "scryfall_id": "ca08b369-783d-4fe4-8fc8-9cd595638550",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 56,
+    "oracle_id": "4e7a8817-1a66-45c3-ade9-eac79b40b89f",
+    "scryfall_id": "3183897e-4f86-4020-b149-cc4c2451a6c0",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 57,
+    "oracle_id": "7b8528b0-71eb-4c9e-bed9-aa2d2e84038f",
+    "scryfall_id": "d27cf7b7-7982-46bd-a559-7789c0e74bae",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 58,
+    "oracle_id": "4bf95747-4572-49b8-b892-87fe7f910252",
+    "scryfall_id": "c9b1d4d8-7df9-41e0-b2d9-dbca9c9f6994",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 59,
+    "oracle_id": "597bce51-af89-4d13-9a97-667b4f4f4694",
+    "scryfall_id": "ac896541-b271-4bbb-a45c-753869361df6",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 60,
+    "oracle_id": "0bfa4512-e35a-4c93-b324-80ec659f5a97",
+    "scryfall_id": "c74ae706-b3b3-4097-a387-6f6c38a9b603",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 61,
+    "oracle_id": "2afefaab-c614-4fca-afba-d8d206d9a8b9",
+    "scryfall_id": "b5821c21-8133-40f7-a28d-addf64b1e35f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 62,
+    "oracle_id": "b817bc56-9b4d-4c50-bafa-3c652b99578f",
+    "scryfall_id": "9464a820-65de-44f2-9895-46a35e8621a0",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 63,
+    "oracle_id": "70ac902e-1eb5-4f83-a5a6-00ac89cfe50f",
+    "scryfall_id": "8cbedb0a-34ca-4d42-bb43-cbea0f3c6d02",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 64,
+    "oracle_id": "60ec735d-c9be-4776-beb7-f603ae22edbf",
+    "scryfall_id": "cacc36d9-4c4b-43b2-a8b4-d265deb1e6b2",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 65,
+    "oracle_id": "14aefe99-fb60-4f1c-a71f-7ffbe94c8b13",
+    "scryfall_id": "1eae3165-554d-4759-8f18-794e2a7d8464",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 66,
+    "oracle_id": "311a449d-dc74-46e6-9a47-6a597931f736",
+    "scryfall_id": "c9bd60fc-2777-44bc-b314-a792e8e48360",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 67,
+    "oracle_id": "61cceb14-9568-4a5e-9b56-07afa6407df2",
+    "scryfall_id": "21522dff-8a65-4816-8b6e-b71270fda3cd",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 68,
+    "oracle_id": "29f61caf-1aba-40cd-aff6-c3685a0997d7",
+    "scryfall_id": "7980e24c-bcb4-479c-8012-f19f4e87f0bf",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 69,
+    "oracle_id": "69e1a166-02f7-43f8-b099-dbb01034370c",
+    "scryfall_id": "b0937274-d5cb-4790-8c10-804f537c5581",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 70,
+    "oracle_id": "516101be-be39-4d84-8fee-d8a79930dd0a",
+    "scryfall_id": "be2d74cd-76fb-4bca-99b5-07749aef4d06",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 71,
+    "oracle_id": "4fc5f871-a809-4a4a-adfb-eb4cd52837c8",
+    "scryfall_id": "979076a7-313f-4227-a4c3-548e86997e0a",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 72,
+    "oracle_id": "353dd446-2ea6-41c9-a10f-5a03e4de19b4",
+    "scryfall_id": "1642df77-6fe8-47cf-b750-ca4dd9b331ba",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 73,
+    "oracle_id": "ab1cc360-b9de-48d9-9983-4dfe4a7d2a37",
+    "scryfall_id": "5eb843ef-b223-40d0-a461-54b16d188d0e",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 74,
+    "oracle_id": "85cbb035-25df-43bb-ae06-ab098f448b02",
+    "scryfall_id": "8a2ab58d-a632-4162-82b2-664e9ac4b319",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 75,
+    "oracle_id": "dad4af15-5b26-417d-a41b-29e671e878f4",
+    "scryfall_id": "b74caf65-1e6c-444e-9121-906ba7e8ea20",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 76,
+    "oracle_id": "ca204b66-8d0c-431a-8d34-282f7c2d17da",
+    "scryfall_id": "b61634ae-05be-4b56-8ebb-9d4ade902e42",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 77,
+    "oracle_id": "37688720-03de-4eca-a82d-a0afe8d58adc",
+    "scryfall_id": "4ae1ec4a-5367-4663-841b-4038ae30a690",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 78,
+    "oracle_id": "3407fe41-fdd3-4119-8f70-4bc4590a379f",
+    "scryfall_id": "52d58fe4-6070-4022-9cd7-c35a11b44525",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 79,
+    "oracle_id": "59c7496b-19a2-478b-b28f-6f153c2458ae",
+    "scryfall_id": "073c301e-5bb6-49fa-bf61-2f662030540f",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 80,
+    "oracle_id": "af247e2f-b271-4f5b-ab98-4579d2c17c21",
+    "scryfall_id": "aa0ba9cb-e45c-4c23-baab-38e01391ec6b",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 81,
+    "oracle_id": "f0e4dda1-2ffb-4353-a292-dcbc966967b4",
+    "scryfall_id": "0f51afd9-7093-4aa3-ad5b-7383684d6285",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 82,
+    "oracle_id": "02746b0e-3ef9-46c0-9517-6c52c2905d0b",
+    "scryfall_id": "1be45e44-44b5-438f-9fcd-22c1c6668e11",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 83,
+    "oracle_id": "08e2fead-53e9-445b-8fd1-c108bb09d81c",
+    "scryfall_id": "289cc92d-68e7-4b9c-8779-fa2583f3eef1",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 84,
+    "oracle_id": "6df620b8-1e54-4f63-8556-12c75e5679af",
+    "scryfall_id": "da2e856f-59c5-410a-9442-b42dd0a1724a",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 85,
+    "oracle_id": "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+    "scryfall_id": "f3cc07cd-cc79-4745-b0b7-eade60175cc3",
+    "quantity": 8,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 86,
+    "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+    "scryfall_id": "b7387103-1df1-4fd0-9e91-1544509792c7",
+    "quantity": 4,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 87,
+    "oracle_id": "4869a530-757f-4364-8d8e-4dc8001f433c",
+    "scryfall_id": "bcb5a670-7c8f-4b76-82c6-c89abffbb4bd",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 88,
+    "oracle_id": "819fc966-434e-470f-91e9-a38df974ad17",
+    "scryfall_id": "ebea49ab-e5cf-46d9-ae35-226a7321ede0",
+    "quantity": 1,
+    "commander": 0
+   },
+   {
+    "version_id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+    "position": 89,
+    "oracle_id": "ed1d21ba-ddfe-4f82-9e37-93f9e2c7ba33",
+    "scryfall_id": "8887f26d-b097-4fbc-9c48-bdc656409a32",
+    "quantity": 1,
+    "commander": 1
+   }
+  ]
+ },
+ "games": {
+  "ATLAS-JADE-35": {
+   "interpretations": [
+    {
+     "at": "2026-11-28T14:31:06.900Z",
+     "turn": 1,
+     "transcriptVersion": 1,
+     "promptVersion": "4ae33723",
+     "cardsVersion": "68d59c5b",
+     "user": "Turn 1. Active player: p1. The table is now in: upkeep.\n\nSeats, in turn order:\n- p1: melissa, life 40, commander Vona, Butcher of Magan (in the command zone)\n- p2: michael, life 40, commander Satoru Umezawa (in the command zone)\n\nBoard when the turn began:\np1 controls: nothing\np2 controls: nothing\n\nOther cards in this game, not on any Deck (tokens):\n(none)\n\nWhat players said this turn, in order:\n[s1] melissa (p1): \"i play hinterland sanctifier\"",
+     "provider": "claude:claude-haiku-5-5",
+     "model": "claude-haiku-5-5",
+     "answer": "{\"entries\":[],\"questions\":[{\"kind\":\"chooseOption\",\"askPlayer\":\"p1\",\"text\":\"You said: \\\"i play hinterland sanctifier\\\". No card by that name is in this game. Which card did you mean to play?\",\"about\":[\"s1\"],\"options\":[]}]}",
+     "inputTokens": 263,
+     "outputTokens": 451,
+     "cacheReadTokens": 0,
+     "cacheWriteTokens": 22378,
+     "latencyMs": 2800
+    }
+   ],
+   "setup": {
+    "code": "ATLAS-JADE-35",
+    "createdAt": "2026-11-28T14:22:15.688Z",
+    "seats": [
+     {
+      "id": "p1",
+      "name": "melissa",
+      "deck": {
+       "id": "6ff677e6-9835-4683-871d-7eea55c07046",
+       "versionId": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+       "name": "Vona",
+       "commanders": [
+        "Vona, Butcher of Magan"
+       ],
+       "colorIdentity": [
+        "W",
+        "B"
+       ]
+      }
+     },
+     {
+      "id": "p2",
+      "name": "michael",
+      "deck": {
+       "id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6",
+       "versionId": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+       "name": "Ninjutsu Maker",
+       "commanders": [
+        "Satoru Umezawa"
+       ],
+       "colorIdentity": [
+        "U",
+        "B"
+       ]
+      }
+     }
+    ],
+    "nextSeat": 3,
+    "started": true,
+    "joinCode": "863405",
+    "decks": {
+     "p1": {
+      "id": "6ff677e6-9835-4683-871d-7eea55c07046",
+      "versionId": "6ff677e6-9835-4683-871d-7eea55c07046.1",
+      "name": "Vona",
+      "commanders": [
+       "Vona, Butcher of Magan"
+      ],
+      "colorIdentity": [
+       "W",
+       "B"
+      ]
+     },
+     "p2": {
+      "id": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6",
+      "versionId": "a219a4e2-a107-4a6c-bb0b-70c7576db9b6.1",
+      "name": "Ninjutsu Maker",
+      "commanders": [
+       "Satoru Umezawa"
+      ],
+      "colorIdentity": [
+       "U",
+       "B"
+      ]
+     }
+    },
+    "firstSeatId": "p1"
+   },
+   "turn": {
+    "statements": [
+     {
+      "id": "s1",
+      "playerId": "p1",
+      "pressedAt": "2026-11-28T14:31:06.593Z",
+      "text": "i play hinterland sanctifier"
+     }
+    ],
+    "transcriptVersion": 1,
+    "currentStep": "upkeep",
+    "overrides": [],
+    "doneTasks": [],
+    "turnStart": {
+     "turn": {
+      "number": 1,
+      "activePlayerId": "p1",
+      "step": "untap"
+     },
+     "turnOrder": [
+      "p1",
+      "p2"
+     ],
+     "players": {
+      "p1": {
+       "id": "p1",
+       "name": "melissa",
+       "life": 40,
+       "poison": 0,
+       "commanderDamage": {},
+       "out": false,
+       "colorIdentity": [
+        "W",
+        "B"
+       ]
+      },
+      "p2": {
+       "id": "p2",
+       "name": "michael",
+       "life": 40,
+       "poison": 0,
+       "commanderDamage": {},
+       "out": false,
+       "colorIdentity": [
+        "U",
+        "B"
+       ]
+      }
+     },
+     "cards": {},
+     "permanents": {},
+     "graveyards": {
+      "p1": [],
+      "p2": []
+     },
+     "exile": [],
+     "commandZone": {
+      "p1": {
+       "card": "Vona, Butcher of Magan",
+       "casts": 0,
+       "inZone": true
+      },
+      "p2": {
+       "card": "Satoru Umezawa",
+       "casts": 0,
+       "inZone": true
+      }
+     },
+     "stack": [],
+     "combat": null,
+     "delayedTriggers": [],
+     "pendingTriggers": [],
+     "gameEventsThisTurn": [],
+     "nextIds": {
+      "permanent": 1,
+      "gameEvent": 1,
+      "stackItem": 1
+     }
+    },
+    "pinned": [],
+    "reading": {
+     "timeline": {
+      "entries": [],
+      "questions": [
+       {
+        "kind": "chooseOption",
+        "askPlayer": "p1",
+        "text": "You said: \"i play hinterland sanctifier\". No card by that name is in this game. Which card did you mean to play?",
+        "about": [
+         "s1"
+        ],
+        "options": []
+       }
+      ]
+     },
+     "transcriptVersion": 1
+    }
+   },
+   "version": 6
+  }
+ }
+}
