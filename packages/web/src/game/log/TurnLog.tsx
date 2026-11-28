@@ -1,4 +1,4 @@
-import type { RulesWarning, TableView } from '@onthestack/engine';
+import type { ReadbackNote, RulesWarning, TableView } from '@onthestack/engine';
 import type { TurnLog } from '@onthestack/server/protocol';
 
 type Question = TurnLog['questions'][number];
@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Sheet } from '../../decks/parts.js';
 import type { ScreenProps } from '../useGame.js';
 import { describeEntry, namesFor } from './describe.js';
+import { describeNote, noteStep, placeNotes } from './notes.js';
 import { openWarnings, placeTasks, placeWarnings, undoneTasks } from './warnings.js';
 
 const STATUS_TEXT = { interpreting: 'Interpreting…', failed: "Couldn't interpret" } as const;
@@ -104,6 +105,21 @@ function TaskNote({ task, view }: { task: TableView['playerTasks'][number]; view
   );
 }
 
+/** What the app applied on its own, under the line that led to it (ADR 0134, 0136). */
+function NoteLine({ note, view }: { note: ReadbackNote; view: TableView }) {
+  const lines = describeNote(note, namesFor(view));
+  const step = noteStep(note);
+  if (lines.length === 0) return null;
+  return (
+    <div className="log-note">
+      <span className="log-note-label display">{step ? `App · ${step}` : 'App'}</span>
+      {lines.map((l, i) => (
+        <span key={i}>{l}</span>
+      ))}
+    </div>
+  );
+}
+
 /** A RulesWarning under the line that raised it, with "Do it anyway" for a seated player (ADR 0122, 0123). */
 function WarningNote({ w, view, game }: { w: RulesWarning; view: TableView; game?: ScreenProps['game'] }) {
   const names = namesFor(view);
@@ -127,8 +143,8 @@ function WarningNote({ w, view, game }: { w: RulesWarning; view: TableView; game
 }
 
 /**
- * The turn's log: open questions, warnings no statement raised, each statement with who said it, how it was read and
- * the warnings it raised, then what was tapped (ADR 0106, 0122). `override`: this device is a seat, so it can choose
+ * The turn's log: open questions, warnings and notes no statement led to, each statement with who said it, how it was
+ * read, what the app applied after it and the warnings it raised, then what was tapped (ADR 0106, 0122, 0136). `override`: this device is a seat, so it can choose
  * "Do it anyway".
  */
 export function TurnLogList({ log, view, game, answerQuestions, override }: { log: TurnLog; view: TableView; game?: ScreenProps['game']; answerQuestions?: boolean; override?: boolean }) {
@@ -136,8 +152,9 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
   const taps = log.entries.filter((e) => e.from.length === 0);
   const warned = placeWarnings(view.warnings, log.statements.map((s) => s.id));
   const tasked = placeTasks(view.playerTasks, log.statements.map((s) => s.id));
+  const noted = placeNotes(log.readbackNotes, log.entries, log.statements.map((s) => s.id));
   const overrideWith = override ? game : undefined;
-  if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0 && view.warnings.length === 0 && view.playerTasks.length === 0) {
+  if (log.statements.length === 0 && taps.length === 0 && log.questions.length === 0 && view.warnings.length === 0 && view.playerTasks.length === 0 && log.readbackNotes.length === 0) {
     return <p className="faint" style={{ margin: 0, fontSize: 14 }}>Nothing yet this turn.</p>;
   }
   const anyFailed = log.statements.some((s) => s.status === 'failed');
@@ -154,6 +171,9 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
       ))}
       {tasked.top.map((t) => (
         <TaskNote key={t.id} task={t} view={view} />
+      ))}
+      {noted.top.map((n, i) => (
+        <NoteLine key={`note${i}`} note={n} view={view} />
       ))}
       {log.statements.length > 0 && (
         <ol className="log-statements">
@@ -188,6 +208,9 @@ export function TurnLogList({ log, view, game, answerQuestions, override }: { lo
                 )}
                 {warned.byStatement.get(s.id)?.map((w, i) => (
                   <WarningNote key={i} w={w} view={view} game={overrideWith} />
+                ))}
+                {noted.byStatement.get(s.id)?.map((n, i) => (
+                  <NoteLine key={`note${i}`} note={n} view={view} />
                 ))}
                 {tasked.byStatement.get(s.id)?.map((t) => (
                   <TaskNote key={t.id} task={t} view={view} />
