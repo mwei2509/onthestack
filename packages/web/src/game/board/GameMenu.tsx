@@ -4,9 +4,12 @@ import { Sheet } from '../../decks/parts.js';
 import { useTestPhase } from '../testPhase.js';
 import type { ScreenProps } from '../useGame.js';
 
-type Showing = 'menu' | 'confirm' | 'report' | 'reported';
+type Showing = 'menu' | 'confirm' | 'restart' | 'report' | 'reported';
 
-/** The board's Game menu (ADR 0102): End game with its confirm, and during the test phase "Something's wrong?" (ADR 0118). */
+/**
+ * The board's Game menu (ADR 0102): Restart game and End game, each with its confirm (ADR 0145), and during the test
+ * phase "Something's wrong?" (ADR 0118).
+ */
 export function GameMenuButton({ game }: { game: ScreenProps['game'] }) {
   const [showing, setShowing] = useState<Showing | null>(null);
   const [report, setReport] = useState('');
@@ -47,6 +50,9 @@ export function GameMenuButton({ game }: { game: ScreenProps['game'] }) {
                 Something's wrong?
               </button>
             )}
+            <button className="btn" disabled={!online} onClick={() => setShowing('restart')}>
+              Restart game
+            </button>
             <button className="btn danger" disabled={!online} onClick={() => setShowing('confirm')}>
               End game
             </button>
@@ -93,6 +99,29 @@ export function GameMenuButton({ game }: { game: ScreenProps['game'] }) {
           <button className="btn" style={{ height: 52 }} onClick={close}>
             Back to the game
           </button>
+        </Sheet>
+      )}
+      {showing === 'restart' && (
+        <Sheet title="Restart the game for everyone?" onClose={close}>
+          <p className="muted" style={{ margin: 0, fontSize: 15, lineHeight: 1.45 }}>
+            Back to the lobby with the same seats and Decks. Everything played so far is cleared. This can't be undone.
+          </p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button className="btn" style={{ flexGrow: 1, height: 56 }} onClick={close}>
+              Cancel
+            </button>
+            <button
+              className="btn danger"
+              style={{ flexGrow: 1, height: 56 }}
+              disabled={!online}
+              onClick={() => {
+                game.send({ type: 'restart' });
+                close();
+              }}
+            >
+              Restart game
+            </button>
+          </div>
         </Sheet>
       )}
       {open && confirming && (
