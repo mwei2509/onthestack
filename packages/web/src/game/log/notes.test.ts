@@ -1,7 +1,7 @@
 import type { ReadbackNote } from '@onthestack/engine';
 import { describe, expect, it } from 'vitest';
 import type { Names } from './describe.js';
-import { describeNote, netLife, newNoteKeys, placeNotes } from './notes.js';
+import { describeNote, netLife, newNoteKeys, noteSpeaker, placeNotes } from './notes.js';
 
 const names: Names = { player: (id) => ({ m: 'melissa', t: 'tester', a: 'Ana', p: 'Priya' })[id] ?? id, object: () => 'a card that left' };
 
@@ -108,5 +108,21 @@ describe('netLife', () => {
         note([{ type: 'life', playerId: 'a', delta: -2, reason: 'damage' }, { type: 'life', playerId: 'p', delta: -1, reason: 'loss' }]),
       ]),
     ).toEqual({ a: -3 });
+  });
+});
+
+describe('noteSpeaker (ADR 0142)', () => {
+  const statements = [{ id: 's1', playerId: 'm' }];
+  it("speaks for a trigger's controller", () => {
+    const note: ReadbackNote = { cause: { stackItem: 'k1', kind: 'trigger', card: 'Blood Artist', controllerId: 'p', status: 'resolved' }, entry: { playerStatement: 's1' }, effects: [] };
+    expect(noteSpeaker(note, statements, 't')).toBe('p');
+  });
+
+  it('speaks for whoever said the statement the note sits under', () => {
+    expect(noteSpeaker({ cause: { combatDamage: 'combatDamage' }, entry: { playerStatement: 's1' }, effects: [] }, statements, 't')).toBe('m');
+  });
+
+  it('falls back to the active player', () => {
+    expect(noteSpeaker({ cause: { stateBased: true }, entry: { step: 'upkeep' }, effects: [] }, statements, 't')).toBe('t');
   });
 });
