@@ -13,9 +13,10 @@ export const seedCommand = new Command('seed').description("This checkout's loca
 
 seedCommand
   .command('save')
-  .description('Write every local Deck, and the named games, to packages/server/seed/local.json')
-  .argument('[games...]', 'game codes to include')
-  .action((games: string[]) => runSeed(['save', ...games]));
+  .description("Write every local Deck to packages/server/seed/local.json, keeping the seed's games and adding or refreshing the named ones")
+  .argument('[games...]', 'game codes to add or refresh from this checkout')
+  .option('--only', "keep only the named games, dropping the seed's others")
+  .action((games: string[], opts: { only?: boolean }) => runSeed(['save', ...(opts.only ? ['--only'] : []), ...games]));
 
 seedCommand
   .command('load')

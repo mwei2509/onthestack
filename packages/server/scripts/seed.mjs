@@ -2,7 +2,8 @@
 // The local seed (ADR 0143). Plain JavaScript so `postinstall` can run it in a fresh worktree before anything is built.
 //   node scripts/seed.mjs install         load the seed if this checkout has no Decks (postinstall; skipped in CI)
 //   node scripts/seed.mjs load            load the seed, replacing what it covers
-//   node scripts/seed.mjs save [codes…]   write every local Deck and the named games to the seed
+//   node scripts/seed.mjs save [codes…]   write every local Deck to the seed, keeping its games and adding or
+//                                         refreshing the named ones from this checkout; --only keeps just those
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -67,16 +68,20 @@ async function load() {
   say(`loaded ${loaded.decks} Decks and ${loaded.games.length ? `games ${loaded.games.join(', ')}` : 'no games'}`);
 }
 
-async function save(codes) {
+async function save(codes, only) {
   wrangler(['d1', 'migrations', 'apply', 'DB', '--local', '-y']);
-  const seed = await withWorker(async (base) => {
+  const read = await withWorker(async (base) => {
     const res = await fetch(`${base}/api/dev/seed?games=${codes.join(',')}`);
     if (!res.ok) throw new Error(`Reading the seed failed: ${await res.text()}`);
     return res.json();
   });
+  // Games already in the seed are kept as they are there, so this checkout doesn't need a copy of each one.
+  const kept = only || !existsSync(SEED) ? {} : JSON.parse(readFileSync(SEED, 'utf8')).games;
+  const seed = { ...read, games: { ...kept, ...read.games } };
   mkdirSync(dirname(SEED), { recursive: true });
   writeFileSync(SEED, `${JSON.stringify(seed, null, 1)}\n`);
-  say(`saved ${seed.tables.decks.length} Decks and ${codes.length ? `games ${Object.keys(seed.games).join(', ')}` : 'no games'} to ${SEED}`);
+  const games = Object.keys(seed.games);
+  say(`saved ${seed.tables.decks.length} Decks and ${games.length ? `games ${games.join(', ')}` : 'no games'} to ${SEED}`);
 }
 
 const [command, ...args] = process.argv.slice(2);
@@ -89,9 +94,9 @@ try {
   } else if (command === 'load' || command === 'save') {
     if (devServerHere()) throw new Error('Stop `stx start` in this checkout first: it holds the games in memory.');
     if (command === 'load') await load();
-    else await save(args.map((c) => c.toUpperCase()));
+    else await save(args.filter((a) => a !== '--only').map((c) => c.toUpperCase()), args.includes('--only'));
   } else {
-    say('usage: seed.mjs install | load | save [game codes…]');
+    say('usage: seed.mjs install | load | save [--only] [game codes…]');
     process.exit(1);
   }
 } catch (e) {
