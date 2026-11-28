@@ -2366,6 +2366,13 @@ h1.title {
   color: var(--text-2);
 }
 
+.log-note-action {
+  align-self: flex-start;
+  height: 28px;
+  padding: 0;
+  font-size: 13px;
+}
+
 .log-note-label {
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -2504,6 +2511,48 @@ h1.title {
   gap: 8px;
   max-height: 40dvh;
   overflow-y: auto;
+}
+
+.note-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 14px;
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--line-3);
+  font-size: 14px;
+}
+
+.note-card-lines {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 6px;
+}
+
+.note-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.note-card-actions .btn {
+  height: 36px;
+  padding: 0 8px;
+}
+
+.note-more {
+  align-self: center;
+  height: 32px;
+  font-size: 13px;
+}
+
+.note-delta {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
 }
 
 .question-card {

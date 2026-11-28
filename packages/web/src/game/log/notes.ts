@@ -100,3 +100,43 @@ export function placeNotes(notes: ReadbackNote[], entries: TimelineEntry[], stat
 
 /** The Step a note no statement led to is shown with. */
 export const noteStep = (note: ReadbackNote): string | null => ('step' in note.entry ? STEP_NAMES[note.entry.step] : null);
+
+/**
+ * What makes two notes the same across re-reads (ADR 0136): their kind, card, entry and outcome. Object and Stack
+ * item ids are left out, since they're numbered by replay position and shift when an earlier entry changes.
+ */
+export function noteKey(note: ReadbackNote): string {
+  const strip = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(strip);
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(Object.entries(value).filter(([k]) => k !== 'objectId' && k !== 'stackItem').map(([k, v]) => [k, strip(v)]));
+    }
+    return value;
+  };
+  return JSON.stringify(strip(note));
+}
+
+/** Each note's key, with an order number among identical notes, such as two Blood Artist triggers from one death. */
+export function noteKeys(notes: ReadbackNote[]): string[] {
+  const seen = new Map<string, number>();
+  return notes.map((n) => {
+    const key = noteKey(n);
+    const i = seen.get(key) ?? 0;
+    seen.set(key, i + 1);
+    return `${key}#${i}`;
+  });
+}
+
+/** The keys of notes that are new, or whose outcome changed, since `before` (ADR 0136). */
+export function newNoteKeys(before: ReadbackNote[], now: ReadbackNote[]): string[] {
+  const old = new Set(noteKeys(before));
+  return noteKeys(now).filter((k) => !old.has(k));
+}
+
+/** Each player's net life change across these notes, leaving out players whose life didn't change. */
+export function netLife(notes: ReadbackNote[]): Record<string, number> {
+  const net: Record<string, number> = {};
+  for (const n of notes) for (const e of n.effects) if (e.type === 'life') net[e.playerId] = (net[e.playerId] ?? 0) + e.delta;
+  for (const [id, delta] of Object.entries(net)) if (delta === 0) delete net[id];
+  return net;
+}
