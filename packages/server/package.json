@@ -14,7 +14,10 @@
     "db:migrate": "wrangler d1 migrations apply DB --local -y",
     "typegen": "wrangler types",
     "typecheck": "wrangler types && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "node scripts/seed.mjs install",
+    "seed:load": "node scripts/seed.mjs load",
+    "seed:save": "node scripts/seed.mjs save"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "^1.9.0",
