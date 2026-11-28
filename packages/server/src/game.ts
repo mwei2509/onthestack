@@ -99,19 +99,35 @@ export class Game extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.decks = libraryDecks(env.DB);
-    void ctx.blockConcurrencyWhile(async () => {
-      const stored = await ctx.storage.get<unknown>(['setup', 'version', 'turn']);
-      this.setup = (stored.get('setup') as Setup | undefined) ?? null;
-      this.version = (stored.get('version') as number | undefined) ?? 0;
-      this.cards = await this.loadCards();
-      const turn = loadTurn(stored.get('turn') as StoredTurn | undefined);
-      this.turn = turn && { ...turn, turnStart: withCards(turn.turnStart, this.cards) };
-      if (this.setup?.ended) {
-        const last = await ctx.storage.get<StoredSealedTurn>(`sealed:${this.setup.ended.turn}`);
-        if (last) this.endedBoard = { state: withCards(last.finalBoard, this.cards), events: [], tableEvents: [], warnings: last.warnings ?? [] };
-      }
-      this.replay();
-    });
+    void ctx.blockConcurrencyWhile(() => this.load());
+  }
+
+  private async load(): Promise<void> {
+    const stored = await this.ctx.storage.get<unknown>(['setup', 'version', 'turn']);
+    this.setup = (stored.get('setup') as Setup | undefined) ?? null;
+    this.version = (stored.get('version') as number | undefined) ?? 0;
+    this.cards = await this.loadCards();
+    const turn = loadTurn(stored.get('turn') as StoredTurn | undefined);
+    this.turn = turn && { ...turn, turnStart: withCards(turn.turnStart, this.cards) };
+    this.endedBoard = null;
+    if (this.setup?.ended) {
+      const last = await this.ctx.storage.get<StoredSealedTurn>(`sealed:${this.setup.ended.turn}`);
+      if (last) this.endedBoard = { state: withCards(last.finalBoard, this.cards), events: [], tableEvents: [], warnings: last.warnings ?? [] };
+    }
+    this.replay();
+  }
+
+  /** Everything the game stores, key by key, for the local seed (ADR 0143); null if there's no game. */
+  async storageEntries(): Promise<Record<string, unknown> | null> {
+    if (!this.setup) return null;
+    return Object.fromEntries(await this.ctx.storage.list());
+  }
+
+  /** Replaces everything the game stores with a seed's entries and loads it again (ADR 0143). */
+  async restoreStorage(entries: Record<string, unknown>): Promise<void> {
+    await this.ctx.storage.deleteAll();
+    await this.ctx.storage.put(entries);
+    await this.load();
   }
 
   /** Called once by `POST /api/games`. Null if the code is already a game, so a new game never overwrites one. */
