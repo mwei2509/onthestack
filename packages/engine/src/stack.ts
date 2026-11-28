@@ -3,7 +3,7 @@ import { clone } from './clone.js';
 import { emit } from './emit.js';
 import type { GameEvent, TableEventDraft } from './events.js';
 import type { GameState, StackItem } from './state.js';
-import { conditionHolds, entersTappedBecause, findAbility } from './triggers.js';
+import { conditionHolds, entersTappedBecause, fillTemplates, findAbility } from './triggers.js';
 import type { RulesWarning } from './warnings.js';
 
 export interface ResolveResult {
@@ -40,7 +40,10 @@ export function resolveTop(state: GameState): ResolveResult {
     return { state: draft, events, tableEvents, warnings };
   }
 
-  item.gameActions.forEach((gameAction, i) => {
+  // Amounts and the objects effects act on are worked out again as it resolves (CR 608.2h): "for each creature you
+  // control" counts the creatures there are now, not when it triggered.
+  const gameActions = ability?.kind === 'triggered' ? fillTemplates(draft, { ...item, matched: item.matched ?? {} }, ability.effect).gameActions : item.gameActions;
+  gameActions.forEach((gameAction, i) => {
     const r = applyAction(draft, gameAction, {
       playerId: item.controllerId,
       cause: { stackItem: item.id, gameAction: i, ...(item.triggeredBy ? { triggeredBy: item.triggeredBy } : {}) },

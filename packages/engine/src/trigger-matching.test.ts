@@ -22,7 +22,7 @@ const fixture = (name: string, ability: Omit<TriggeredAbility, 'id' | 'kind' | '
   name,
   types,
   ...(types.includes('Creature') ? { power: 2, toughness: 2 } : {}),
-  abilities: [{ id: `${name}#1`, kind: 'triggered', effect: [{ gameAction: 'life', who: 'you', delta: 1 }], ...ability }],
+  abilities: [{ id: `${name}#1`, kind: 'triggered', effect: [{ gameAction: 'life', who: 'you', amount: 1 }], ...ability }],
 });
 
 const entersUnderYou = (object: ObjectFilter) => ({ when: { event: 'ZoneChanged' as const, to: 'battlefield' as const, object: { types: ['Creature'], controller: 'you' as const, ...object } } });

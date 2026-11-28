@@ -26,7 +26,7 @@ const cards: Record<string, CardDefinition> = {
       id: 'blood-artist#1',
       kind: 'triggered',
       when: { event: 'ZoneChanged', from: 'battlefield', to: 'graveyard', object: { selfOr: { types: ['Creature'] } } },
-      effect: [{ gameAction: 'life', who: 'eachOpponent', delta: -1 }, { gameAction: 'life', who: 'you', delta: 1 }],
+      effect: [{ gameAction: 'life', who: 'eachOpponent', amount: 1, lose: true }, { gameAction: 'life', who: 'you', amount: 1 }],
     }],
   },
 };
