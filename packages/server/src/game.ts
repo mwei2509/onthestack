@@ -1,5 +1,5 @@
 import { DurableObject } from 'cloudflare:workers';
-import { createGame, overrideMatches, replayTurn, sealTurn, STEPS, stepsAhead, tableView, taskDoneMatches, type GameState, type PlayerStatement, type PlayerTaskDone, type ReplayResult, type RulesWarning, type RulesWarningCode, type SealedTurn, type Step, type TableView, type TimelineEntry, type WarningOverride } from '@onthestack/engine';
+import { createGame, overrideMatches, readbackNotes, replayTurn, sealTurn, STEPS, stepsAhead, tableView, taskDoneMatches, type GameState, type PlayerStatement, type PlayerTaskDone, type ReplayResult, type RulesWarning, type RulesWarningCode, type SealedTurn, type Step, type TableView, type TimelineEntry, type WarningOverride } from '@onthestack/engine';
 import { buildPrompt, claudeProvider, interpretPrompt, LlmOutputError, resolveTimeline, type InterpretedTimeline, type LlmProvider, type PinnedEntry, type ResolvedTimeline } from '@onthestack/interpreter';
 import { replaySummary } from './log.js';
 import { fitDump } from './reports.js';
@@ -607,6 +607,7 @@ export class Game extends DurableObject<Env> {
       statements: turn.statements.map((s, i) => ({ id: s.id, playerId: s.playerId, text: s.text, status: status(i) })),
       entries: this.resolved.timeline,
       questions: this.resolved.questions,
+      readbackNotes: this.board ? readbackNotes(turn.turnStart, this.board.events) : [],
     };
   }
 

@@ -1,4 +1,4 @@
-import { STEPS, type TableView, type TimelineEntry } from '@onthestack/engine';
+import { STEPS, type ReadbackNote, type TableView, type TimelineEntry } from '@onthestack/engine';
 import type { InterpretedQuestion } from '@onthestack/interpreter';
 import { z } from 'zod';
 
@@ -125,4 +125,6 @@ export interface TurnLog {
   entries: TimelineEntry[];
   /** What the reading couldn't settle, asked of a player instead of guessed (ADR 0043, 0068). */
   questions: InterpretedQuestion[];
+  /** What the engine applied on its own this turn, one note per cause (ADR 0134, 0135). */
+  readbackNotes: ReadbackNote[];
 }
