@@ -4,7 +4,7 @@ import { nextStackItemId, type PermanentId, type PlayerId } from './ids.js';
 import { clone } from './clone.js';
 import { reduceInto } from './reduce.js';
 import { hasKeyword } from './stats.js';
-import { entersTappedBecause } from './triggers.js';
+import { entersTappedBecause, lifeToEnterUntapped } from './triggers.js';
 import { colourWarning } from './colour.js';
 import { attackWarnings, blockWarnings } from './combat.js';
 import type { GameState, Permanent } from './state.js';
@@ -60,7 +60,15 @@ export function applyAction(state: GameState, action: GameAction, ctx: ApplyCont
       }
       const offColour = colourWarning(draft, action.card, ctx.playerId);
       if (offColour) warnings.push(offColour);
-      const because = entersTappedBecause(draft, action.card, ctx.playerId);
+      const lifeCost = action.payLife ? lifeToEnterUntapped(draft, action.card) : undefined;
+      if (action.payLife && lifeCost === undefined) {
+        warnings.push({ code: 'nothingToPay', message: `${action.card} doesn't ask for life to enter untapped.` });
+      }
+      if (lifeCost !== undefined && player(ctx.playerId)) {
+        const life = draft.players[ctx.playerId]!.life;
+        emit({ type: 'LifeChanged', playerId: ctx.playerId, delta: -lifeCost, lifeAfter: life - lifeCost, reason: 'payment' });
+      }
+      const because = entersTappedBecause(draft, action.card, ctx.playerId, undefined, lifeCost !== undefined);
       emit({
         type: 'ZoneChanged',
         from: 'hand',
