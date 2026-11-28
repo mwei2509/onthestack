@@ -5,6 +5,7 @@ export * from './combat.js';
 export * from './events.js';
 export * from './game.js';
 export * from './ids.js';
+export * from './readback.js';
 export * from './reduce.js';
 export * from './settle.js';
 export * from './stack.js';

@@ -26,6 +26,8 @@ export interface Scenario {
 
 export interface ScenarioResult {
   state: GameState;
+  /** The last turn's starting snapshot. */
+  turnStart: GameState;
   sealed: SealedTurn[];
   events: GameEvent[];
   tableEvents: TableEvent[];
@@ -78,6 +80,7 @@ export function scenario(options: { seats: PlayerId[]; life?: number; cards: Rec
       const state = last.state;
       return {
         state,
+        turnStart,
         sealed,
         events,
         tableEvents,
