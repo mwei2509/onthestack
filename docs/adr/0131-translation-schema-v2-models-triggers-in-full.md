@@ -1,6 +1,6 @@
 # Translation schema v2 models triggers in full; the rest is an Oracle reminder
 
-Status: Accepted (decided with Melissa, 2026-11-25, in the session starting #52)
+Status: Accepted (decided with Melissa, 2026-11-25, in the session starting #52); amended by ADR 0139
 
 ADR 0031 puts card knowledge in M1 as "recognise every triggered ability, apply five effects, remind for the rest". Of the XMage research's proposals for the schema (`docs/research/xmage-engine.md`, B13), v2 takes the ones that trigger recognition and lands need:
 
