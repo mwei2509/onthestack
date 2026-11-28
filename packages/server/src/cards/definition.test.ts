@@ -56,7 +56,7 @@ const sireOfSevenDeaths: CardData = {
 };
 
 describe('cardDefinition (ADR 0120)', () => {
-  it('reads types, subtypes, legendary, power and toughness, cost, mana value and colour identity', () => {
+  it('reads types, subtypes, legendary, power and toughness, cost, mana value, colours and colour identity', () => {
     expect(cardDefinition(vona!)).toEqual({
       name: 'Vona, Butcher of Magan',
       types: ['Creature'],
@@ -67,10 +67,11 @@ describe('cardDefinition (ADR 0120)', () => {
       power: 4,
       toughness: 4,
       keywords: ['Lifelink', 'Vigilance'],
+      colors: ['W', 'B'],
       colorIdentity: ['W', 'B'],
       abilities: [],
     });
-    expect(cardDefinition(solRing!)).toMatchObject({ types: ['Artifact'], manaValue: 1, colorIdentity: [] });
+    expect(cardDefinition(solRing!)).toMatchObject({ types: ['Artifact'], manaValue: 1, colors: [], colorIdentity: [] });
   });
 
   it('keeps only the keywords a card has itself, not ones it grants to others', () => {

@@ -78,6 +78,7 @@ export function cardDefinition(data: CardData): CardDefinition {
     ...(toughness.value !== undefined ? { toughness: toughness.value } : {}),
     ...(power.varies || toughness.varies ? { ptVaries: true } : {}),
     ...(keywords.length > 0 ? { keywords } : {}),
+    ...(data.colors ? { colors: colorIdentityOf([data.colors]) } : {}),
     colorIdentity: colorIdentityOf([data.color_identity ?? []]),
     ...(faces ? { faces } : {}),
     abilities: [],
