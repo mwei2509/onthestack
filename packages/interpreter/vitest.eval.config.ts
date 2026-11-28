@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'vitest/config';
 
 // Live evals read provider keys from packages/interpreter/.env (git-ignored) or the environment (ADR 0042).
-function readEnvFile(path: string): Record<string, string> {
+export function readEnvFile(path: string): Record<string, string> {
   const env: Record<string, string> = {};
   if (!existsSync(path)) return env;
   for (const line of readFileSync(path, 'utf8').split('\n')) {

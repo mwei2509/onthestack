@@ -83,11 +83,25 @@ export interface TargetSpec {
  */
 export type Amount = number | { count: ObjectFilter } | { x: true } | { powerOf: 'self' | 'matched' | 'target' };
 
-export interface StaticAbility {
+export type StaticAbility = EntersTappedAbility | AlwaysOnAbility;
+
+export interface EntersTappedAbility {
   id: AbilityId;
   kind: 'static';
   zone?: AbilityZone;
   effect: { entersTapped: ObjectFilter | 'self'; unless?: EntersUntappedIf };
+}
+
+/**
+ * A continuous or replacement effect the engine doesn't apply (M3): its Oracle reminder, shown on each GameEvent its
+ * `when` matches, or never during play without one (ADR 0139).
+ */
+export interface AlwaysOnAbility {
+  id: AbilityId;
+  kind: 'static';
+  zone?: AbilityZone;
+  when?: TriggerCondition | TriggerCondition[];
+  effect: { oracle: string };
 }
 
 export interface SpellAbility {
